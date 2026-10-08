@@ -263,7 +263,6 @@ export default async function ProductDetails(props: {
 
       <section className='mt-12 scroll-mt-24' id='reviews'>
         <div className='mb-4 flex items-center gap-3'>
-          <span className='h-8 w-1.5 rounded-full bg-gradient-to-b from-primary to-gold' />
           <h2 className='text-xl font-bold tracking-tight lg:text-2xl'>
             Customer Reviews
           </h2>

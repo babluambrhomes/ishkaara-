@@ -1,5 +1,5 @@
 
-import { IUserInput } from '@/types'
+import { IAddress, IUserInput } from '@/types'
 import { Document, Model, Schema, model, models } from 'mongoose'
 
 export interface IUser extends Document, IUserInput {
@@ -7,9 +7,60 @@ export interface IUser extends Document, IUserInput {
   otp: string | null
   profile: string | null
   phoneVerified: boolean
+  addresses: IAddress[]
   createdAt: Date
   updatedAt: Date
 }
+
+const addressSchema = new Schema<IAddress>(
+  {
+    label: {
+      type: String,
+      enum: ['Home', 'Office', 'Other'],
+      default: 'Home',
+    },
+    fullName: {
+      type: String,
+      required: [true, 'Full name is required'],
+      trim: true,
+    },
+    street: {
+      type: String,
+      required: [true, 'Address is required'],
+      trim: true,
+    },
+    city: {
+      type: String,
+      required: [true, 'City is required'],
+      trim: true,
+    },
+    postalCode: {
+      type: String,
+      required: [true, 'Postal code is required'],
+      trim: true,
+    },
+    province: {
+      type: String,
+      required: [true, 'Province is required'],
+      trim: true,
+    },
+    phone: {
+      type: String,
+      required: [true, 'Phone number is required'],
+      trim: true,
+    },
+    country: {
+      type: String,
+      required: [true, 'Country is required'],
+      trim: true,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: true }
+)
 
 const userSchema = new Schema<IUser>(
   {
@@ -66,6 +117,11 @@ const userSchema = new Schema<IUser>(
     phoneVerified: {
       type: Boolean,
       default: false,
+    },
+
+    addresses: {
+      type: [addressSchema],
+      default: [],
     },
   },
   {

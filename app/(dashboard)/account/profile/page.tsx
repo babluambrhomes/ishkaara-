@@ -33,8 +33,7 @@ export default async function ProfilePage(props: {
 
   return (
     <div className='mx-auto max-w-2xl'>
-      <div className='mb-6 flex items-center gap-2'>
-        <span className='h-7 w-1.5 rounded-full bg-gradient-to-b from-primary to-gold' />
+      <div className='mb-6'>
         <h1 className='text-3xl font-bold tracking-tight'>Edit Profile</h1>
       </div>
       <SessionProvider>

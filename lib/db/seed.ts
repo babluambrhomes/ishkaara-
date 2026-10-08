@@ -14,7 +14,6 @@ import {
   round2,
 } from '../utils'
 import WebPage from './models/web-page.model'
-import Setting from './models/setting.model'
 import BlogPost from './models/blog-post.model'
 import { OrderItem, IOrderInput, ShippingAddress } from '@/types'
 
@@ -28,16 +27,12 @@ const main = async () => {
       reviews,
       webPages,
       blogPosts,
-      settings,
     } = data
     await connectToDatabase(process.env.MONGODB_URI)
 
     await User.deleteMany()
     await User.syncIndexes()
     const createdUser = await User.insertMany(users)
-
-    await Setting.deleteMany()
-    const createdSetting = await Setting.insertMany(settings)
 
     await WebPage.deleteMany()
     await WebPage.insertMany(webPages)
@@ -90,7 +85,6 @@ const main = async () => {
       createdProducts,
       createdReviews,
       createdOrders,
-      createdSetting,
       message: 'Seeded database successfully',
     })
     process.exit(0)

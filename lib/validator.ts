@@ -96,6 +96,20 @@ export const ShippingAddressSchema = z.object({
   country: z.string().min(1, 'Country is required'),
 })
 
+export const AddressSchema = ShippingAddressSchema.extend({
+  label: z.enum(['Home', 'Office', 'Other']).default('Home'),
+  isDefault: z.boolean().default(false),
+})
+export const AddressesSchema = z
+  .array(AddressSchema)
+  .max(10, 'Maximum 10 addresses allowed')
+export const AddressUpdateSchema = AddressSchema.extend({
+  _id: MongoId,
+})
+export const AddressInputSchema = AddressSchema.extend({
+  _id: MongoId.optional(),
+})
+
 // Order
 export const OrderInputSchema = z.object({
   user: z.union([

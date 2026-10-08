@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import CheckoutForm from './checkout-form'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { getUserAddresses } from '@/lib/actions/address.actions'
 
 export const metadata: Metadata = {
   title: 'Checkout',
@@ -12,5 +13,6 @@ export default async function CheckoutPage() {
   if (!session?.user) {
     redirect('/sign-in?callbackUrl=/checkout')
   }
-  return <CheckoutForm />
+  const { data: savedAddresses } = await getUserAddresses()
+  return <CheckoutForm savedAddresses={savedAddresses} />
 }

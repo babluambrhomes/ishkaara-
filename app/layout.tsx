@@ -2,8 +2,8 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import ClientProviders from '@/components/shared/client-providers'
 import { getSetting } from '@/lib/actions/setting.actions'
-import Header from '@/components/shared/header'
-import Footer from '@/components/shared/footer'
+
+
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -42,12 +42,7 @@ export default async function AppLayout({
         className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
       >
         <ClientProviders setting={setting}>
-
-          <div className='flex flex-col min-h-screen'>
-            <Header />
-            <main className='flex-1 flex flex-col'>{children}</main>
-            <Footer />
-          </div>
+          {children}
         </ClientProviders>
       </body>
     </html>

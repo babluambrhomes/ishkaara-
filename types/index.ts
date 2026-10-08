@@ -1,4 +1,5 @@
 import {
+  AddressSchema,
   BlogPostInputSchema,
   CarouselSchema,
   CartSchema,
@@ -64,6 +65,8 @@ export type IOrderList = IOrderInput & {
 export type OrderItem = z.infer<typeof OrderItemSchema>
 export type Cart = z.infer<typeof CartSchema>
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>
+export type IAddress = z.infer<typeof AddressSchema>
+export type IAddressWithId = IAddress & { _id: string }
 
 // user
 export type IUserInput = z.infer<typeof UserInputSchema>

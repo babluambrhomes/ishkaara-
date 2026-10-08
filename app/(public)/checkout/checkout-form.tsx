@@ -33,12 +33,14 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import CheckoutFooter from './checkout-footer'
-import { ShippingAddress } from '@/types'
+import { IAddressWithId, ShippingAddress } from '@/types'
 import useIsMounted from '@/hooks/use-is-mounted'
 import Link from 'next/link'
 import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
+import { Badge } from '@/components/ui/badge'
+import { ArrowLeft, MapPin, Plus } from 'lucide-react'
 
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
@@ -61,7 +63,11 @@ const shippingAddressDefaultValues =
         country: '',
       }
 
-const CheckoutForm = () => {
+const CheckoutForm = ({
+  savedAddresses = [],
+}: {
+  savedAddresses?: IAddressWithId[]
+}) => {
   const { toast } = useToast()
   const router = useRouter()
   const {
@@ -118,6 +124,22 @@ const CheckoutForm = () => {
     useState<boolean>(false)
   const [isDeliveryDateSelected, setIsDeliveryDateSelected] =
     useState<boolean>(false)
+  const [showManualAddressForm, setShowManualAddressForm] =
+    useState<boolean>(false)
+
+  const selectSavedAddress = (address: IAddressWithId) => {
+    setShippingAddress({
+      fullName: address.fullName,
+      street: address.street,
+      city: address.city,
+      province: address.province,
+      postalCode: address.postalCode,
+      phone: address.phone,
+      country: address.country,
+    })
+    setShowManualAddressForm(false)
+    setIsAddressSelected(true)
+  }
 
   const handlePlaceOrder = async () => {
     const res = await createOrder({
@@ -269,6 +291,7 @@ const CheckoutForm = () => {
                       setIsAddressSelected(false)
                       setIsPaymentMethodSelected(true)
                       setIsDeliveryDateSelected(true)
+                      setShowManualAddressForm(false)
                     }}
                   >
                     Change
@@ -281,7 +304,84 @@ const CheckoutForm = () => {
                   <span className='w-8'>1 </span>
                   <span>Enter shipping address</span>
                 </div>
-                <Form {...shippingAddressForm}>
+                {!showManualAddressForm && savedAddresses.length > 0 && (
+                  <div className='md:ml-8 my-4'>
+                    <p className='mb-2 text-sm font-semibold text-muted-foreground'>
+                      Select a saved address
+                    </p>
+                    <div className='space-y-3'>
+                      {savedAddresses.map((address) => (
+                        <Card
+                          key={address._id}
+                          className={`border ${
+                            address.isDefault
+                              ? 'border-gold/50'
+                              : 'border-border'
+                          }`}
+                        >
+                          <CardContent className='flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between'>
+                            <div className='min-w-0'>
+                              <div className='mb-1 flex items-center gap-2'>
+                                <MapPin className='h-4 w-4 shrink-0 text-primary' />
+                                <span className='text-sm font-bold'>
+                                  {address.label}
+                                </span>
+                                {address.isDefault && (
+                                  <Badge className='rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white'>
+                                    Default
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className='text-sm font-semibold'>
+                                {address.fullName}
+                              </p>
+                              <p className='text-sm text-muted-foreground'>
+                                {address.street}
+                              </p>
+                              <p className='text-sm text-muted-foreground'>
+                                {address.city}, {address.province}{' '}
+                                {address.postalCode}, {address.country}
+                              </p>
+                              <p className='text-sm text-muted-foreground'>
+                                {address.phone}
+                              </p>
+                            </div>
+                            <Button
+                              type='button'
+                              variant='outline'
+                              className='shrink-0 rounded-full border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground'
+                              onClick={() => selectSavedAddress(address)}
+                            >
+                              Use this address
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    <button
+                      type='button'
+                      onClick={() => setShowManualAddressForm(true)}
+                      className='mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline'
+                    >
+                      <Plus className='h-4 w-4' />
+                      Enter a new address
+                    </button>
+                  </div>
+                )}
+                {(!savedAddresses.length || showManualAddressForm) && (
+                  <Form {...shippingAddressForm}>
+                    {showManualAddressForm && savedAddresses.length > 0 && (
+                      <div className='md:ml-9 -mb-3'>
+                        <button
+                          type='button'
+                          onClick={() => setShowManualAddressForm(false)}
+                          className='inline-flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-primary'
+                        >
+                          <ArrowLeft className='h-4 w-4' />
+                          Back to saved addresses
+                        </button>
+                      </div>
+                    )}
                   <form
                     method='post'
                     onSubmit={shippingAddressForm.handleSubmit(
@@ -424,6 +524,7 @@ const CheckoutForm = () => {
                     </Card>
                   </form>
                 </Form>
+                )}
               </>
             )}
           </div>

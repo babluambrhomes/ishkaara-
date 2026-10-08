@@ -15,7 +15,6 @@ import {
   Package,
   PackageCheckIcon,
   Pencil,
-  Settings,
   ShieldCheck,
   Smartphone,
   Tags,
@@ -76,15 +75,13 @@ export default async function AccountPage() {
     { href: '/admin/products', icon: Tags, label: 'Products' },
     { href: '/admin/blog/posts', icon: FileText, label: 'Blog' },
     { href: '/admin/users', icon: Users, label: 'Users' },
-    { href: '/admin/settings', icon: Settings, label: 'Settings' },
   ]
 
   return (
     <div className='mx-auto px-3 py-8'>
       <div className='mb-8 flex flex-wrap items-center justify-between gap-4'>
         <div>
-          <div className='mb-2 flex items-center gap-2'>
-            <span className='h-7 w-1.5 rounded-full bg-gradient-to-b from-primary to-gold' />
+          <div className='mb-2'>
             <h1 className='text-3xl font-bold tracking-tight'>{PAGE_TITLE}</h1>
           </div>
           <p className='text-sm text-muted-foreground'>

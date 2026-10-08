@@ -94,10 +94,6 @@ body {
   .premium-title {
     @apply relative inline-block pb-2 font-bold tracking-tight;
   }
-  .premium-title::after {
-    content: '';
-    @apply absolute left-0 bottom-0 h-[3px] w-10 rounded-full bg-gradient-to-r from-primary to-gold;
-  }
 }
 
 @layer utilities {

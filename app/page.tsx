@@ -1,4 +1,6 @@
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import Footer from '@/components/shared/footer'
+import Header from '@/components/shared/header'
 import { HomeCard } from '@/components/shared/home/home-card'
 import { HomeCarousel } from '@/components/shared/home/home-carousel'
 import ProductSlider from '@/components/shared/product/product-slider'
@@ -13,6 +15,7 @@ import { getSetting } from '@/lib/actions/setting.actions'
 import { toSlug } from '@/lib/utils'
 
 export default async function HomePage() {
+  const heroProducts = await getProductsByTag({ tag: 'featured', limit: 6 })
   const { carousels } = await getSetting()
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
   const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
@@ -67,8 +70,10 @@ export default async function HomePage() {
   ]
 
   return (
+    <>
+     <Header />
     <div className='flex-1 flex flex-col gap-6 p-3 '>
-      <HomeCarousel items={carousels} />
+      <HomeCarousel products={heroProducts} banners={carousels} />
       <HomeCard cards={cards} />
       <Card className='w-full overflow-hidden rounded-2xl shadow-soft'>
         <CardContent className='p-4 items-center gap-3'>
@@ -86,5 +91,7 @@ export default async function HomePage() {
       </Card>
       <BrowsingHistoryList />
     </div>
+    <Footer />
+    </>
   )
 }
