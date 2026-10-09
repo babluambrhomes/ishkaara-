@@ -4,11 +4,24 @@ import {
   useElements,
   useStripe,
 } from '@stripe/react-stripe-js'
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import ProductPrice from '@/components/shared/product/product-price'
 import useSettingStore from '@/hooks/use-setting-store'
+
+const StripeFormSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Email is invalid')
+    .optional(),
+})
+
+type StripeFormValues = z.infer<typeof StripeFormSchema>
 
 export default function StripeForm({
   priceInCents,
@@ -25,12 +38,20 @@ export default function StripeForm({
   const elements = useElements()
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>()
-  const [email, setEmail] = useState<string>()
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
+  const form = useForm<StripeFormValues>({
+    resolver: zodResolver(StripeFormSchema),
+    defaultValues: {
+      email: undefined,
+    },
+  })
 
-    if (stripe == null || elements == null || email == null) return
+  const { handleSubmit, setValue, watch } = form
+  const email = watch('email')
+
+  async function onSubmit(_values: StripeFormValues) {
+    if (stripe == null || elements == null || email == null || email === '')
+      return
 
     setIsLoading(true)
     stripe
@@ -51,12 +72,14 @@ export default function StripeForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
       <div className='text-xl'>Stripe Checkout</div>
       {errorMessage && <div className='text-destructive'>{errorMessage}</div>}
       <PaymentElement />
       <div>
-        <LinkAuthenticationElement onChange={(e) => setEmail(e.value.email)} />
+        <LinkAuthenticationElement
+          onChange={(e) => setValue('email', e.value.email)}
+        />
       </div>
       <Button
         className='w-full'

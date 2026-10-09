@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import Product from '@/lib/db/models/product.model'
-import { connectToDatabase } from '@/lib/db'
+import Product from '@/lib/models/product.model'
+import { connectToDatabase } from '@/config/db'
 
 export const GET = async (request: NextRequest) => {
   const listType = request.nextUrl.searchParams.get('type') || 'history'
@@ -19,7 +19,7 @@ export const GET = async (request: NextRequest) => {
       ? {
           _id: { $in: productIds },
         }
-      : { category: { $in: categories }, _id: { $nin: productIds } }
+      : { categoryName: { $in: categories }, _id: { $nin: productIds } }
 
   await connectToDatabase()
   const products = await Product.find(filter)

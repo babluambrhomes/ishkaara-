@@ -15,7 +15,8 @@ import {
 } from '@react-email/components'
 
 import { formatCurrency } from '@/lib/utils'
-import { IOrder } from '@/lib/db/models/order.model'
+import { getAbsoluteImageUrl } from '@/lib/image-url'
+import { IOrder } from '@/lib/models/order.model'
 import { getSetting } from '@/lib/actions/setting.actions'
 
 type OrderInformationProps = {
@@ -111,11 +112,7 @@ export default async function PurchaseReceiptEmail({
                         width='80'
                         alt={item.name}
                         className='rounded'
-                        src={
-                          item.image.startsWith('/')
-                            ? `${site.url}${item.image}`
-                            : item.image
-                        }
+                        src={getAbsoluteImageUrl(item.image, site.url)}
                       />
                     </Link>
                   </Column>

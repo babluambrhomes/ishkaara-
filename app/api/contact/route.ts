@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import ContactMessage from '@/lib/db/models/contact-message.model'
-import { connectToDatabase } from '@/lib/db'
+import ContactMessage from '@/lib/models/contact-message.model'
+import { connectToDatabase } from '@/config/db'
 
 export const POST = async (request: NextRequest) => {
   const body = (await request.json().catch(() => null)) as {

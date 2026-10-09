@@ -26,6 +26,7 @@ import {
   formatDateTime,
   timeUntilMidnight,
 } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 import { ShippingAddressSchema } from '@/lib/validator'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
@@ -665,7 +666,7 @@ const CheckoutForm = ({
                           <div key={_index} className='flex gap-4 py-2'>
                             <div className='relative w-16 h-16'>
                               <Image
-                                src={item.image}
+                                src={getImageUrl(item.image)}
                                 alt={item.name}
                                 fill
                                 sizes='20vw'

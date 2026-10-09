@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import PostForm from '../post-form'
 import { Metadata } from 'next'
+import { getCategoriesByType } from '@/lib/actions/category.actions'
 
 export const metadata: Metadata = {
   title: 'Create Blog Post',
 }
 
-const CreatePostPage = () => {
+const CreatePostPage = async () => {
+  const categories = await getCategoriesByType('blog')
   return (
     <main className='max-w-full p-4'>
       <div className='flex mb-4'>
@@ -16,7 +18,7 @@ const CreatePostPage = () => {
       </div>
 
       <div className='my-8'>
-        <PostForm type='Create' />
+        <PostForm type='Create' categories={categories} />
       </div>
     </main>
   )

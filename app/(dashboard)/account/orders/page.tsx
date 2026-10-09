@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { getMyOrders } from '@/lib/actions/order.actions'
-import { IOrder } from '@/lib/db/models/order.model'
+import { IOrder } from '@/lib/models/order.model'
 import { formatDateTime, formatId } from '@/lib/utils'
 import BrowsingHistoryList from '@/components/shared/browsing-history-list'
 import ProductPrice from '@/components/shared/product/product-price'

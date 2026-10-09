@@ -32,8 +32,8 @@ export default async function Search() {
           <SelectContent position='popper'>
             <SelectItem value='all'>All</SelectItem>
             {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
+              <SelectItem key={category._id} value={category.name}>
+                {category.name}
               </SelectItem>
             ))}
           </SelectContent>

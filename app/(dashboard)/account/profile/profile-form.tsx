@@ -34,18 +34,33 @@ import {
 import { UserProfileUpdateSchema } from '@/lib/validator'
 import { BadgeCheck, Mail, ShieldX, Smartphone } from 'lucide-react'
 
+type AddPhoneStepValues = {
+  phone: string
+}
+
+type AddOtpStepValues = {
+  otp: string
+}
+
 function AddPhoneFlow() {
   const router = useRouter()
   const { toast } = useToast()
   const { update } = useSession()
   const [step, setStep] = useState<'phone' | 'otp'>('phone')
-  const [phone, setPhone] = useState('')
   const [sentOtp, setSentOtp] = useState('')
-  const [otp, setOtp] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  const sendOtp = async () => {
-    if (!phone.trim()) {
+  const phoneForm = useForm<AddPhoneStepValues>({
+    defaultValues: { phone: '' },
+  })
+
+  const otpForm = useForm<AddOtpStepValues>({
+    defaultValues: { otp: '' },
+  })
+
+  const sendOtp = async (data: AddPhoneStepValues) => {
+    const trimmed = data.phone.trim()
+    if (!trimmed) {
       toast({
         title: 'Error',
         description: 'Please enter a phone number',
@@ -54,7 +69,7 @@ function AddPhoneFlow() {
       return
     }
     setSubmitting(true)
-    const res = await sendPhoneVerificationOtp(phone)
+    const res = await sendPhoneVerificationOtp(trimmed)
     setSubmitting(false)
     if (!res.success) {
       toast({ title: 'Error', description: res.message, variant: 'destructive' })
@@ -65,8 +80,8 @@ function AddPhoneFlow() {
     toast({ title: 'OTP sent', description: 'Use the OTP to verify your phone.' })
   }
 
-  const verify = async () => {
-    if (otp.length !== 6) {
+  const verify = async (data: AddOtpStepValues) => {
+    if (data.otp.length !== 6) {
       toast({
         title: 'Error',
         description: 'Enter the 6 digit OTP',
@@ -74,14 +89,15 @@ function AddPhoneFlow() {
       })
       return
     }
+    const currentPhone = phoneForm.getValues('phone').trim()
     setSubmitting(true)
-    const res = await verifyPhoneLink({ phone, otp })
+    const res = await verifyPhoneLink({ phone: currentPhone, otp: data.otp })
     setSubmitting(false)
     if (!res.success) {
       toast({ title: 'Error', description: res.message, variant: 'destructive' })
       return
     }
-    await update({ phone, phoneVerified: true })
+    await update({ phone: currentPhone, phoneVerified: true })
     toast({ description: res.message })
     router.refresh()
   }
@@ -100,27 +116,25 @@ function AddPhoneFlow() {
 
       <div className='mt-4 space-y-3'>
         {step === 'phone' ? (
-          <>
+          <form onSubmit={phoneForm.handleSubmit(sendOtp)} className='space-y-3'>
             <Input
               type='tel'
               inputMode='tel'
               placeholder='Enter phone number'
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              {...phoneForm.register('phone')}
             />
             <Button
-              type='button'
+              type='submit'
               disabled={submitting}
-              onClick={sendOtp}
               className='h-10 rounded-full px-6'
             >
               {submitting ? 'Sending...' : 'Send OTP'}
             </Button>
-          </>
+          </form>
         ) : (
-          <>
+          <form onSubmit={otpForm.handleSubmit(verify)} className='space-y-3'>
             <div className='rounded-md border border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm'>
-              <p className='font-medium'>Verification code sent to {phone}</p>
+              <p className='font-medium'>Verification code sent to {phoneForm.watch('phone')}</p>
               <p className='mt-1 text-muted-foreground'>
                 Demo OTP: <span className='font-semibold'>{sentOtp}</span>
               </p>
@@ -129,14 +143,12 @@ function AddPhoneFlow() {
               inputMode='numeric'
               maxLength={6}
               placeholder='Enter 6 digit OTP'
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              {...otpForm.register('otp')}
             />
             <div className='flex flex-wrap items-center gap-3'>
               <Button
-                type='button'
+                type='submit'
                 disabled={submitting}
-                onClick={verify}
                 className='h-10 rounded-full px-6'
               >
                 {submitting ? 'Verifying...' : 'Verify & Link'}
@@ -149,7 +161,7 @@ function AddPhoneFlow() {
                 Change number
               </button>
             </div>
-          </>
+          </form>
         )}
       </div>
     </div>
@@ -182,7 +194,7 @@ export default function ProfileForm({
     },
   })
 
-  const onSubmit = async (values: z.infer<typeof UserProfileUpdateSchema>) => {
+  const onProfileSubmit = async (values: z.infer<typeof UserProfileUpdateSchema>) => {
     const res = await updateProfile({ name: values.name })
     if (!res.success) {
       toast({ variant: 'destructive', description: res.message })
@@ -213,7 +225,7 @@ export default function ProfileForm({
           <Form {...form}>
             <form
               method='post'
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(onProfileSubmit)}
               className='space-y-4'
             >
               <FormField

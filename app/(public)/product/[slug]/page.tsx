@@ -27,6 +27,7 @@ import RatingSummary from '@/components/shared/product/rating-summary'
 import ProductSlider from '@/components/shared/product/product-slider'
 import AddToWishlist from '@/components/shared/add-to-wishlist'
 import { Separator } from '@/components/ui/separator'
+import { TiptapContent } from '@/components/editor/tiptap-content'
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
@@ -38,7 +39,7 @@ export async function generateMetadata(props: {
   }
   return {
     title: product.name,
-    description: product.description,
+    description: product.description.replace(/<[^>]*>/g, '').trim(),
   }
 }
 
@@ -92,7 +93,7 @@ export default async function ProductDetails(props: {
 
   return (
     <div className='mx-auto  px-4 pb-16 pt-8 '>
-      <AddToBrowsingHistory id={product._id} category={product.category} />
+      <AddToBrowsingHistory id={product._id} category={product.categoryName} />
 
       <nav className='mb-6 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground'>
         <Link href='/' className='transition-colors hover:text-primary'>
@@ -100,10 +101,10 @@ export default async function ProductDetails(props: {
         </Link>
         <ChevronRight className='h-3.5 w-3.5' />
         <Link
-          href={`/search?category=${product.category}`}
+          href={`/search?category=${product.categoryName}`}
           className='transition-colors hover:text-primary'
         >
-          {product.category}
+          {product.categoryName}
         </Link>
         <ChevronRight className='h-3.5 w-3.5' />
         <span className='max-w-[220px] truncate font-medium text-foreground'>
@@ -121,7 +122,7 @@ export default async function ProductDetails(props: {
               slug: product.slug,
               price: round2(product.price),
               image: product.images[0],
-              category: product.category,
+              category: product.categoryName,
             }}
           />
           <ProductGallery images={product.images} />
@@ -199,7 +200,7 @@ export default async function ProductDetails(props: {
                         countInStock: product.countInStock,
                         name: product.name,
                         slug: product.slug,
-                        category: product.category,
+                        category: product.categoryName,
                         price: round2(product.price),
                         quantity: 1,
                         image: product.images[0],
@@ -228,9 +229,9 @@ export default async function ProductDetails(props: {
                   </div>
                 </div>
 
-                <p className='text-sm leading-6 text-muted-foreground lg:text-[15px] lg:leading-7'>
-                  {product.description}
-                </p>
+                <div className='text-sm leading-6 text-muted-foreground lg:text-[15px] lg:leading-7'>
+                  <TiptapContent html={product.description} />
+                </div>
 
               </div>
 
@@ -273,7 +274,7 @@ export default async function ProductDetails(props: {
       <section className='mt-14'>
         <ProductSlider
           products={relatedProducts.data}
-          title={`Best Sellers in ${product.category}`}
+          title={`Best Sellers in ${product.categoryName}`}
         />
       </section>
 

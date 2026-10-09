@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { getImageUrl } from '@/lib/image-url'
 import Zoom from 'react-medium-image-zoom'
 import 'react-medium-image-zoom/dist/styles.css'
 
@@ -24,7 +25,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
             }`}
           >
             <Image
-              src={image}
+              src={getImageUrl(image)}
               alt='product image'
               width={56}
               height={56}
@@ -38,7 +39,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
         <Zoom>
           <div className='relative h-[380px] sm:h-[480px]'>
             <Image
-              src={images[selectedImage]}
+              src={getImageUrl(images[selectedImage])}
               alt={'product image'}
               fill
               sizes='70vw'

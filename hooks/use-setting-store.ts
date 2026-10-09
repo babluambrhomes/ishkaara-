@@ -1,4 +1,4 @@
-import data from '@/lib/data'
+import data from '@/config/data'
 import { ClientSetting } from '@/types'
 import { create } from 'zustand'
 

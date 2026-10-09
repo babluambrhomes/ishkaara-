@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
-import ReactMarkdown from 'react-markdown'
 import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,8 +8,10 @@ import {
   getBlogPostBySlug,
   getRelatedPosts,
 } from '@/lib/actions/blog.actions'
-import { formatDateTime, toSlug } from '@/lib/utils'
+import { formatDateTime, stripHtml, toSlug } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 import TableOfContents from '@/components/shared/blog/table-of-contents'
+import { TiptapContent } from '@/components/editor/tiptap-content'
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>
@@ -21,29 +21,34 @@ export async function generateMetadata(props: {
   if (!post) return { title: 'Post not found' }
   return {
     title: post.title,
-    description: post.excerpt,
+    description: stripHtml(post.excerpt),
     openGraph: {
       title: post.title,
-      description: post.excerpt,
+      description: stripHtml(post.excerpt),
       type: 'article',
       publishedTime: post.date,
-      images: [post.image],
+      images: [getImageUrl(post.image)],
     },
   }
 }
 
-function headingText(node: React.ReactNode): string {
-  if (typeof node === 'string' || typeof node === 'number') return String(node)
-  if (Array.isArray(node)) return node.map(headingText).join(' ')
-  if (node && typeof node === 'object' && 'props' in node) {
-    return headingText(
-      (node as { props: { children?: React.ReactNode } }).props.children
-    )
-  }
-  return ''
+function addHeadingIds(html: string): string {
+  return html.replace(
+    /<h([1-6])([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (match, level, attrs, inner) => {
+      const text = String(inner).replace(/<[^>]*>/g, '').trim()
+      if (!text) return match
+      let newAttrs = String(attrs)
+      if (!/\bid=["']/.test(newAttrs)) {
+        newAttrs += ` id="${toSlug(text)}"`
+      }
+      if (!/class=/.test(newAttrs)) {
+        newAttrs += ' class="scroll-mt-24"'
+      }
+      return `<h${level}${newAttrs}>${inner}</h${level}>`
+    }
+  )
 }
-
-const headingClass = 'scroll-mt-24'
 
 export default async function BlogPostPage(props: {
   params: Promise<{ slug: string }>
@@ -77,7 +82,7 @@ export default async function BlogPostPage(props: {
               variant='outline'
               className='rounded-full border-gold/40 px-3 py-1 text-gold'
             >
-              {post.category}
+              {post.categoryName}
             </Badge>
             <span className='text-muted-foreground'>
               {formatDateTime(new Date(post.date)).dateOnly}
@@ -89,7 +94,9 @@ export default async function BlogPostPage(props: {
           <h1 className='premium-title text-3xl font-bold leading-tight tracking-tight lg:text-4xl'>
             {post.title}
           </h1>
-          <p className='mt-4 text-lg text-muted-foreground'>{post.excerpt}</p>
+          <p className='mt-4 text-lg text-muted-foreground'>
+            {stripHtml(post.excerpt)}
+          </p>
 
           {/* Mobile TOC */}
           <details className='mt-6 rounded-2xl border border-border/60 bg-background shadow-soft lg:hidden'>
@@ -104,7 +111,7 @@ export default async function BlogPostPage(props: {
           {/* Cover image */}
           <div className='relative mt-8 aspect-[21/9] w-full overflow-hidden'>
             <Image
-              src={post.image}
+              src={getImageUrl(post.image)}
               alt={post.title}
               fill
               priority
@@ -116,36 +123,7 @@ export default async function BlogPostPage(props: {
           {/* Article body */}
           <div className='mt-8'>
             <section className='web-page-content text-lg leading-relaxed'>
-              <ReactMarkdown
-                components={{
-                  h2: ({ children }) => (
-                    <h2
-                      id={toSlug(headingText(children))}
-                      className={headingClass}
-                    >
-                      {children}
-                    </h2>
-                  ),
-                  h3: ({ children }) => (
-                    <h3
-                      id={toSlug(headingText(children))}
-                      className={headingClass}
-                    >
-                      {children}
-                    </h3>
-                  ),
-                  h4: ({ children }) => (
-                    <h4
-                      id={toSlug(headingText(children))}
-                      className={headingClass}
-                    >
-                      {children}
-                    </h4>
-                  ),
-                }}
-              >
-                {post.content}
-              </ReactMarkdown>
+              <TiptapContent html={addHeadingIds(post.content)} />
             </section>
           </div>
         </article>
@@ -173,7 +151,7 @@ export default async function BlogPostPage(props: {
                 <Link href={`/blog/${related.slug}`} className='block'>
                   <div className='relative aspect-[16/10] overflow-hidden'>
                     <Image
-                      src={related.image}
+                      src={getImageUrl(related.image)}
                       alt={related.title}
                       fill
                       sizes='(max-width: 768px) 100vw, 33vw'
@@ -187,7 +165,7 @@ export default async function BlogPostPage(props: {
                       variant='outline'
                       className='rounded-full border-gold/40 px-2.5 py-0.5 text-gold'
                     >
-                      {related.category}
+                      {related.categoryName}
                     </Badge>
                     <span className='text-muted-foreground'>
                       {formatDateTime(new Date(related.date)).dateOnly}

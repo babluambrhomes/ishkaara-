@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
 import Search from './search'
-import data from '@/lib/data'
+import data from '@/config/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
 

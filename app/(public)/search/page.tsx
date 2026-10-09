@@ -17,7 +17,7 @@ import {
   getAllProducts,
   getAllTags,
 } from '@/lib/actions/product.actions'
-import { IProduct } from '@/lib/db/models/product.model'
+import { IProduct } from '@/lib/models/product.model'
 import {
   Check,
   PackageSearch,
@@ -252,13 +252,13 @@ export default async function SearchPage(props: {
                           All
                         </FilterLink>
                       </li>
-                      {categories.map((c: string) => (
-                        <li key={c}>
+                      {categories.map((c) => (
+                        <li key={c._id}>
                           <FilterLink
-                            href={getFilterUrl({ category: c, params })}
-                            active={c === category}
+                            href={getFilterUrl({ category: c.name, params })}
+                            active={c.name === category}
                           >
-                            {c}
+                            {c.name}
                           </FilterLink>
                         </li>
                       ))}

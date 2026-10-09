@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
 import { sendPurchaseReceipt } from '@/emails'
-import Order from '@/lib/db/models/order.model'
+import Order from '@/lib/models/order.model'
 
 let stripe: Stripe | undefined
 

@@ -13,8 +13,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { IOrder } from '@/lib/db/models/order.model'
+import { IOrder } from '@/lib/models/order.model'
 import { cn, formatDateTime } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 import { buttonVariants } from '@/components/ui/button'
 import ProductPrice from '../product/product-price'
 import ActionButton from '../action-button'
@@ -104,7 +105,7 @@ export default function OrderDetailsForm({
                         className='flex items-center'
                       >
                         <Image
-                          src={item.image}
+                          src={getImageUrl(item.image)}
                           alt={item.name}
                           width={50}
                           height={50}

@@ -9,7 +9,8 @@ import {
   getAllBlogCategories,
   getAllBlogPosts,
 } from '@/lib/actions/blog.actions'
-import { cn, formatDateTime } from '@/lib/utils'
+import { cn, formatDateTime, stripHtml } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -112,7 +113,7 @@ export default async function BlogPage(props: {
                   <Link href={`/blog/${post.slug}`} className='block'>
                     <div className='relative aspect-[16/10] overflow-hidden'>
                       <Image
-                        src={post.image}
+                        src={getImageUrl(post.image)}
                         alt={post.title}
                         fill
                         priority={post === posts[0]}
@@ -127,7 +128,7 @@ export default async function BlogPage(props: {
                         variant='outline'
                         className='rounded-full border-gold/40 px-2.5 py-0.5 text-gold'
                       >
-                        {post.category}
+                        {post.categoryName}
                       </Badge>
                       <span className='text-muted-foreground'>
                         {formatDateTime(new Date(post.date)).dateOnly}
@@ -140,7 +141,7 @@ export default async function BlogPage(props: {
                       {post.title}
                     </Link>
                     <p className='mt-2 line-clamp-2 text-sm text-muted-foreground'>
-                      {post.excerpt}
+                      {stripHtml(post.excerpt)}
                     </p>
                     <Link
                       href={`/blog/${post.slug}`}

@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import ProductForm from '../product-form'
 import { Metadata } from 'next'
+import { getCategoriesByType } from '@/lib/actions/category.actions'
 
 export const metadata: Metadata = {
   title: 'Create Product',
 }
 
-const CreateProductPage = () => {
+const CreateProductPage = async () => {
+  const categories = await getCategoriesByType('product')
   return (
     <main className='max-w-6xl mx-auto p-4'>
       <div className='flex mb-4'>
@@ -16,7 +18,7 @@ const CreateProductPage = () => {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Create' />
+        <ProductForm type='Create' categories={categories} />
       </div>
     </main>
   )

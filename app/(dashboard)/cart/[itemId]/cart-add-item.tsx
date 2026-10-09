@@ -4,6 +4,7 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 import { CheckCircle2Icon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -30,7 +31,7 @@ export default function CartAddItem({ itemId }: { itemId: string }) {
           <CardContent className='flex h-full items-center justify-center  gap-3 py-4'>
             <Link href={`/product/${item.slug}`}>
               <Image
-                src={item.image}
+                src={getImageUrl(item.image)}
                 alt={item.name}
                 width={80}
                 height={80}

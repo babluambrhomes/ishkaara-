@@ -18,9 +18,10 @@ import {
 } from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
 import { WishlistItem } from '@/hooks/use-wishlist-store'
-import { IProduct } from '@/lib/db/models/product.model'
+import { IProduct } from '@/lib/models/product.model'
 import { OrderItem } from '@/types'
 import { generateId, round2 } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
 
 import AddToCart from './add-to-cart'
 import AddToWishlist from '../add-to-wishlist'
@@ -61,7 +62,7 @@ function ProductCardImage({
           ) : (
             <div className='relative h-36'>
               <Image
-                src={images[0]}
+                src={getImageUrl(images[0])}
                 alt={name}
                 fill
                 sizes='80vw'
@@ -162,6 +163,9 @@ export default function ProductCard({
 }) {
   const images = isProductData(product) ? product.images : [product.image]
   const brand = isProductData(product) ? product.brand : product.category
+  const category = isProductData(product)
+    ? product.categoryName
+    : product.category
   const countInStock = isProductData(product) ? product.countInStock : 10
   const isDeal = isProductData(product)
     ? product.tags.includes('todays-deal')
@@ -177,7 +181,7 @@ export default function ProductCard({
     slug: product.slug,
     price: round2(product.price),
     image: images[0],
-    category: product.category,
+    category,
   }
 
   const orderItem: OrderItem = {
@@ -188,7 +192,7 @@ export default function ProductCard({
     countInStock,
     name: product.name,
     slug: product.slug,
-    category: product.category,
+    category,
     price: round2(product.price),
     quantity: 1,
     image: images[0],
@@ -259,7 +263,7 @@ export function ProductCardSlider({
     slug: product.slug,
     price: round2(product.price),
     image: product.images[0],
-    category: product.category,
+    category: product.categoryName,
   }
 
   return (
@@ -298,7 +302,7 @@ export function CartItemRow({ item }: { item: OrderItem }) {
       <Link href={`/product/${item.slug}`}>
         <div className='relative h-40 w-40'>
           <Image
-            src={item.image}
+            src={getImageUrl(item.image)}
             alt={item.name}
             fill
             sizes='20vw'

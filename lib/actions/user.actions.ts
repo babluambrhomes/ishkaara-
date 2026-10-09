@@ -8,9 +8,9 @@ import {
   UserProfileUpdateSchema,
   UserUpdateSchema,
 } from '../validator'
-import { connectToDatabase } from '../db'
-import User, { IUser } from '../db/models/user.model'
-import Order from '../db/models/order.model'
+import { connectToDatabase } from '@/config/db'
+import User, { IUser } from '../models/user.model'
+import Order from '../models/order.model'
 import { formatError } from '../utils'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -261,25 +261,44 @@ export const SignOut = async () => {
 export async function getAllUsers({
   limit,
   page,
+  query = '',
 }: {
   limit?: number
   page: number
+  query?: string
 }) {
+  const session = await auth()
+  if (session?.user?.role !== 'Admin')
+    throw new Error('Admin permission required')
+
   const {
     common: { pageSize },
   } = await getSetting()
   limit = limit || pageSize
   await connectToDatabase()
 
+  const trimmed = query.trim()
+  const safeQuery = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const filter = trimmed
+    ? {
+        $or: [
+          { name: { $regex: safeQuery, $options: 'i' } },
+          { email: { $regex: safeQuery, $options: 'i' } },
+          { phone: { $regex: safeQuery, $options: 'i' } },
+        ],
+      }
+    : {}
+
   const skipAmount = (Number(page) - 1) * limit
-  const users = await User.find()
+  const users = await User.find(filter)
     .sort({ createdAt: 'desc' })
     .skip(skipAmount)
     .limit(limit)
-  const usersCount = await User.countDocuments()
+  const usersCount = await User.countDocuments(filter)
   return {
     data: JSON.parse(JSON.stringify(users)) as IUser[],
     totalPages: Math.ceil(usersCount / limit),
+    totalUsers: usersCount,
   }
 }
 

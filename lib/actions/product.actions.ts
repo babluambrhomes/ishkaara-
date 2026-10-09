@@ -1,20 +1,39 @@
 'use server'
 
-import { connectToDatabase } from '@/lib/db'
-import Product, { IProduct } from '@/lib/db/models/product.model'
+import { connectToDatabase } from '@/config/db'
+import Product, { IProduct } from '@/lib/models/product.model'
+import Category, { ICategory } from '@/lib/models/category.model'
 import { revalidatePath } from 'next/cache'
-import { formatError } from '../utils'
+import { formatError, generateSlug, toSlug } from '../utils'
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
+
+const resolveCategoryName = async (categoryId: string) => {
+  const category = await Category.findById(categoryId).select('name')
+  if (!category) throw new Error('Category not found')
+  return category.name
+}
+
+const resolveSlug = async (slug: string, name: string, excludeId?: string) => {
+  const base = toSlug(slug) || toSlug(name)
+  if (!base) return generateSlug(name)
+  const exists = await Product.exists({
+    slug: base,
+    _id: { $ne: excludeId },
+  })
+  return exists ? generateSlug(base) : base
+}
 
 // CREATE
 export async function createProduct(data: IProductInput) {
   try {
     const product = ProductInputSchema.parse(data)
     await connectToDatabase()
-    await Product.create(product)
+    const categoryName = await resolveCategoryName(product.category)
+    const slug = await resolveSlug(product.slug, product.name)
+    await Product.create({ ...product, slug, categoryName })
     revalidatePath('/admin/products')
     return {
       success: true,
@@ -30,8 +49,11 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
   try {
     const product = ProductUpdateSchema.parse(data)
     await connectToDatabase()
-    await Product.findByIdAndUpdate(product._id, product)
+    const categoryName = await resolveCategoryName(product.category)
+    const slug = await resolveSlug(product.slug, product.name, product._id)
+    await Product.findByIdAndUpdate(product._id, { ...product, slug, categoryName })
     revalidatePath('/admin/products')
+    revalidatePath('/product/[slug]', 'page')
     return {
       success: true,
       message: 'Product updated successfully',
@@ -40,11 +62,11 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     return { success: false, message: formatError(error) }
   }
 }
-// DELETE
+// DELETE (soft delete)
 export async function deleteProduct(id: string) {
   try {
     await connectToDatabase()
-    const res = await Product.findByIdAndDelete(id)
+    const res = await Product.findByIdAndUpdate(id, { status: 'delete' })
     if (!res) throw new Error('Product not found')
     revalidatePath('/admin/products')
     return {
@@ -101,6 +123,7 @@ export async function getAllProductsForAdmin({
             ? { avgRating: -1 }
             : { _id: -1 }
   const products = await Product.find({
+    status: { $ne: 'delete' },
     ...queryFilter,
   })
     .sort(order)
@@ -109,6 +132,7 @@ export async function getAllProductsForAdmin({
     .lean()
 
   const countProducts = await Product.countDocuments({
+    status: { $ne: 'delete' },
     ...queryFilter,
   })
   return {
@@ -120,12 +144,13 @@ export async function getAllProductsForAdmin({
   }
 }
 
-export async function getAllCategories() {
+export async function getAllCategories(): Promise<ICategory[]> {
   await connectToDatabase()
-  const categories = await Product.find({ isPublished: true }).distinct(
-    'category'
-  )
-  return categories
+  const categories = await Category.find({
+    type: 'product',
+    status: 'public',
+  }).sort({ name: 1 })
+  return JSON.parse(JSON.stringify(categories)) as ICategory[]
 }
 export async function getProductsForCard({
   tag,
@@ -136,7 +161,7 @@ export async function getProductsForCard({
 }) {
   await connectToDatabase()
   const products = await Product.find(
-    { tags: { $in: [tag] }, isPublished: true },
+    { tags: { $in: [tag] }, status: 'public' },
     {
       name: 1,
       href: { $concat: ['/product/', '$slug'] },
@@ -162,7 +187,19 @@ export async function getProductsByTag({
   await connectToDatabase()
   const products = await Product.find({
     tags: { $in: [tag] },
-    isPublished: true,
+    status: 'public',
+  })
+    .sort({ createdAt: 'desc' })
+    .limit(limit)
+  return JSON.parse(JSON.stringify(products)) as IProduct[]
+}
+
+// GET PRODUCTS FOR HOME HERO (only products with a site banner)
+export async function getProductsForHero({ limit = 6 }: { limit?: number } = {}) {
+  await connectToDatabase()
+  const products = await Product.find({
+    status: 'public',
+    siteBanner: { $nin: ['', null] },
   })
     .sort({ createdAt: 'desc' })
     .limit(limit)
@@ -172,7 +209,7 @@ export async function getProductsByTag({
 // GET ONE PRODUCT BY SLUG
 export async function getProductBySlug(slug: string) {
   await connectToDatabase()
-  const product = await Product.findOne({ slug, isPublished: true })
+  const product = await Product.findOne({ slug, status: 'public' })
   if (!product) return null
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
@@ -195,7 +232,7 @@ export async function getRelatedProductsByCategory({
   await connectToDatabase()
   const skipAmount = (Number(page) - 1) * limit
   const conditions = {
-    isPublished: true,
+    status: 'public' as const,
     category,
     _id: { $ne: productId },
   }
@@ -245,7 +282,8 @@ export async function getAllProducts({
           },
         }
       : {}
-  const categoryFilter = category && category !== 'all' ? { category } : {}
+  const categoryFilter =
+    category && category !== 'all' ? { categoryName: category } : {}
   const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
 
   const ratingFilter =
@@ -276,9 +314,9 @@ export async function getAllProducts({
           : sort === 'avg-customer-review'
             ? { avgRating: -1 }
             : { _id: -1 }
-  const isPublished = { isPublished: true }
+  const statusFilter = { status: 'public' as const }
   const products = await Product.find({
-    ...isPublished,
+    ...statusFilter,
     ...queryFilter,
     ...tagFilter,
     ...categoryFilter,
@@ -291,6 +329,7 @@ export async function getAllProducts({
     .lean()
 
   const countProducts = await Product.countDocuments({
+    ...statusFilter,
     ...queryFilter,
     ...tagFilter,
     ...categoryFilter,

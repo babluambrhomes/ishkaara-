@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 
 import { getBlogPostById } from '@/lib/actions/blog.actions'
+import { getCategoriesByType } from '@/lib/actions/category.actions'
 import Link from 'next/link'
 import PostForm from '../post-form'
 import { Metadata } from 'next'
@@ -20,7 +21,10 @@ const UpdatePost = async (props: UpdatePostProps) => {
 
   const { id } = params
 
-  const post = await getBlogPostById(id)
+  const [post, categories] = await Promise.all([
+    getBlogPostById(id),
+    getCategoriesByType('blog'),
+  ])
   if (!post) notFound()
   return (
     <main className='max-w-full p-4'>
@@ -31,7 +35,12 @@ const UpdatePost = async (props: UpdatePostProps) => {
       </div>
 
       <div className='my-8'>
-        <PostForm type='Update' post={post} postId={post._id} />
+        <PostForm
+          type='Update'
+          post={post}
+          postId={post._id}
+          categories={categories}
+        />
       </div>
     </main>
   )

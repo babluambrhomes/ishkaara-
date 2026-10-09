@@ -2,6 +2,9 @@
 
 import { Send } from 'lucide-react'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -12,43 +15,53 @@ import { cn } from '@/lib/utils'
 
 const inputClass = 'bg-white focus-visible:ring-primary/30'
 
+const ContactFormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().min(1, 'Email is required').email('Email is invalid'),
+  phone: z.string().min(1, 'Phone number is required'),
+  subject: z.string().min(1, 'Subject is required'),
+  message: z.string().min(1, 'Message is required'),
+})
+
+type ContactFormValues = z.infer<typeof ContactFormSchema>
+
 export default function ContactForm() {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-  })
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
   )
   const [message, setMessage] = useState('')
 
-  const update = (field: keyof typeof form) => (value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
-  }
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(ContactFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: '',
+    },
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const {
+    handleSubmit,
+    register,
+    formState: { isSubmitting },
+    reset,
+  } = form
+
+  const onSubmit = async (values: ContactFormValues) => {
     setStatus('loading')
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(values),
       })
       const data = await res.json()
       setStatus(res.ok ? 'success' : 'error')
       setMessage(data.message || 'Something went wrong. Please try again.')
       if (res.ok) {
-        setForm({
-          name: '',
-          email: '',
-          phone: '',
-          subject: '',
-          message: '',
-        })
+        reset()
       }
     } catch {
       setStatus('error')
@@ -59,17 +72,15 @@ export default function ContactForm() {
   return (
     <Card className='rounded-2xl border-border/60 shadow-soft'>
       <CardContent className='p-5 md:p-6'>
-        <form onSubmit={handleSubmit} className='space-y-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
             <div className='space-y-1.5'>
               <Label htmlFor='name'>Name</Label>
               <Input
                 id='name'
-                value={form.name}
-                onChange={(e) => update('name')(e.target.value)}
                 placeholder='Your full name'
                 className={inputClass}
-                required
+                {...register('name')}
               />
             </div>
             <div className='space-y-1.5'>
@@ -77,11 +88,9 @@ export default function ContactForm() {
               <Input
                 id='email'
                 type='email'
-                value={form.email}
-                onChange={(e) => update('email')(e.target.value)}
                 placeholder='you@example.com'
                 className={inputClass}
-                required
+                {...register('email')}
               />
             </div>
             <div className='space-y-1.5'>
@@ -89,22 +98,18 @@ export default function ContactForm() {
               <Input
                 id='phone'
                 type='tel'
-                value={form.phone}
-                onChange={(e) => update('phone')(e.target.value)}
-                placeholder='+1 (123) 456-7890'
+                placeholder='Your phone number'
                 className={inputClass}
-                required
+                {...register('phone')}
               />
             </div>
             <div className='space-y-1.5'>
               <Label htmlFor='subject'>Subject</Label>
               <Input
                 id='subject'
-                value={form.subject}
-                onChange={(e) => update('subject')(e.target.value)}
                 placeholder='What is this regarding?'
                 className={inputClass}
-                required
+                {...register('subject')}
               />
             </div>
           </div>
@@ -113,12 +118,10 @@ export default function ContactForm() {
             <Label htmlFor='message'>Message</Label>
             <Textarea
               id='message'
-              value={form.message}
-              onChange={(e) => update('message')(e.target.value)}
               placeholder='Write your message here...'
               rows={5}
               className='bg-white'
-              required
+              {...register('message')}
             />
           </div>
 
@@ -135,11 +138,13 @@ export default function ContactForm() {
 
           <Button
             type='submit'
-            disabled={status === 'loading'}
+            disabled={isSubmitting || status === 'loading'}
             className='w-full rounded-full py-2.5'
           >
             <Send className='h-4 w-4' />
-            {status === 'loading' ? 'Sending…' : 'Send Message'}
+            {isSubmitting || status === 'loading'
+              ? 'Sending…'
+              : 'Send Message'}
           </Button>
         </form>
       </CardContent>

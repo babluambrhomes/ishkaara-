@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 import { Eye, Heart, Shirt, Target, Users } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { getSetting } from '@/lib/actions/setting.actions'
-import { staticPages } from '@/lib/static-pages'
+import { TiptapContent } from '@/components/editor/tiptap-content'
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -43,7 +42,6 @@ export default async function AboutUsPage() {
   const {
     site: { name, slogan },
   } = await getSetting()
-  const page = staticPages['about-us']
 
   return (
     <div className='w-full  py-8 px-3'>
@@ -89,7 +87,15 @@ export default async function AboutUsPage() {
             Welcome to {name}
           </h2>
           <div className='mt-4 text-justify text-lg leading-relaxed web-page-content'>
-            <ReactMarkdown>{page.content}</ReactMarkdown>
+            <TiptapContent
+              html={`<p>Welcome to <strong>Ishkaara</strong>, your trusted destination for quality products and exceptional service.</p>
+
+<p>Our journey began with a mission to bring you the best shopping experience by offering a wide range of products at competitive prices, all in one convenient platform.</p>
+
+<p>At Ishkaara, we prioritize customer satisfaction and innovation. Our team works tirelessly to curate a diverse selection of items, from everyday essentials to exclusive deals, ensuring there's something for everyone. We also make your shopping experience seamless with fast shipping, secure payments, and excellent customer support.</p>
+
+<p>As we continue to grow, our commitment to quality and service remains unwavering. Thank you for choosing Ishkaara - we look forward to being a part of your journey and delivering value every step of the way.</p>`}
+            />
           </div>
         </div>
       </div>

@@ -38,6 +38,14 @@ body {
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
   * {
     @apply border-border;
   }
@@ -66,8 +74,345 @@ body {
 }
 
 @layer utilities {
+  /* ===== Shared rich-text content: editor + rendered output ===== */
+  .tiptap,
+  .tiptap-content,
+  .web-page-content {
+    @apply text-foreground;
+    word-break: break-word;
+  }
+  .tiptap {
+    @apply min-h-[320px] outline-none;
+  }
+  .tiptap:focus {
+    @apply outline-none;
+  }
+
+  /* Paragraphs */
+  .tiptap p,
+  .tiptap-content p,
   .web-page-content p {
-    @apply py-2;
+    @apply my-3 leading-7;
+  }
+
+  /* Headings */
+  .tiptap h1,
+  .tiptap-content h1,
+  .web-page-content h1 {
+    @apply mb-3 mt-8 text-3xl font-bold leading-tight tracking-tight;
+  }
+  .tiptap h2,
+  .tiptap-content h2,
+  .web-page-content h2 {
+    @apply mb-3 mt-8 text-2xl font-bold leading-snug tracking-tight;
+  }
+  .tiptap h3,
+  .tiptap-content h3,
+  .web-page-content h3 {
+    @apply mb-2 mt-6 text-xl font-semibold leading-snug tracking-tight;
+  }
+  .tiptap h4,
+  .tiptap-content h4,
+  .web-page-content h4 {
+    @apply mb-2 mt-5 text-lg font-semibold leading-snug;
+  }
+  .tiptap h5,
+  .tiptap-content h5,
+  .web-page-content h5 {
+    @apply mb-2 mt-4 text-base font-semibold uppercase tracking-wide;
+  }
+  .tiptap h6,
+  .tiptap-content h6,
+  .web-page-content h6 {
+    @apply mb-2 mt-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground;
+  }
+
+  /* Inline formatting */
+  .tiptap strong,
+  .tiptap b,
+  .tiptap-content strong,
+  .tiptap-content b,
+  .web-page-content strong,
+  .web-page-content b {
+    @apply font-bold;
+  }
+  .tiptap em,
+  .tiptap i,
+  .tiptap-content em,
+  .tiptap-content i,
+  .web-page-content em,
+  .web-page-content i {
+    @apply italic;
+  }
+  .tiptap u,
+  .tiptap-content u,
+  .web-page-content u {
+    @apply underline underline-offset-2;
+  }
+  .tiptap s,
+  .tiptap strike,
+  .tiptap del,
+  .tiptap-content s,
+  .tiptap-content strike,
+  .tiptap-content del,
+  .web-page-content s,
+  .web-page-content strike,
+  .web-page-content del {
+    @apply line-through;
+  }
+  .tiptap small,
+  .tiptap-content small,
+  .web-page-content small {
+    font-size: 0.85em;
+    @apply text-muted-foreground;
+  }
+  .tiptap big,
+  .tiptap-content big,
+  .web-page-content big {
+    font-size: 1.25em;
+  }
+  .tiptap sub,
+  .tiptap sup,
+  .tiptap-content sub,
+  .tiptap-content sup,
+  .web-page-content sub,
+  .web-page-content sup {
+    font-size: 0.75em;
+    line-height: 0;
+  }
+  .tiptap mark,
+  .tiptap-content mark,
+  .web-page-content mark {
+    @apply rounded-sm bg-yellow-200 px-0.5 text-foreground;
+    color: inherit;
+  }
+  .tiptap a,
+  .tiptap-content a,
+  .web-page-content a {
+    @apply font-medium text-sky-700 underline decoration-sky-700 underline-offset-2 hover:text-sky-800;
+  }
+
+  /* Lists */
+  .tiptap ul,
+  .tiptap-content ul,
+  .web-page-content ul {
+    @apply my-3 list-disc space-y-1 pl-6;
+  }
+  .tiptap ol,
+  .tiptap-content ol,
+  .web-page-content ol {
+    @apply my-3 list-decimal space-y-1 pl-6;
+  }
+  .tiptap li,
+  .tiptap-content li,
+  .web-page-content li {
+    @apply leading-7;
+  }
+  .tiptap li > p,
+  .tiptap-content li > p,
+  .web-page-content li > p {
+    @apply my-0;
+  }
+  .tiptap ul ul,
+  .tiptap-content ul ul,
+  .web-page-content ul ul {
+    list-style-type: circle;
+  }
+  .tiptap ul ul ul,
+  .tiptap-content ul ul ul,
+  .web-page-content ul ul ul {
+    list-style-type: square;
+  }
+  .tiptap ol ol,
+  .tiptap-content ol ol,
+  .web-page-content ol ol {
+    list-style-type: lower-alpha;
+  }
+
+  /* Blockquote */
+  .tiptap blockquote,
+  .tiptap-content blockquote,
+  .web-page-content blockquote {
+    @apply my-5 rounded-r-md border-l-4 border-primary/40 bg-muted/50 py-2 pl-4 pr-3 italic text-muted-foreground;
+  }
+  .tiptap blockquote p,
+  .tiptap-content blockquote p,
+  .web-page-content blockquote p {
+    @apply my-1;
+  }
+
+  /* Code */
+  .tiptap code,
+  .tiptap-content code,
+  .web-page-content code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-primary;
+  }
+  .tiptap pre,
+  .tiptap-content pre,
+  .web-page-content pre {
+    @apply my-4 overflow-x-auto rounded-lg bg-foreground/90 p-4 font-mono text-sm leading-relaxed text-background;
+  }
+  .tiptap pre code,
+  .tiptap-content pre code,
+  .web-page-content pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  /* Divider & media */
+  .tiptap hr,
+  .tiptap-content hr,
+  .web-page-content hr {
+    @apply my-6 border-t border-border;
+  }
+  .tiptap img,
+  .tiptap-content img,
+  .web-page-content img {
+    @apply my-4 h-auto max-w-full rounded-lg;
+  }
+  .tiptap iframe,
+  .tiptap-content iframe,
+  .web-page-content iframe {
+    @apply my-4 aspect-video w-full rounded-lg;
+  }
+
+  /* Miscellaneous elements */
+  .tiptap abbr[title],
+  .tiptap-content abbr[title],
+  .web-page-content abbr[title] {
+    @apply cursor-help border-b border-dotted border-muted-foreground no-underline;
+    text-decoration-skip-ink: none;
+  }
+  .tiptap q,
+  .tiptap-content q,
+  .web-page-content q {
+    @apply italic;
+    quotes: '\201C' '\201D' '\2018' '\2019';
+  }
+  .tiptap ins,
+  .tiptap-content ins,
+  .web-page-content ins {
+    @apply underline underline-offset-2;
+  }
+  .tiptap cite,
+  .tiptap-content cite,
+  .web-page-content cite {
+    @apply italic text-muted-foreground;
+  }
+  .tiptap address,
+  .tiptap-content address,
+  .web-page-content address {
+    @apply my-3 not-italic leading-7 text-muted-foreground;
+  }
+  .tiptap label,
+  .tiptap-content label,
+  .web-page-content label {
+    @apply font-medium;
+  }
+  .tiptap span,
+  .tiptap-content span,
+  .web-page-content span,
+  .tiptap div,
+  .tiptap-content div,
+  .web-page-content div {
+    @apply break-words;
+  }
+  .tiptap br,
+  .tiptap-content br,
+  .web-page-content br {
+    @apply align-baseline;
+  }
+
+  /* Placeholder (editor only) */
+  .tiptap .is-editor-empty::before,
+  .tiptap .is-empty::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+    @apply text-muted-foreground/70;
+  }
+
+  /* Editor toolbar tooltip */
+  [data-tooltip] {
+    @apply relative;
+  }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 50;
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 5px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+  [data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Rich-text tables */
+  .tiptap table,
+  .tiptap-content table,
+  .web-page-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+    table-layout: fixed;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-size: 0.95em;
+  }
+  .tiptap table th,
+  .tiptap table td,
+  .tiptap-content table th,
+  .tiptap-content table td,
+  .web-page-content table th,
+  .web-page-content table td {
+    border: 1px solid hsl(var(--border));
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+    position: relative;
+    min-width: 3rem;
+  }
+  .tiptap table th,
+  .tiptap-content table th,
+  .web-page-content table th {
+    background: hsl(var(--muted));
+    font-weight: 600;
+    text-align: left;
+  }
+  .tiptap table tbody tr:nth-child(even),
+  .tiptap-content table tbody tr:nth-child(even),
+  .web-page-content table tbody tr:nth-child(even) {
+    background: hsl(var(--muted) / 0.4);
+  }
+  .tiptap .selectedCell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--primary) / 0.15);
+    pointer-events: none;
+  }
+  .tiptap .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: hsl(var(--primary));
+    pointer-events: none;
   }
   .highlight-link a,
   a.highlight-link {

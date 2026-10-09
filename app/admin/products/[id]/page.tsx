@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 
 import { getProductById } from '@/lib/actions/product.actions'
+import { getCategoriesByType } from '@/lib/actions/category.actions'
 import Link from 'next/link'
 import ProductForm from '../product-form'
 import { Metadata } from 'next'
@@ -20,7 +21,10 @@ const UpdateProduct = async (props: UpdateProductProps) => {
 
   const { id } = params
 
-  const product = await getProductById(id)
+  const [product, categories] = await Promise.all([
+    getProductById(id),
+    getCategoriesByType('product'),
+  ])
   if (!product) notFound()
   return (
     <main className='max-w-6xl mx-auto p-4'>
@@ -31,7 +35,12 @@ const UpdateProduct = async (props: UpdateProductProps) => {
       </div>
 
       <div className='my-8'>
-        <ProductForm type='Update' product={product} productId={product._id} />
+        <ProductForm
+          type='Update'
+          product={product}
+          productId={product._id}
+          categories={categories}
+        />
       </div>
     </main>
   )

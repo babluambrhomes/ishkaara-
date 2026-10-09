@@ -1,8 +1,12 @@
 import { Document, Model, model, models, Schema } from 'mongoose'
 import { IProductInput } from '@/types'
 
+export type ProductStatus = 'public' | 'draft' | 'delete'
+
 export interface IProduct extends Document, IProductInput {
   _id: string
+  categoryName: string
+  siteBanner: string
   createdAt: Date
   updatedAt: Date
 }
@@ -19,10 +23,22 @@ const productSchema = new Schema<IProduct>(
       unique: true,
     },
     category: {
+      type: Schema.Types.ObjectId as unknown as typeof String,
+      ref: 'Category',
+      required: true,
+      index: true,
+    },
+    categoryName: {
       type: String,
       required: true,
+      trim: true,
+      index: true,
     },
     images: [String],
+    siteBanner: {
+      type: String,
+      default: '',
+    },
     brand: {
       type: String,
       required: true,
@@ -73,10 +89,12 @@ const productSchema = new Schema<IProduct>(
       required: true,
       default: 0,
     },
-    isPublished: {
-      type: Boolean,
+    status: {
+      type: String,
       required: true,
-      default: false,
+      enum: ['public', 'draft', 'delete'],
+      default: 'draft',
+      index: true,
     },
     reviews: [
       {

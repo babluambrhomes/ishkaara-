@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import Image from 'next/image'
+import { getImageUrl } from '@/lib/image-url'
 import { useState } from 'react'
 
 const ImageHover = ({
@@ -30,7 +31,7 @@ const ImageHover = ({
       onMouseLeave={handleMouseLeave}
     >
       <Image
-        src={src}
+        src={getImageUrl(src)}
         alt={alt}
         fill
         sizes='80vw'
@@ -39,7 +40,7 @@ const ImageHover = ({
         }`}
       />
       <Image
-        src={hoverSrc}
+        src={getImageUrl(hoverSrc)}
         alt={alt}
         fill
         sizes='80vw'

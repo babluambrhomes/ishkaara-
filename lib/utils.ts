@@ -3,6 +3,15 @@ import { twMerge } from 'tailwind-merge'
 
 import qs from 'query-string'
 
+export class ApiError extends Error {
+  statusCode: number
+  constructor(statusCode: number, message: string) {
+    super(message)
+    this.name = 'ApiError'
+    this.statusCode = statusCode
+  }
+}
+
 export function formUrlQuery({
   params,
   key,
@@ -43,6 +52,18 @@ export const toSlug = (text: string): string =>
     .replace(/\s+/g, '-')
     .replace(/^-+|-+$/g, '')
     .replace(/-+/g, '-')
+
+export const generateSlug = (text: string): string => {
+  const base = toSlug(text)
+  const suffix = Math.random().toString(36).slice(2, 8)
+  return base ? `${base}-${suffix}` : suffix
+}
+
+export const stripHtml = (value?: string | null): string =>
+  (value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 const CURRENCY_FORMATTER = new Intl.NumberFormat('en-IN', {
   currency: 'INR',
@@ -163,7 +184,7 @@ export const formatDateTime = (dateString: Date) => {
 }
 
 export function formatId(id: string) {
-  return `..${id.substring(id.length - 6)}`
+  return `#${id}`
 }
 
 export const getFilterUrl = ({

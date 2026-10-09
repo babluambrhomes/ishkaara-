@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
+import { getImageUrl } from '@/lib/image-url'
 
 type CardItem = {
   title: string
@@ -32,7 +33,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
                   className='flex flex-col group/item'
                 >
                   <Image
-                    src={item.image}
+                    src={getImageUrl(item.image)}
                     alt={item.name}
                     className='aspect-square object-scale-down max-w-full h-auto mx-auto transition-transform duration-300 group-hover/item:scale-105'
                     height={120}

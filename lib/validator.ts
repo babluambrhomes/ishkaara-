@@ -6,6 +6,8 @@ const MongoId = z
   .string()
   .regex(/^[0-9a-fA-F]{24}$/, { message: 'Invalid MongoDB ID' })
 
+export const ContentStatusSchema = z.enum(['public', 'draft', 'delete'])
+
 const Price = (field: string) =>
   z.coerce
     .number()
@@ -30,11 +32,12 @@ export const ReviewInputSchema = z.object({
 export const ProductInputSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters'),
-  category: z.string().min(1, 'Category is required'),
+  category: MongoId,
   images: z.array(z.string()).min(1, 'Product must have at least one image'),
+  siteBanner: z.string().default(''),
   brand: z.string().min(1, 'Brand is required'),
   description: z.string().min(1, 'Description is required'),
-  isPublished: z.boolean(),
+  status: ContentStatusSchema.default('draft'),
   price: Price('Price'),
   listPrice: Price('List price'),
   countInStock: z.coerce
@@ -238,7 +241,7 @@ export const BlogPostInputSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters'),
   image: z.string().min(1, 'Cover image is required'),
-  category: z.string().min(1, 'Category is required'),
+  category: MongoId,
   tags: z.array(z.string()).default([]),
   excerpt: z.string().min(1, 'Excerpt is required'),
   content: z.string().min(1, 'Content is required'),
@@ -246,12 +249,29 @@ export const BlogPostInputSchema = z.object({
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
   author: z.string().min(1, 'Author is required').default('Ishkaara'),
-  isPublished: z.boolean().default(false),
+  status: ContentStatusSchema.default('draft'),
 })
 
 export const BlogPostUpdateSchema = BlogPostInputSchema.extend({
   _id: z.string(),
 })
+
+// CATEGORY
+export const CategoryInputSchema = z.object({
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(60, 'Name must be at most 60 characters'),
+  type: z.enum(['product', 'blog']),
+  description: z.string().max(300, 'Too long').default(''),
+  imageUrl: z.string().default(''),
+  status: ContentStatusSchema.default('public'),
+})
+
+export const CategoryUpdateSchema = CategoryInputSchema.extend({
+  _id: z.string(),
+})
+
 
 // WEBPAGE
 export const WebPageInputSchema = z.object({
@@ -327,3 +347,15 @@ export const SettingInputSchema = z.object({
     .min(1, 'At least one delivery date is required'),
   defaultDeliveryDate: z.string().min(1, 'Delivery date is required'),
 })
+
+// FAQ
+export const FaqInputSchema = z.object({
+  question: z.string().min(3, 'Question must be at least 3 characters'),
+  answer: z.string().min(3, 'Answer must be at least 3 characters'),
+  is_public: z.boolean().default(true),
+})
+
+export const FaqUpdateSchema = FaqInputSchema.extend({
+  _id: z.string(),
+})
+

@@ -112,7 +112,7 @@ function AddressForm({
         },
   })
 
-  const onSubmit = async (values: AddressFormValues) => {
+  const onAddressSubmit = async (values: AddressFormValues) => {
     setSubmitting(true)
     const res = await saveAddress(values)
     setSubmitting(false)
@@ -150,7 +150,7 @@ function AddressForm({
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-5'>
+          <form onSubmit={form.handleSubmit(onAddressSubmit)} className='space-y-5'>
             <div className='grid gap-4 sm:grid-cols-2'>
               <FormField
                 control={form.control}

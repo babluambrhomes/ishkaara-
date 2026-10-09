@@ -24,8 +24,8 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/hooks/use-toast'
 import { updateUser } from '@/lib/actions/user.actions'
-import { USER_ROLES } from '@/lib/constants'
-import { IUser } from '@/lib/db/models/user.model'
+import { USER_ROLES } from '@/config/data'
+import { IUser } from '@/lib/models/user.model'
 import { UserUpdateSchema } from '@/lib/validator'
 
 const UserEditForm = ({ user }: { user: IUser }) => {
@@ -37,7 +37,7 @@ const UserEditForm = ({ user }: { user: IUser }) => {
   })
 
   const { toast } = useToast()
-  async function onSubmit(values: z.infer<typeof UserUpdateSchema>) {
+  async function onUserEditSubmit(values: z.infer<typeof UserUpdateSchema>) {
     try {
       const res = await updateUser({
         ...values,
@@ -67,7 +67,7 @@ const UserEditForm = ({ user }: { user: IUser }) => {
     <Form {...form}>
       <form
         method='post'
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onUserEditSubmit)}
         className='space-y-8'
       >
         <div className='flex flex-col gap-5 md:flex-row'>

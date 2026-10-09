@@ -6,12 +6,16 @@ import React, { useState } from 'react'
 import {
   LayoutDashboard,
   Tags,
+  FolderTree,
   FileText,
   Package,
   Users,
   LogOut,
   PanelLeft,
   MenuIcon,
+  MessageSquare,
+  Mail,
+  HelpCircle,
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -28,9 +32,13 @@ import {
 const links = [
   { title: 'Overview', href: '/admin/overview', icon: LayoutDashboard },
   { title: 'Products', href: '/admin/products', icon: Tags },
+  { title: 'Categories', href: '/admin/categories', icon: FolderTree },
   { title: 'Blog', href: '/admin/blog/posts', icon: FileText },
   { title: 'Orders', href: '/admin/orders', icon: Package },
   { title: 'Users', href: '/admin/users', icon: Users },
+  { title: 'Messages', href: '/admin/messages', icon: MessageSquare },
+  { title: 'Newsletter', href: '/admin/newsletter', icon: Mail },
+  { title: 'FAQs', href: '/admin/faqs', icon: HelpCircle },
 ]
 
 function NavLinks({

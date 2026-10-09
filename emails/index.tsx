@@ -1,25 +1,11 @@
-import { Resend } from 'resend'
 import PurchaseReceiptEmail from './purchase-receipt'
-import { IOrder } from '@/lib/db/models/order.model'
+import { IOrder } from '@/lib/models/order.model'
 import AskReviewOrderItemsEmail from './ask-review-order-items'
-import { SENDER_EMAIL, SENDER_NAME } from '@/lib/constants'
-
-let resend: Resend | undefined
-
-const getResend = () => {
-  const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    throw new Error(
-      'RESEND_API_KEY is not set. Add it to your environment to send emails.'
-    )
-  }
-  resend ??= new Resend(apiKey)
-  return resend
-}
+import { getResend, sender } from '@/config/email'
 
 export const sendPurchaseReceipt = async ({ order }: { order: IOrder }) => {
   await getResend().emails.send({
-    from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
+    from: `${sender.name} <${sender.email}>`,
     to: (order.user as { email: string }).email,
     subject: 'Order Confirmation',
     react: <PurchaseReceiptEmail order={order} />,
@@ -30,7 +16,7 @@ export const sendAskReviewOrderItems = async ({ order }: { order: IOrder }) => {
   const oneDayFromNow = new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString()
 
   await getResend().emails.send({
-    from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
+    from: `${sender.name} <${sender.email}>`,
     to: (order.user as { email: string }).email,
     subject: 'Review your order items',
     react: <AskReviewOrderItemsEmail order={order} />,

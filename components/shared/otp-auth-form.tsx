@@ -49,7 +49,7 @@ function PhoneStep({ onSubmitted }: { onSubmitted: (phone: string, otp: string) 
 
   const { handleSubmit, control } = form
 
-  const onSubmit = async (data: IUserOtpSend) => {
+  const onPhoneSubmit = async (data: IUserOtpSend) => {
     try {
       const res = await sendOtp({ phone: data.phone })
 
@@ -79,7 +79,7 @@ function PhoneStep({ onSubmitted }: { onSubmitted: (phone: string, otp: string) 
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onPhoneSubmit)}>
         <div className='space-y-6'>
           <FormField
             control={control}
@@ -129,7 +129,7 @@ function OtpStep({
 
   const { handleSubmit, control } = form
 
-  const onSubmit = async (data: IUserSignIn) => {
+  const onOtpSubmit = async (data: IUserSignIn) => {
     try {
       await signInWithOtp({ phone: data.phone, otp: data.otp })
       window.location.href = callbackUrl
@@ -145,7 +145,7 @@ function OtpStep({
 
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onOtpSubmit)}>
         <div className='space-y-6'>
           <div className='rounded-md border border-dashed border-primary/40 bg-primary/5 px-4 py-3 text-sm'>
             <p className='font-medium'>Verification code sent to {phone}</p>

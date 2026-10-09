@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import NewsletterSubscriber from '@/lib/db/models/newsletter-subscriber.model'
-import { connectToDatabase } from '@/lib/db'
+import NewsletterSubscriber from '@/lib/models/newsletter-subscriber.model'
+import { connectToDatabase } from '@/config/db'
 
 export const POST = async (request: NextRequest) => {
   const body = (await request.json().catch(() => null)) as { email?: string } | null

@@ -13,11 +13,12 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { auth } from '@/auth'
+import { ICategory } from '@/lib/models/category.model'
 
 export default async function Sidebar({
   categories,
 }: {
-  categories: string[]
+  categories: ICategory[]
 }) {
   const session = await auth()
   const user = session?.user
@@ -72,12 +73,12 @@ export default async function Sidebar({
             </div>
             <nav className='flex flex-col'>
               {categories.map((category) => (
-                <DrawerClose asChild key={category}>
+                <DrawerClose asChild key={category._id}>
                   <Link
-                    href={`/search?category=${category}`}
+                    href={`/search?category=${encodeURIComponent(category.name)}`}
                     className='group flex items-center justify-between item-button transition-colors'
                   >
-                    <span>{category}</span>
+                    <span>{category.name}</span>
                     <ChevronRight className='h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5' />
                   </Link>
                 </DrawerClose>

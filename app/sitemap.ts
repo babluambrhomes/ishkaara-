@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { connectToDatabase } from '@/lib/db'
-import BlogPost from '@/lib/db/models/blog-post.model'
-import { staticPages } from '@/lib/static-pages'
+import { connectToDatabase } from '@/config/db'
+import BlogPost from '@/lib/models/blog-post.model'
 
 const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
@@ -28,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   await connectToDatabase()
-  const posts = await BlogPost.find({ isPublished: true })
+  const posts = await BlogPost.find({ status: 'public' })
     .select('slug date')
     .lean()
 
@@ -39,12 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  const pageRoutes = Object.keys(staticPages).map((slug) => ({
-    url: `${baseUrl}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
-
-  return [...staticRoutes, ...blogRoutes, ...pageRoutes]
+  return [...staticRoutes, ...blogRoutes]
 }

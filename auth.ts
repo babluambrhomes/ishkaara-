@@ -1,12 +1,12 @@
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import Google from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { connectToDatabase } from './lib/db'
-import client from './lib/db/client'
-import User from './lib/db/models/user.model'
+import { connectToDatabase } from './config/db'
+import client from './config/db'
+import User from './lib/models/user.model'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
-import authConfig from './auth.config'
+import authConfig from './config/auth.config'
 
 declare module 'next-auth' {
   interface Session {

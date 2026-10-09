@@ -9,14 +9,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   getProductsForCard,
   getProductsByTag,
+  getProductsForHero,
   getAllCategories,
 } from '@/lib/actions/product.actions'
-import { getSetting } from '@/lib/actions/setting.actions'
 import { toSlug } from '@/lib/utils'
 
 export default async function HomePage() {
-  const heroProducts = await getProductsByTag({ tag: 'featured', limit: 6 })
-  const { carousels } = await getSetting()
+  const heroProducts = await getProductsForHero({ limit: 6 })
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
   const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
 
@@ -38,9 +37,10 @@ export default async function HomePage() {
         href: '/search',
       },
       items: categories.map((category) => ({
-        name: category,
-        image: `/images/${toSlug(category)}.jpg`,
-        href: `/search?category=${category}`,
+        name: category.name,
+        image:
+          category.imageUrl || `/images/${toSlug(category.name)}.jpg`,
+        href: `/search?category=${encodeURIComponent(category.name)}`,
       })),
     },
     {
@@ -73,7 +73,7 @@ export default async function HomePage() {
     <>
      <Header />
     <div className='flex-1 flex flex-col gap-6 p-3 '>
-      <HomeCarousel products={heroProducts} banners={carousels} />
+      <HomeCarousel products={heroProducts} />
       <HomeCard cards={cards} />
       <Card className='w-full overflow-hidden rounded-2xl shadow-soft'>
         <CardContent className='p-4 items-center gap-3'>

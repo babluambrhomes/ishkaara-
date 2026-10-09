@@ -7,20 +7,23 @@ import { cn } from '@/lib/utils'
 
 type HeadingItem = { level: number; text: string; slug: string }
 
-const headingRegex = /^(#{1,4})\s+(.+)$/gm
+const headingRegex = /<h([2-6])([^>]*)>([\s\S]*?)<\/h\1>/gi
 
 function extractHeadings(content: string): HeadingItem[] {
   const headings: HeadingItem[] = []
   for (const match of content.matchAll(headingRegex)) {
-    const level = match[1].length
-    const text = match[2]
-      .replace(/\*\*(.+?)\*\*/g, '$1')
-      .replace(/\*(.+?)\*/g, '$1')
-      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-      .replace(/`(.+?)`/g, '$1')
+    const level = parseInt(match[1], 10)
+    const attrs = match[2] ?? ''
+    const id = attrs.match(/\bid=["']([^"']+)["']/)?.[1]
+    const text = match[3]
+      .replace(/<[^>]*>/g, '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&nbsp;/g, ' ')
       .trim()
     if (!text) continue
-    headings.push({ level, text, slug: toSlug(text) })
+    headings.push({ level, text, slug: id ?? toSlug(text) })
   }
   return headings
 }
