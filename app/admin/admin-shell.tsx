@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Mail,
   HelpCircle,
+  Ticket,
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -38,6 +39,7 @@ const links = [
   { title: 'Users', href: '/admin/users', icon: Users },
   { title: 'Messages', href: '/admin/messages', icon: MessageSquare },
   { title: 'Newsletter', href: '/admin/newsletter', icon: Mail },
+  { title: 'Coupons', href: '/admin/coupons', icon: Ticket },
   { title: 'FAQs', href: '/admin/faqs', icon: HelpCircle },
 ]
 

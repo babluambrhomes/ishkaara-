@@ -15,7 +15,7 @@ import {
   deleteProduct,
   getAllProductsForAdmin,
 } from '@/lib/actions/product.actions'
-import { IProduct } from '@/lib/models/product.model'
+import { IProductDisplay } from '@/types'
 
 import React, { useCallback, useEffect, useState, useTransition } from 'react'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,7 @@ import { useDebouncedValue } from '@/hooks/use-debounce'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 type ProductListDataProps = {
-  products: IProduct[]
+  products: IProductDisplay[]
   totalPages: number
   totalProducts: number
   to: number
@@ -110,7 +110,7 @@ export default function AdminProduct() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data?.products.map((product: IProduct) => (
+              {data?.products.map((product: IProductDisplay) => (
                 <TableRow key={product._id}>
                   <TableCell>{formatId(product._id).slice(0, 8)}</TableCell>
                   <TableCell>
@@ -124,7 +124,9 @@ export default function AdminProduct() {
                   <TableCell>{product.avgRating}</TableCell>
                   <TableCell className='capitalize'>{product.status}</TableCell>
                   <TableCell>
-                    {formatDateTime(product.updatedAt).dateTime}
+                    {product.updatedAt
+                      ? formatDateTime(new Date(product.updatedAt)).dateTime
+                      : 'N/A'}
                   </TableCell>
                   <TableCell className='flex gap-1'>
                     <Button asChild variant='outline' size='sm'>

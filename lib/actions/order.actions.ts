@@ -1,6 +1,7 @@
 'use server'
 
 import { Cart, IOrderList, OrderItem, ShippingAddress } from '@/types'
+import { FREE_SHIPPING_MIN_PRICE, SHIPPING_PRICE, TAX_RATE } from '@/config/data'
 import { formatError, round2 } from '../utils'
 import { connectToDatabase } from '@/config/db'
 import { auth } from '@/auth'
@@ -44,7 +45,6 @@ export const createOrderFromCart = async (
     ...calcDeliveryDateAndPrice({
       items: clientSideCart.items,
       shippingAddress: clientSideCart.shippingAddress,
-      deliveryDateIndex: clientSideCart.deliveryDateIndex,
     }),
   }
 
@@ -100,12 +100,11 @@ const updateProductStock = async (orderId: string) => {
       const product = await Product.findById(item.product).session(session)
       if (!product) throw new Error('Product not found')
 
-      product.countInStock -= item.quantity
-      await Product.updateOne(
-        { _id: product._id },
-        { countInStock: product.countInStock },
-        opts
-      )
+      const variant = product.variants?.[0]
+      if (!variant) throw new Error('Product variant not found')
+
+      variant.countInStock = Math.max(0, variant.countInStock - item.quantity)
+      await product.save({ session })
     }
     await session.commitTransaction()
     session.endSession()
@@ -279,43 +278,25 @@ export async function approvePayPalOrder(
 export const calcDeliveryDateAndPrice = async ({
   items,
   shippingAddress,
-  deliveryDateIndex,
 }: {
-  deliveryDateIndex?: number
   items: OrderItem[]
   shippingAddress?: ShippingAddress
 }) => {
-  const { availableDeliveryDates } = await getSetting()
   const itemsPrice = round2(
     items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   )
 
-  const deliveryDate =
-    availableDeliveryDates[
-      deliveryDateIndex === undefined
-        ? availableDeliveryDates.length - 1
-        : deliveryDateIndex
-    ]
-  const shippingPrice =
-    !shippingAddress || !deliveryDate
-      ? undefined
-      : deliveryDate.freeShippingMinPrice > 0 &&
-          itemsPrice >= deliveryDate.freeShippingMinPrice
-        ? 0
-        : deliveryDate.shippingPrice
+  const shippingPrice = !shippingAddress
+    ? undefined
+    : itemsPrice >= FREE_SHIPPING_MIN_PRICE
+      ? 0
+      : SHIPPING_PRICE
 
-  const taxPrice = !shippingAddress ? undefined : round2(itemsPrice * 0.15)
+  const taxPrice = !shippingAddress ? undefined : round2(itemsPrice * TAX_RATE)
   const totalPrice = round2(
-    itemsPrice +
-      (shippingPrice ? round2(shippingPrice) : 0) +
-      (taxPrice ? round2(taxPrice) : 0)
+    itemsPrice + (shippingPrice ?? 0) + (taxPrice ?? 0)
   )
   return {
-    availableDeliveryDates,
-    deliveryDateIndex:
-      deliveryDateIndex === undefined
-        ? availableDeliveryDates.length - 1
-        : deliveryDateIndex,
     itemsPrice,
     shippingPrice,
     taxPrice,

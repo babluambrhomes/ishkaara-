@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { IProductDisplay } from '@/types'
 
 export type WishlistItem = {
   _id: string
@@ -11,46 +11,61 @@ export type WishlistItem = {
 }
 
 interface WishlistState {
-  items: WishlistItem[]
-  toggleItem: (item: WishlistItem) => boolean
-  removeItem: (productId: string) => void
+  items: IProductDisplay[]
+  loadWishlist: () => Promise<void>
+  toggleItem: (productId: string) => Promise<'added' | 'removed' | 'error'>
+  removeItem: (productId: string) => Promise<void>
   hasItem: (productId: string) => boolean
   clear: () => void
 }
 
-const useWishlistStore = create(
-  persist<WishlistState>(
-    (set, get) => ({
-      items: [],
+const useWishlistStore = create<WishlistState>((set, get) => ({
+  items: [],
 
-      toggleItem: (item) => {
-        const { items } = get()
-        const exists = items.find((x) => x._id === item._id)
-        if (exists) {
-          set({
-            items: items.filter((x) => x._id !== item._id),
-          })
-          return false
-        }
-        set({
-          items: [item, ...items],
-        })
-        return true
-      },
-
-      removeItem: (productId) => {
-        set({
-          items: get().items.filter((x) => x._id !== productId),
-        })
-      },
-
-      hasItem: (productId) => get().items.some((x) => x._id === productId),
-
-      clear: () => set({ items: [] }),
-    }),
-    {
-      name: 'wishlist-store',
+  loadWishlist: async () => {
+    try {
+      const res = await fetch('/api/wishlist', { cache: 'no-store' })
+      if (!res.ok) return
+      const data = (await res.json()) as { items: IProductDisplay[] }
+      set({ items: data.items ?? [] })
+    } catch (error) {
+      console.error('Failed to load wishlist:', error)
     }
-  )
-)
+  },
+
+  toggleItem: async (productId) => {
+    try {
+      const res = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      })
+      if (res.status === 401) return 'error'
+      if (!res.ok) return 'error'
+      const data = (await res.json()) as {
+        added: boolean
+        items: IProductDisplay[]
+      }
+      set({ items: data.items ?? [] })
+      return data.added ? 'added' : 'removed'
+    } catch (error) {
+      console.error('Failed to toggle wishlist:', error)
+      return 'error'
+    }
+  },
+
+  removeItem: async (productId) => {
+    const res = await fetch(`/api/wishlist/${productId}`, {
+      method: 'DELETE',
+    })
+    if (!res.ok) return
+    const data = (await res.json()) as { items: IProductDisplay[] }
+    set({ items: data.items ?? [] })
+  },
+
+  hasItem: (productId) =>
+    get().items.some((x) => x._id === productId),
+
+  clear: () => set({ items: [] }),
+}))
 export default useWishlistStore

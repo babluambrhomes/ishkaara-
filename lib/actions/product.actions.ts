@@ -9,6 +9,14 @@ import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
+import {
+  toPublicProduct,
+  toPublicProducts as toPublicProductsList,
+} from '../utils/product-transform'
+
+// Price of the display (first) variant. Kept in one place so listings always
+// sort/filter on the same value they show.
+const PRICE_PATH = 'variants.0.price'
 
 const resolveCategoryName = async (categoryId: string) => {
   const category = await Category.findById(categoryId).select('name')
@@ -25,6 +33,17 @@ const resolveSlug = async (slug: string, name: string, excludeId?: string) => {
   })
   return exists ? generateSlug(base) : base
 }
+
+const orderBy = (sort?: string): Record<string, 1 | -1> =>
+  sort === 'best-selling'
+    ? { numSales: -1 }
+    : sort === 'price-low-to-high'
+      ? { [PRICE_PATH]: 1 }
+      : sort === 'price-high-to-low'
+        ? { [PRICE_PATH]: -1 }
+        : sort === 'avg-customer-review'
+          ? { avgRating: -1 }
+          : { _id: -1 }
 
 // CREATE
 export async function createProduct(data: IProductInput) {
@@ -51,7 +70,11 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     await connectToDatabase()
     const categoryName = await resolveCategoryName(product.category)
     const slug = await resolveSlug(product.slug, product.name, product._id)
-    await Product.findByIdAndUpdate(product._id, { ...product, slug, categoryName })
+    await Product.findByIdAndUpdate(product._id, {
+      ...product,
+      slug,
+      categoryName,
+    })
     revalidatePath('/admin/products')
     revalidatePath('/product/[slug]', 'page')
     return {
@@ -77,14 +100,16 @@ export async function deleteProduct(id: string) {
     return { success: false, message: formatError(error) }
   }
 }
-// GET ONE PRODUCT BY ID
+// GET ONE PRODUCT BY ID (full document, used by the admin form)
 export async function getProductById(productId: string) {
   await connectToDatabase()
-  const product = await Product.findById(productId)
-  return JSON.parse(JSON.stringify(product)) as IProduct
+  const product = await Product.findById(productId).lean()
+  return product
+    ? (JSON.parse(JSON.stringify(product)) as IProduct)
+    : (null as unknown as IProduct)
 }
 
-// GET ALL PRODUCTS FOR ADMIN
+// GET ALL PRODUCTS FOR ADMIN (includes drafts, flattened for the table)
 export async function getAllProductsForAdmin({
   query,
   page = 1,
@@ -112,21 +137,11 @@ export async function getAllProductsForAdmin({
         }
       : {}
 
-  const order: Record<string, 1 | -1> =
-    sort === 'best-selling'
-      ? { numSales: -1 }
-      : sort === 'price-low-to-high'
-        ? { price: 1 }
-        : sort === 'price-high-to-low'
-          ? { price: -1 }
-          : sort === 'avg-customer-review'
-            ? { avgRating: -1 }
-            : { _id: -1 }
   const products = await Product.find({
     status: { $ne: 'delete' },
     ...queryFilter,
   })
-    .sort(order)
+    .sort(orderBy(sort))
     .skip(limit * (Number(page) - 1))
     .limit(limit)
     .lean()
@@ -136,7 +151,7 @@ export async function getAllProductsForAdmin({
     ...queryFilter,
   })
   return {
-    products: JSON.parse(JSON.stringify(products)) as IProduct[],
+    products: toPublicProductsList(products),
     totalPages: Math.ceil(countProducts / pageSize),
     totalProducts: countProducts,
     from: pageSize * (Number(page) - 1) + 1,
@@ -162,19 +177,16 @@ export async function getProductsForCard({
   await connectToDatabase()
   const products = await Product.find(
     { tags: { $in: [tag] }, status: 'public' },
-    {
-      name: 1,
-      href: { $concat: ['/product/', '$slug'] },
-      image: { $arrayElemAt: ['$images', 0] },
-    }
+    { name: 1, slug: 1, variants: 1 }
   )
     .sort({ createdAt: 'desc' })
     .limit(limit)
-  return JSON.parse(JSON.stringify(products)) as {
-    name: string
-    href: string
-    image: string
-  }[]
+    .lean()
+  return products.map((product) => ({
+    name: product.name,
+    href: `/product/${product.slug}`,
+    image: product.variants?.[0]?.images?.[0] ?? '',
+  }))
 }
 // GET PRODUCTS BY TAG
 export async function getProductsByTag({
@@ -191,7 +203,8 @@ export async function getProductsByTag({
   })
     .sort({ createdAt: 'desc' })
     .limit(limit)
-  return JSON.parse(JSON.stringify(products)) as IProduct[]
+    .lean()
+  return toPublicProductsList(products)
 }
 
 // GET PRODUCTS FOR HOME HERO (only products with a site banner)
@@ -203,15 +216,16 @@ export async function getProductsForHero({ limit = 6 }: { limit?: number } = {})
   })
     .sort({ createdAt: 'desc' })
     .limit(limit)
-  return JSON.parse(JSON.stringify(products)) as IProduct[]
+    .lean()
+  return toPublicProductsList(products)
 }
 
-// GET ONE PRODUCT BY SLUG
-export async function getProductBySlug(slug: string) {
+// GET ONE PRODUCT BY SLUG (flattened to the requested/primary variant)
+export async function getProductBySlug(slug: string, variantId?: string) {
   await connectToDatabase()
-  const product = await Product.findOne({ slug, status: 'public' })
+  const product = await Product.findOne({ slug, status: 'public' }).lean()
   if (!product) return null
-  return JSON.parse(JSON.stringify(product)) as IProduct
+  return toPublicProduct(product, variantId)
 }
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
 export async function getRelatedProductsByCategory({
@@ -240,9 +254,10 @@ export async function getRelatedProductsByCategory({
     .sort({ numSales: 'desc' })
     .skip(skipAmount)
     .limit(limit)
+    .lean()
   const productsCount = await Product.countDocuments(conditions)
   return {
-    data: JSON.parse(JSON.stringify(products)) as IProduct[],
+    data: toPublicProductsList(products),
     totalPages: Math.ceil(productsCount / limit),
   }
 }
@@ -298,22 +313,12 @@ export async function getAllProducts({
   const priceFilter =
     price && price !== 'all'
       ? {
-          price: {
+          [PRICE_PATH]: {
             $gte: Number(price.split('-')[0]),
             $lte: Number(price.split('-')[1]),
           },
         }
       : {}
-  const order: Record<string, 1 | -1> =
-    sort === 'best-selling'
-      ? { numSales: -1 }
-      : sort === 'price-low-to-high'
-        ? { price: 1 }
-        : sort === 'price-high-to-low'
-          ? { price: -1 }
-          : sort === 'avg-customer-review'
-            ? { avgRating: -1 }
-            : { _id: -1 }
   const statusFilter = { status: 'public' as const }
   const products = await Product.find({
     ...statusFilter,
@@ -323,7 +328,7 @@ export async function getAllProducts({
     ...priceFilter,
     ...ratingFilter,
   })
-    .sort(order)
+    .sort(orderBy(sort))
     .skip(limit * (Number(page) - 1))
     .limit(limit)
     .lean()
@@ -337,7 +342,7 @@ export async function getAllProducts({
     ...ratingFilter,
   })
   return {
-    products: JSON.parse(JSON.stringify(products)) as IProduct[],
+    products: toPublicProductsList(products),
     totalPages: Math.ceil(countProducts / limit),
     totalProducts: countProducts,
     from: limit * (Number(page) - 1) + 1,

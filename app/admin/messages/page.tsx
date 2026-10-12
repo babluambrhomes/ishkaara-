@@ -5,11 +5,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
-  MessageSquare,
   Phone,
-  Calendar,
   User,
-  Clock,
   Eye,
 } from 'lucide-react'
 

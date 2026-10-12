@@ -29,40 +29,53 @@ export const ReviewInputSchema = z.object({
     .max(5, 'Rating must be at most 5'),
 })
 
-export const ProductInputSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
-  slug: z.string().min(3, 'Slug must be at least 3 characters'),
-  category: MongoId,
-  images: z.array(z.string()).min(1, 'Product must have at least one image'),
-  siteBanner: z.string().default(''),
-  brand: z.string().min(1, 'Brand is required'),
-  description: z.string().min(1, 'Description is required'),
-  status: ContentStatusSchema.default('draft'),
+// Each product variant carries its own price, images and stock. Its identity is
+// the image (plus optional sizes), so there is no separate name.
+export const ProductVariantSchema = z.object({
   price: Price('Price'),
   listPrice: Price('List price'),
+  images: z
+    .array(z.string())
+    .min(1, 'Each variant must have at least one image'),
+  size: z.array(z.string()).optional(),
   countInStock: z.coerce
     .number()
     .int()
     .nonnegative('count in stock must be a non-negative number'),
+})
+
+export const ProductInputSchema = z.object({
+  name: z.string().min(3, 'Name must be at least 3 characters'),
+  slug: z.string().min(3, 'Slug must be at least 3 characters'),
+  category: MongoId,
+  siteBanner: z.string().default(''),
+  brand: z.string().min(1, 'Brand is required'),
+  description: z.string().min(1, 'Description is required'),
+  status: ContentStatusSchema.default('draft'),
+  variants: z
+    .array(ProductVariantSchema)
+    .min(1, 'Product must have at least one variant'),
   tags: z.array(z.string()).default([]),
-  sizes: z.array(z.string()).default([]),
-  colors: z.array(z.string()).default([]),
   avgRating: z.coerce
     .number()
     .min(0, 'Average rating must be at least 0')
-    .max(5, 'Average rating must be at most 5'),
+    .max(5, 'Average rating must be at most 5')
+    .default(0),
   numReviews: z.coerce
     .number()
     .int()
-    .nonnegative('Number of reviews must be a non-negative number'),
+    .nonnegative('Number of reviews must be a non-negative number')
+    .default(0),
   ratingDistribution: z
     .array(z.object({ rating: z.number(), count: z.number() }))
-    .max(5),
+    .max(5)
+    .default([]),
   reviews: z.array(ReviewInputSchema).default([]),
   numSales: z.coerce
     .number()
     .int()
-    .nonnegative('Number of sales must be a non-negative number'),
+    .nonnegative('Number of sales must be a non-negative number')
+    .default(0),
 })
 
 export const ProductUpdateSchema = ProductInputSchema.extend({
@@ -162,7 +175,6 @@ export const CartSchema = z.object({
   totalPrice: z.number(),
   paymentMethod: z.optional(z.string()),
   shippingAddress: z.optional(ShippingAddressSchema),
-  deliveryDateIndex: z.optional(z.number()),
   expectedDeliveryDate: z.optional(z.date()),
 })
 
@@ -337,15 +349,11 @@ export const SettingInputSchema = z.object({
   }),
   carousels: z
     .array(CarouselSchema)
-    .min(1, 'At least one carousel is required'),
+    .optional(),
   availablePaymentMethods: z
     .array(PaymentMethodSchema)
     .min(1, 'At least one payment method is required'),
   defaultPaymentMethod: z.string().min(1, 'Payment method is required'),
-  availableDeliveryDates: z
-    .array(DeliveryDateSchema)
-    .min(1, 'At least one delivery date is required'),
-  defaultDeliveryDate: z.string().min(1, 'Delivery date is required'),
 })
 
 // FAQ
@@ -359,3 +367,20 @@ export const FaqUpdateSchema = FaqInputSchema.extend({
   _id: z.string(),
 })
 
+// COUPON
+export const CouponInputSchema = z.object({
+  code: z
+    .string()
+    .min(3, 'Coupon code must be at least 3 characters')
+    .transform((code) => code.trim().toUpperCase()),
+  value: z.coerce.number().min(1, 'Discount value must be at least 1'),
+  status: z.enum(['Active', 'Inactive']),
+  expiresAt: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Select a valid expiry date'),
+  minAmount: z.coerce.number().min(0, 'Minimum amount must be 0 or more'),
+})
+
+export const CouponUpdateSchema = CouponInputSchema.extend({
+  _id: z.string(),
+})

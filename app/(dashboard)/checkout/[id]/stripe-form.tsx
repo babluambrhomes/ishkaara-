@@ -49,7 +49,7 @@ export default function StripeForm({
   const { handleSubmit, setValue, watch } = form
   const email = watch('email')
 
-  async function onSubmit(_values: StripeFormValues) {
+  async function onSubmit() {
     if (stripe == null || elements == null || email == null || email === '')
       return
 

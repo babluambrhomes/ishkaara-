@@ -1,99 +1,57 @@
-import { Button } from '@/components/ui/button'
-import { IProduct } from '@/lib/models/product.model'
+import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { getImageUrl } from '@/lib/image-url'
+import { IProductDisplay } from '@/types'
 
 export default function SelectVariant({
   product,
-  size,
-  color,
+  variantId,
 }: {
-  product: IProduct
-  color: string
-  size: string
+  product: IProductDisplay
+  variantId?: string
 }) {
-  const selectedColor = color || product.colors[0]
-  const selectedSize = size || product.sizes[0]
+  const variants = product.variants ?? []
+  if (variants.length <= 1) return null
+
+  const selectedId = variantId || variants[0]._id
 
   return (
-    <div className='space-y-5'>
-      {product.colors.length > 0 && (
-        <div className='space-y-2.5'>
-          <p className='text-sm font-semibold text-foreground'>
-            Color:{' '}
-            <span className='font-medium text-muted-foreground'>
-              {selectedColor}
-            </span>
-          </p>
-          <div className='flex flex-wrap gap-2'>
-            {product.colors.map((x: string) => (
-              <Button
-                asChild
-                key={x}
-                variant='outline'
-                className={cn(
-                  'h-9 rounded-full border-2 px-3.5 text-sm font-medium transition-all shadow-none',
-                  selectedColor === x
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                )}
-              >
-                <Link
-                  replace
-                  scroll={false}
-                  href={`?${new URLSearchParams({
-                    color: x,
-                    size: selectedSize,
-                  })}`}
-                >
-                  <span
-                    style={{ backgroundColor: x }}
-                    className='h-4 w-4 rounded-full ring-1 ring-black/10'
+    <div className='space-y-2.5'>
+      <p className='text-sm font-semibold text-foreground'>Options</p>
+      <div className='flex flex-wrap gap-2.5'>
+        {variants.map((variant, index) => {
+          const id = variant._id ?? String(index)
+          const active = id === selectedId
+          return (
+            <Link
+              replace
+              scroll={false}
+              key={id}
+              href={`?variantId=${id}`}
+              aria-label='Select this option'
+              className={cn(
+                'inline-flex rounded-2xl border-2 p-1.5 transition-all shadow-none',
+                active
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border bg-white hover:border-primary/40'
+              )}
+            >
+              <span className='relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-grey-500/10'>
+                {variant.images[0] ? (
+                  <Image
+                    src={getImageUrl(variant.images[0])}
+                    alt='Variant option'
+                    fill
+                    sizes='48px'
+                    className='object-cover'
                   />
-                  <span className='capitalize'>{x}</span>
-                </Link>
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {product.sizes.length > 0 && (
-        <div className='space-y-2.5'>
-          <p className='text-sm font-semibold text-foreground'>
-            Size:{' '}
-            <span className='font-medium text-muted-foreground'>
-              {selectedSize}
-            </span>
-          </p>
-          <div className='flex flex-wrap gap-2'>
-            {product.sizes.map((x: string) => (
-              <Button
-                asChild
-                key={x}
-                variant='outline'
-                className={cn(
-                  'h-9 min-w-11 rounded-full border-2 px-4 text-sm font-semibold transition-all shadow-none',
-                  selectedSize === x
-                    ? 'border-primary bg-primary text-primary-foreground shadow-soft'
-                    : 'border-border bg-white text-muted-foreground hover:border-primary/40 hover:text-foreground'
-                )}
-              >
-                <Link
-                  replace
-                  scroll={false}
-                  href={`?${new URLSearchParams({
-                    color: selectedColor,
-                    size: x,
-                  })}`}
-                >
-                  {x}
-                </Link>
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
+                ) : null}
+              </span>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }

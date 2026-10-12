@@ -49,7 +49,7 @@ import {
 } from '@/lib/actions/review.actions'
 import { ReviewInputSchema } from '@/lib/validator'
 import RatingSummary from '@/components/shared/product/rating-summary'
-import { IProduct } from '@/lib/models/product.model'
+import { IProductDisplay } from '@/types'
 import { Separator } from '@/components/ui/separator'
 import { IReviewDetails } from '@/types'
 
@@ -64,7 +64,7 @@ export default function ReviewList({
   product,
 }: {
   userId: string | undefined
-  product: IProduct
+  product: IProductDisplay
 }) {
   const [page, setPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)

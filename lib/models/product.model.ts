@@ -1,26 +1,70 @@
+
 import { Document, Model, model, models, Schema } from 'mongoose'
 import { IProductInput } from '@/types'
 
 export type ProductStatus = 'public' | 'draft' | 'delete'
 
+export interface IProductVariant {
+  price: number
+  listPrice: number
+  images: string[]
+  size?: string[]
+  countInStock: number
+}
+
 export interface IProduct extends Document, IProductInput {
   _id: string
   categoryName: string
   siteBanner: string
+  variants: IProductVariant[]
   createdAt: Date
   updatedAt: Date
 }
+
+const variantSchema = new Schema<IProductVariant>(
+  {
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    listPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    size: {
+      type: [String],
+      default: undefined,
+    },
+    countInStock: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
+  },
+  {
+    _id: true,
+  }
+)
 
 const productSchema = new Schema<IProduct>(
   {
     name: {
       type: String,
       required: true,
+      trim: true,
     },
     slug: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     category: {
       type: Schema.Types.ObjectId as unknown as typeof String,
@@ -34,7 +78,6 @@ const productSchema = new Schema<IProduct>(
       trim: true,
       index: true,
     },
-    images: [String],
     siteBanner: {
       type: String,
       default: '',
@@ -42,52 +85,60 @@ const productSchema = new Schema<IProduct>(
     brand: {
       type: String,
       required: true,
+      trim: true,
     },
     description: {
       type: String,
       trim: true,
+      default: '',
     },
-    price: {
-      type: Number,
+
+    // Each variant has its own price, images and stock.
+    variants: {
+      type: [variantSchema],
       required: true,
+      default: undefined,
+      validate: {
+        validator: (variants: IProductVariant[]) =>
+          Array.isArray(variants) && variants.length > 0,
+        message: 'A product must have at least one variant.',
+      },
     },
-    listPrice: {
-      type: Number,
-      required: true,
+
+    tags: {
+      type: [String],
+      default: [],
     },
-    countInStock: {
-      type: Number,
-      required: true,
-    },
-    tags: { type: [String], default: ['new arrival'] },
-    colors: { type: [String], default: ['White', 'Red', 'Black'] },
-    sizes: { type: [String], default: ['S', 'M', 'L'] },
     avgRating: {
       type: Number,
-      required: true,
       default: 0,
+      min: 0,
+      max: 5,
     },
     numReviews: {
       type: Number,
-      required: true,
       default: 0,
+      min: 0,
     },
     ratingDistribution: [
       {
         rating: {
           type: Number,
           required: true,
+          min: 1,
+          max: 5,
         },
         count: {
           type: Number,
           required: true,
+          min: 0,
         },
       },
     ],
     numSales: {
       type: Number,
-      required: true,
       default: 0,
+      min: 0,
     },
     status: {
       type: String,
@@ -100,7 +151,6 @@ const productSchema = new Schema<IProduct>(
       {
         type: Schema.Types.ObjectId,
         ref: 'Review',
-        default: [],
       },
     ],
   },

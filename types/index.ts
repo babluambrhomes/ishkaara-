@@ -8,6 +8,7 @@ import {
   OrderItemSchema,
   PaymentMethodSchema,
   ProductInputSchema,
+  ProductVariantSchema,
   ReviewInputSchema,
   SettingInputSchema,
   ShippingAddressSchema,
@@ -28,6 +29,27 @@ export type IReviewDetails = IReviewInput & {
   }
 }
 export type IProductInput = z.infer<typeof ProductInputSchema>
+export type IProductVariant = z.infer<typeof ProductVariantSchema> & {
+  _id?: string
+}
+
+// Product shape returned to the storefront: the full document plus the
+// flattened fields of the selected (or primary/first) variant, so existing
+// cards/sliders can keep reading `price`, `images`, `countInStock`, etc.
+export type IProductDisplay = Omit<IProductInput, 'variants'> & {
+  _id: string
+  categoryName: string
+  variants: IProductVariant[]
+  price: number
+  listPrice: number
+  images: string[]
+  countInStock: number
+  size?: string[]
+  variantId?: string
+  primaryVariant?: IProductVariant
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
 
 export type Data = {
   settings: ISettingInput[]
@@ -49,7 +71,10 @@ export type IOrderList = IOrderInput & {
   createdAt: Date
 }
 export type OrderItem = z.infer<typeof OrderItemSchema>
-export type Cart = z.infer<typeof CartSchema>
+export type CartItem = OrderItem & { variantId?: string }
+export type Cart = Omit<z.infer<typeof CartSchema>, 'items'> & {
+  items: CartItem[]
+}
 export type ShippingAddress = z.infer<typeof ShippingAddressSchema>
 export type IAddress = z.infer<typeof AddressSchema>
 export type IAddressWithId = IAddress & { _id: string }

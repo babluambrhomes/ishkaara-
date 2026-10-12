@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import Product from '@/lib/models/product.model'
 import { connectToDatabase } from '@/config/db'
+import { toPublicProducts } from '@/lib/utils/product-transform'
 
 export const GET = async (request: NextRequest) => {
   const listType = request.nextUrl.searchParams.get('type') || 'history'
@@ -22,14 +23,16 @@ export const GET = async (request: NextRequest) => {
       : { categoryName: { $in: categories }, _id: { $nin: productIds } }
 
   await connectToDatabase()
-  const products = await Product.find(filter)
+  const products = await Product.find(filter).lean()
   if (listType === 'history')
     return NextResponse.json(
-      products.sort(
-        (a, b) =>
-          productIds.indexOf(a._id.toString()) -
-          productIds.indexOf(b._id.toString())
+      toPublicProducts(
+        products.sort(
+          (a, b) =>
+            productIds.indexOf(a._id.toString()) -
+            productIds.indexOf(b._id.toString())
+        )
       )
     )
-  return NextResponse.json(products)
+  return NextResponse.json(toPublicProducts(products))
 }

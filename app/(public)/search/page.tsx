@@ -17,7 +17,7 @@ import {
   getAllProducts,
   getAllTags,
 } from '@/lib/actions/product.actions'
-import { IProduct } from '@/lib/models/product.model'
+import { IProductDisplay } from '@/types'
 import {
   Check,
   PackageSearch,
@@ -387,7 +387,7 @@ export default async function SearchPage(props: {
             ) : (
               <>
                 <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4'>
-                  {data.products.map((product: IProduct) => (
+                  {data.products.map((product: IProductDisplay) => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>

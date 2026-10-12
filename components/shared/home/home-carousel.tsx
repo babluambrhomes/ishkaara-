@@ -11,12 +11,10 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { IProduct } from '@/lib/models/product.model'
+import { IProductDisplay } from '@/types'
 import { getImageUrl } from '@/lib/image-url'
-import ProductPrice from '@/components/shared/product/product-price'
 
-export function HomeCarousel({ products }: { products: IProduct[] }) {
+export function HomeCarousel({ products }: { products: IProductDisplay[] }) {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true })
   )
@@ -33,38 +31,22 @@ export function HomeCarousel({ products }: { products: IProduct[] }) {
     >
       <CarouselContent>
         {products.map((product) => {
-          const isDeal = product.tags.includes('todays-deal')
+          const banner = getImageUrl(product.siteBanner || product.images?.[0])
+
           return (
             <CarouselItem key={product._id}>
               <Link href={`/product/${product.slug}`}>
-                <div className='relative flex aspect-[16/6] items-center bg-gradient-to-r from-primary/[0.07] via-background to-gold/10'>
-                  <div className='relative z-10 ml-6 w-1/2 space-y-1.5 md:ml-20 md:space-y-3'>
-                    <p className='text-[10px] font-bold uppercase tracking-[0.16em] text-gold md:text-xs'>
-                      {product.brand}
-                    </p>
-                    <h2 className='line-clamp-2 text-sm font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl'>
-                      {product.name}
-                    </h2>
-                    <ProductPrice
-                      price={product.price}
-                      listPrice={product.listPrice}
-                      isDeal={isDeal}
-                      className='text-lg md:text-4xl'
-                    />
-                    <Button className='hidden rounded-full px-8 shadow-lift md:inline-flex'>
-                      Shop Now
-                    </Button>
-                  </div>
-                  <div className='absolute right-0 top-0 h-full w-1/2'>
+                <div className='relative flex h-[70vh] w-full items-center justify-center bg-gradient-to-r from-primary/[0.07] via-background to-gold/10'>
+                  {banner ? (
                     <Image
-                      src={getImageUrl(product.siteBanner)}
+                      src={banner}
                       alt={product.name}
                       fill
-                      sizes='50vw'
-                      className='object-contain p-4'
+                      sizes='100vw'
+                      className='object-cover '
                       priority
                     />
-                  </div>
+                  ) : null}
                 </div>
               </Link>
             </CarouselItem>

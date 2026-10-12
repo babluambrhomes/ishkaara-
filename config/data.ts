@@ -5,6 +5,11 @@ export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev'
 
 export const USER_ROLES = ['Admin', 'User']
 
+export const FREE_SHIPPING_MIN_PRICE = 999
+export const SHIPPING_PRICE = 49
+export const TAX_RATE = 0.05
+export const DELIVERY_DAYS = 7
+
 const data: Data = {
  
   headerMenus: [
@@ -56,53 +61,13 @@ const data: Data = {
         address: '123, Main Street, Anytown, CA, Zip 12345',
         phone: '+1 (123) 456-7890',
       },
-      carousels: [
-        {
-          title: 'Most Popular Shoes For Sale',
-          buttonCaption: 'Shop Now',
-          image: '/images/banner3.jpg',
-          url: '/search?category=Shoes',
-        },
-        {
-          title: 'Best Sellers in T-Shirts',
-          buttonCaption: 'Shop Now',
-          image: '/images/banner1.jpg',
-          url: '/search?category=T-Shirts',
-        },
-        {
-          title: 'Best Deals on Wrist Watches',
-          buttonCaption: 'See More',
-          image: '/images/banner2.jpg',
-          url: '/search?category=Wrist Watches',
-        },
-      ],
+  
       availablePaymentMethods: [
         { name: 'PayPal', commission: 0 },
         { name: 'Stripe', commission: 0 },
         { name: 'Cash On Delivery', commission: 0 },
       ],
       defaultPaymentMethod: 'PayPal',
-      availableDeliveryDates: [
-        {
-          name: 'Tomorrow',
-          daysToDeliver: 1,
-          shippingPrice: 12.9,
-          freeShippingMinPrice: 0,
-        },
-        {
-          name: 'Next 3 Days',
-          daysToDeliver: 3,
-          shippingPrice: 6.9,
-          freeShippingMinPrice: 0,
-        },
-        {
-          name: 'Next 5 Days',
-          daysToDeliver: 5,
-          shippingPrice: 4.9,
-          freeShippingMinPrice: 35,
-        },
-      ],
-      defaultDeliveryDate: 'Next 5 Days',
     },
   ],
 }

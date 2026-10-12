@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/auth'
-import AddToCart from '@/components/shared/product/add-to-cart'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   ChevronRight,
@@ -19,6 +18,7 @@ import {
 import ReviewList from './review-list'
 import { generateId, round2 } from '@/lib/utils'
 import SelectVariant from '@/components/shared/product/select-variant'
+import ProductBuyActions from '@/components/shared/product/product-buy-actions'
 import ProductPrice from '@/components/shared/product/product-price'
 import ProductGallery from '@/components/shared/product/product-gallery'
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
@@ -45,11 +45,11 @@ export async function generateMetadata(props: {
 
 export default async function ProductDetails(props: {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ page: string; color: string; size: string }>
+  searchParams: Promise<{ page: string; variantId: string }>
 }) {
   const searchParams = await props.searchParams
 
-  const { page, color, size } = searchParams
+  const { page, variantId } = searchParams
 
   const params = await props.params
 
@@ -57,7 +57,7 @@ export default async function ProductDetails(props: {
 
   const session = await auth()
 
-  const product = await getProductBySlug(slug)
+  const product = await getProductBySlug(slug, variantId)
   if (!product) notFound()
 
   const relatedProducts = await getRelatedProductsByCategory({
@@ -179,8 +179,7 @@ export default async function ProductDetails(props: {
 
                 <SelectVariant
                   product={product}
-                  size={size || product.sizes[0]}
-                  color={color || product.colors[0]}
+                  variantId={variantId}
                 />
               </div>
 
@@ -190,29 +189,25 @@ export default async function ProductDetails(props: {
                 </div>
               )}
 
-              <div className='flex flex-col gap-3'>
-                {inStock && (
-                  <div className='rounded-3xl border border-gold/30 bg-gradient-to-br from-[#fff5dd] via-background to-[#ffe9bd] max-w-md p-4 sm:p-5'>
-                    <AddToCart
-                      item={{
-                        clientId: generateId(),
-                        product: product._id,
-                        countInStock: product.countInStock,
-                        name: product.name,
-                        slug: product.slug,
-                        category: product.categoryName,
-                        price: round2(product.price),
-                        quantity: 1,
-                        image: product.images[0],
-                        size: size || product.sizes[0],
-                        color: color || product.colors[0],
-                      }}
-                    />
-                  </div>
-                )}
-                <div>
+              {inStock && (
+                <ProductBuyActions
+                  item={{
+                    clientId: generateId(),
+                    product: product._id,
+                    variantId: product.variantId,
+                    countInStock: product.countInStock,
+                    name: product.name,
+                    slug: product.slug,
+                    category: product.categoryName,
+                    price: round2(product.price),
+                    quantity: 1,
+                    image: product.images[0],
+                  }}
+                  sizes={product.size ?? []}
+                />
+              )}
+              <div>
 
-                </div>
               </div>
 
 

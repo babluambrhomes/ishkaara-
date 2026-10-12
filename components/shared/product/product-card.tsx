@@ -1,6 +1,6 @@
 ﻿import Image from 'next/image'
 import Link from 'next/link'
-import { Trash2 } from 'lucide-react'
+import { Minus, Plus, Trash2 } from 'lucide-react'
 
 import {
   Card,
@@ -9,17 +9,10 @@ import {
   CardHeader,
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
 import { WishlistItem } from '@/hooks/use-wishlist-store'
-import { IProduct } from '@/lib/models/product.model'
-import { OrderItem } from '@/types'
+import { IProductDisplay } from '@/types'
+import { CartItem } from '@/types'
 import { generateId, round2 } from '@/lib/utils'
 import { getImageUrl } from '@/lib/image-url'
 
@@ -149,15 +142,16 @@ function ProductCardDetails({
   )
 }
 
-const isProductData = (p: IProduct | WishlistItem): p is IProduct =>
-  'images' in p
+const isProductData = (
+  p: IProductDisplay | WishlistItem
+): p is IProductDisplay => 'images' in p
 
 export default function ProductCard({
   product,
   isWishlist = false,
   onRemove,
 }: {
-  product: IProduct | WishlistItem
+  product: IProductDisplay | WishlistItem
   isWishlist?: boolean
   onRemove?: (productId: string) => void
 }) {
@@ -184,11 +178,11 @@ export default function ProductCard({
     category,
   }
 
-  const orderItem: OrderItem = {
+  const orderItem: CartItem = {
     clientId: generateId(),
     product: product._id,
-    size: isProductData(product) ? product.sizes[0] : '',
-    color: isProductData(product) ? product.colors[0] : '',
+    variantId: isProductData(product) ? product.variantId : undefined,
+    size: '',
     countInStock,
     name: product.name,
     slug: product.slug,
@@ -226,7 +220,11 @@ export default function ProductCard({
       <CardFooter className='px-3 pb-3 pt-0'>
         <div className='flex w-full items-center gap-2'>
           <div className='flex-1'>
-            <AddToCart compact item={orderItem} />
+            <AddToCart
+              compact
+              item={orderItem}
+              sizes={isProductData(product) ? product.size ?? [] : []}
+            />
           </div>
           {isWishlist && onRemove && (
             <Button
@@ -249,7 +247,7 @@ export function ProductCardSlider({
   product,
   hideDetails = false,
 }: {
-  product: IProduct
+  product: IProductDisplay
   hideDetails?: boolean
 }) {
   const isDeal = product.tags.includes('todays-deal')
@@ -294,81 +292,89 @@ export function ProductCardSlider({
   )
 }
 
-export function CartItemRow({ item }: { item: OrderItem }) {
+export function CartItemRow({ item }: { item: CartItem }) {
   const { updateItem, removeItem } = useCartStore()
 
   return (
-    <div className='flex flex-col justify-between gap-4 border-b py-4 md:flex-row'>
-      <Link href={`/product/${item.slug}`}>
-        <div className='relative h-40 w-40'>
+    <div className='group flex flex-col gap-4 rounded-2xl border border-border/60 bg-white p-4 shadow-soft transition-all hover:border-primary/30 sm:flex-row sm:items-center sm:gap-6'>
+      <Link
+        href={`/product/${item.slug}`}
+        className='shrink-0 self-center sm:self-auto'
+      >
+        <div className='relative h-28 w-28 overflow-hidden rounded-xl bg-gradient-to-br from-grey-500/10 via-background to-primary/[0.05]'>
           <Image
             src={getImageUrl(item.image)}
             alt={item.name}
             fill
-            sizes='20vw'
-            style={{
-              objectFit: 'contain',
-            }}
+            sizes='112px'
+            className='object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105'
           />
         </div>
       </Link>
 
-      <div className='flex-1 space-y-4'>
+      <div className='flex-1 space-y-2.5'>
         <Link
           href={`/product/${item.slug}`}
-          className='text-lg hover:no-underline'
+          className='text-base font-semibold leading-snug text-foreground transition-colors hover:text-primary'
         >
           {item.name}
         </Link>
-        <div>
-          <p className='text-sm'>
-            <span className='font-bold'>Color: </span>
-            {item.color}
-          </p>
-          <p className='text-sm'>
-            <span className='font-bold'>Size: </span>
-            {item.size}
-          </p>
-        </div>
-        <div className='flex items-center gap-2'>
-          <Select
-            value={item.quantity.toString()}
-            onValueChange={(value) => updateItem(item, Number(value))}
-          >
-            <SelectTrigger className='w-auto'>
-              <SelectValue>Quantity: {item.quantity}</SelectValue>
-            </SelectTrigger>
-            <SelectContent position='popper'>
-              {Array.from({ length: item.countInStock }).map((_, i) => (
-                <SelectItem key={i + 1} value={`${i + 1}`}>
-                  {i + 1}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+
+        {item.size && (
+          <span className='inline-flex items-center rounded-full border border-border bg-muted/40 px-2.5 py-0.5 text-xs font-medium text-muted-foreground'>
+            Size: {item.size}
+          </span>
+        )}
+
+        <div className='flex flex-wrap items-center gap-2 pt-1'>
+          <div className='inline-flex items-center rounded-full border border-border bg-background'>
+            <button
+              type='button'
+              aria-label='Decrease quantity'
+              disabled={item.quantity <= 1}
+              onClick={() =>
+                updateItem(item, Math.max(1, item.quantity - 1))
+              }
+              className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+            >
+              <Minus className='h-4 w-4' />
+            </button>
+            <span className='w-8 text-center text-sm font-semibold text-foreground'>
+              {item.quantity}
+            </span>
+            <button
+              type='button'
+              aria-label='Increase quantity'
+              disabled={item.quantity >= item.countInStock}
+              onClick={() =>
+                updateItem(item, Math.min(item.countInStock, item.quantity + 1))
+              }
+              className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+            >
+              <Plus className='h-4 w-4' />
+            </button>
+          </div>
+
           <button
             type='button'
             onClick={() => removeItem(item)}
-            className='inline-flex items-center gap-1.5 rounded-full border border-input px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive'
+            className='inline-flex items-center gap-1.5 rounded-full border border-border px-3.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive'
           >
-            <Trash2 className='h-4 w-4' />
-            Delete
+            <Trash2 className='h-3.5 w-3.5' />
+            Remove
           </button>
         </div>
       </div>
-      <div>
-        <p className='text-right'>
-          {item.quantity > 1 && (
-            <>
-              {item.quantity} x
-              <ProductPrice price={item.price} plain />
-              <br />
-            </>
-          )}
-          <span className='text-lg font-bold'>
-            <ProductPrice price={item.price * item.quantity} plain />
-          </span>
+
+      <div className='shrink-0 text-right sm:w-24'>
+        <p className='text-lg font-bold text-foreground'>
+          <ProductPrice price={item.price * item.quantity} plain />
         </p>
+        {item.quantity > 1 && (
+          <p className='whitespace-nowrap text-xs text-muted-foreground'>
+            {item.quantity} x <ProductPrice price={item.price} plain />
+          </p>
+        )}
       </div>
     </div>
   )
