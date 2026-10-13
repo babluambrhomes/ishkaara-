@@ -26,7 +26,7 @@ const blogPostSchema = new Schema<IPost>(
     excerpt: { type: String, required: true, trim: true },
     content: { type: String, required: true },
     date: { type: String, required: true },
-    author: { type: String, default: 'Ishkaara', trim: true },
+    author: { type: String, default: 'Lemon Fashion', trim: true },
     status: {
       type: String,
       required: true,

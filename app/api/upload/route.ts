@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { S3_MAX_UPLOAD_SIZE_BYTES } from '@/config/s3'
 import { uploadImage, type StorageEntity } from '@/lib/storage'
 import { formatError } from '@/lib/utils'
+import { isStaffRole } from '@/lib/roles'
 
 export const runtime = 'nodejs'
 
@@ -11,7 +12,7 @@ const ENTITIES: StorageEntity[] = ['user', 'product', 'category', 'blog']
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
+    if (!isStaffRole(session?.user?.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

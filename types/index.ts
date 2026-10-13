@@ -2,10 +2,13 @@ import {
   AddressSchema,
   BlogPostInputSchema,
   CarouselSchema,
+  CartItemSchema,
   CartSchema,
   DeliveryDateSchema,
   OrderInputSchema,
   OrderItemSchema,
+  OrderStatusEnum,
+  OrderStatusHistorySchema,
   PaymentMethodSchema,
   ProductInputSchema,
   ProductVariantSchema,
@@ -71,7 +74,9 @@ export type IOrderList = IOrderInput & {
   createdAt: Date
 }
 export type OrderItem = z.infer<typeof OrderItemSchema>
-export type CartItem = OrderItem & { variantId?: string }
+export type CartItem = z.infer<typeof CartItemSchema>
+export type OrderStatus = z.infer<typeof OrderStatusEnum>
+export type OrderStatusEntry = z.infer<typeof OrderStatusHistorySchema>
 export type Cart = Omit<z.infer<typeof CartSchema>, 'items'> & {
   items: CartItem[]
 }
@@ -98,3 +103,38 @@ export type ISettingInput = z.infer<typeof SettingInputSchema>
 export type ClientSetting = ISettingInput
 export type PaymentMethod = z.infer<typeof PaymentMethodSchema>
 export type DeliveryDate = z.infer<typeof DeliveryDateSchema>
+
+// Razorpay Checkout (browser script) minimal types
+export type RazorpayCheckoutResponse = {
+  razorpay_payment_id: string
+  razorpay_order_id: string
+  razorpay_signature: string
+}
+
+export type RazorpayCheckoutOptions = {
+  key: string
+  amount: number | string
+  currency: string
+  name: string
+  description?: string
+  order_id: string
+  prefill?: { name?: string; email?: string; contact?: string }
+  theme?: { color?: string }
+  handler: (
+    response: RazorpayCheckoutResponse
+  ) => void | Promise<void>
+  modal?: { ondismiss?: () => void }
+}
+
+export type RazorpayCheckoutInstance = {
+  open: () => void
+  on: (event: string, handler: () => void) => void
+}
+
+declare global {
+  interface Window {
+    Razorpay: new (
+      options: RazorpayCheckoutOptions
+    ) => RazorpayCheckoutInstance
+  }
+}

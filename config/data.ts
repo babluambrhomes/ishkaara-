@@ -1,9 +1,9 @@
-﻿import { Data,  } from '@/types'
+import { Data,  } from '@/types'
 
 export const SENDER_NAME = process.env.SENDER_NAME || 'support'
 export const SENDER_EMAIL = process.env.SENDER_EMAIL || 'onboarding@resend.dev'
 
-export const USER_ROLES = ['Admin', 'User']
+export { USER_ROLES } from '@/lib/roles'
 
 export const FREE_SHIPPING_MIN_PRICE = 999
 export const SHIPPING_PRICE = 49
@@ -48,26 +48,25 @@ const data: Data = {
         pageSize: 9,
       },
       site: {
-        name: 'Ishkaara',
+        name: 'Lemon Fashion',
         description:
-          'Ishkaara is a modern beauty & fashion e-commerce platform. Curated styles, timeless elegance.',
-        keywords: 'Ishkaara, Beauty, Fashion, Clothing, Accessories, Ecommerce',
-        url: 'https://ishkaara.com',
-        logo: '/logo.avif',
+          'Lemon Fashion is a modern beauty & fashion e-commerce platform. Curated styles, timeless elegance.',
+        keywords: 'Lemon Fashion, Beauty, Fashion, Clothing, Accessories, Ecommerce',
+        url: 'https://lemonfashion.com',
+        logo: '/logo.png',
         slogan: 'Elegance in every detail.',
-        author: 'Ishkaara',
-        copyright: '2000-2025, Ishkaara. All rights reserved.',
+        author: 'Lemon Fashion',
+        copyright: '2000-2025, Lemon Fashion. All rights reserved.',
         email: 'admin@example.com',
         address: '123, Main Street, Anytown, CA, Zip 12345',
         phone: '+1 (123) 456-7890',
       },
   
       availablePaymentMethods: [
-        { name: 'PayPal', commission: 0 },
-        { name: 'Stripe', commission: 0 },
+        { name: 'Razorpay', commission: 15 },
         { name: 'Cash On Delivery', commission: 0 },
       ],
-      defaultPaymentMethod: 'PayPal',
+      defaultPaymentMethod: 'Razorpay',
     },
   ],
 }

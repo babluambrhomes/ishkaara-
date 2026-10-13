@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { connectToDatabase } from '@/config/db'
 import ContactMessage, { IContactMessage } from '@/lib/models/contact-message.model'
 import { formatError } from '@/lib/utils'
+import { isStaffRole } from '@/lib/roles'
 import { revalidatePath } from 'next/cache'
 import { getSetting } from './setting.actions'
 
@@ -26,8 +27,8 @@ export async function getAllContactMessages({
   status?: string
 }): Promise<ContactMessageListData> {
   const session = await auth()
-  if (session?.user?.role !== 'Admin') {
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role)) {
+    throw new Error('Staff permission required')
   }
 
   const {
@@ -84,8 +85,8 @@ export async function updateContactMessage({
 }) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
@@ -98,7 +99,7 @@ export async function updateContactMessage({
     }
     await message.save()
 
-    revalidatePath('/admin/messages')
+    revalidatePath('/workspace/messages')
     return {
       success: true,
       message: 'Message updated successfully',
@@ -111,15 +112,15 @@ export async function updateContactMessage({
 export async function deleteContactMessage(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
     const res = await ContactMessage.findByIdAndDelete(id)
     if (!res) throw new Error('Message not found')
 
-    revalidatePath('/admin/messages')
+    revalidatePath('/workspace/messages')
     return {
       success: true,
       message: 'Message deleted successfully',

@@ -7,6 +7,7 @@ import { formatError } from '@/lib/utils'
 import { FaqInputSchema, FaqUpdateSchema } from '@/lib/validator'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
 
 
@@ -39,8 +40,8 @@ export async function getAllFaqsForAdmin({
   status?: string
 }): Promise<FaqListData> {
   const session = await auth()
-  if (session?.user?.role !== 'Admin') {
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role)) {
+    throw new Error('Staff permission required')
   }
 
   const {
@@ -89,8 +90,8 @@ export async function getAllFaqsForAdmin({
 export async function createFaq(data: z.infer<typeof FaqInputSchema>) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     const validated = FaqInputSchema.parse(data)
@@ -99,7 +100,7 @@ export async function createFaq(data: z.infer<typeof FaqInputSchema>) {
     await Faq.create(validated)
 
     revalidatePath('/faq')
-    revalidatePath('/admin/faqs')
+    revalidatePath('/workspace/faqs')
     return {
       success: true,
       message: 'FAQ created successfully',
@@ -113,8 +114,8 @@ export async function createFaq(data: z.infer<typeof FaqInputSchema>) {
 export async function updateFaq(data: z.infer<typeof FaqUpdateSchema>) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     const { _id, ...fields } = FaqUpdateSchema.parse(data)
@@ -124,7 +125,7 @@ export async function updateFaq(data: z.infer<typeof FaqUpdateSchema>) {
     if (!faq) throw new Error('FAQ not found')
 
     revalidatePath('/faq')
-    revalidatePath('/admin/faqs')
+    revalidatePath('/workspace/faqs')
     return {
       success: true,
       message: 'FAQ updated successfully',
@@ -138,8 +139,8 @@ export async function updateFaq(data: z.infer<typeof FaqUpdateSchema>) {
 export async function toggleFaqPublic(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
@@ -150,7 +151,7 @@ export async function toggleFaqPublic(id: string) {
     await faq.save()
 
     revalidatePath('/faq')
-    revalidatePath('/admin/faqs')
+    revalidatePath('/workspace/faqs')
     return {
       success: true,
       message: `FAQ marked as ${faq.is_public ? 'Public' : 'Hidden'}`,
@@ -164,8 +165,8 @@ export async function toggleFaqPublic(id: string) {
 export async function deleteFaq(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
@@ -173,7 +174,7 @@ export async function deleteFaq(id: string) {
     if (!res) throw new Error('FAQ not found')
 
     revalidatePath('/faq')
-    revalidatePath('/admin/faqs')
+    revalidatePath('/workspace/faqs')
     return {
       success: true,
       message: 'FAQ deleted successfully',

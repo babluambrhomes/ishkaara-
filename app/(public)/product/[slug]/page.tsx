@@ -68,21 +68,23 @@ export default async function ProductDetails(props: {
 
   const inStock = product.countInStock > 0
   const isDeal = product.tags.includes('todays-deal')
-  const lowStock = inStock && product.countInStock <= 3
+  const lowStock = inStock && product.countInStock < 30
 
   const stockStatus = !inStock
     ? {
-      dot: 'bg-destructive',
-      text: 'Out of Stock',
-      cls: 'text-destructive',
-    }
+        show: true,
+        dot: 'bg-destructive',
+        text: 'Out of Stock',
+      }
     : lowStock
       ? {
-        dot: 'bg-amber-500',
-        text: `Only ${product.countInStock} left in stock`,
-        cls: 'text-amber-600',
-      }
-      : { dot: 'bg-emerald-500', text: 'In Stock', cls: 'text-emerald-600' }
+          show: true,
+          dot: 'bg-destructive',
+          text: `${product.countInStock} ${
+            product.countInStock === 1 ? 'product' : 'products'
+          } left`,
+        }
+      : { show: false, dot: '', text: '' }
 
   const trustItems = [
     { icon: Truck, title: 'Free Shipping', sub: 'On orders over ₹499' },
@@ -92,7 +94,7 @@ export default async function ProductDetails(props: {
   ]
 
   return (
-    <div className='mx-auto  px-4 pb-16 pt-8 '>
+    <div className='px-4 pb-16 pt-8 '>
       <AddToBrowsingHistory id={product._id} category={product.categoryName} />
 
       <nav className='mb-6 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground'>
@@ -165,16 +167,16 @@ export default async function ProductDetails(props: {
                     isDeal={isDeal}
                     forListing={false}
                   />
-                  <span
-                    className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold ${stockStatus.cls} ${inStock ? 'bg-emerald-500/10' : 'bg-destructive/10'
-                      }`}
-                  >
-                    <span
-                      className={`h-2 w-2 rounded-full ${stockStatus.dot} ${inStock ? 'animate-pulse' : ''
+                  {stockStatus.show && (
+                    <span className='inline-flex items-center gap-2 rounded-full bg-destructive/10 px-3.5 py-1.5 text-sm font-semibold text-destructive'>
+                      <span
+                        className={`h-2 w-2 rounded-full ${stockStatus.dot} ${
+                          inStock ? 'animate-pulse' : ''
                         }`}
-                    />
-                    {stockStatus.text}
-                  </span>
+                      />
+                      {stockStatus.text}
+                    </span>
+                  )}
                 </div>
 
                 <SelectVariant
@@ -182,12 +184,6 @@ export default async function ProductDetails(props: {
                   variantId={variantId}
                 />
               </div>
-
-              {lowStock && (
-                <div className='rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700'>
-                  Hurry! Only {product.countInStock} left in stock — order soon.
-                </div>
-              )}
 
               {inStock && (
                 <ProductBuyActions

@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 export const metadata: Metadata = {
   title: 'Testimonials & Reviews',
   description:
-    'See what our customers say about shopping with Ishkaara.',
+    'See what our customers say about shopping with Lemon Fashion.',
 }
 
 const testimonials = [
@@ -13,7 +13,7 @@ const testimonials = [
     name: 'Aarav Mehta',
     location: 'Mumbai',
     rating: 5,
-    text: 'The quality is amazing and delivery was faster than expected. Ishkaara has become my go-to store for everything.',
+    text: 'The quality is amazing and delivery was faster than expected. Lemon Fashion has become my go-to store for everything.',
   },
   {
     name: 'Sophia Bennett',
@@ -37,7 +37,7 @@ const testimonials = [
     name: 'Emma Wilson',
     location: 'Sydney',
     rating: 5,
-    text: 'The deals are genuinely worth it. I have recommended Ishkaara to all my friends and family.',
+    text: 'The deals are genuinely worth it. I have recommended Lemon Fashion to all my friends and family.',
   },
   {
     name: 'Lucas Ferreira',
@@ -53,7 +53,7 @@ export default function TestimonialsPage() {
       <h1 className='h1-bold py-4'>Testimonials & Reviews</h1>
       <p className='text-lg mb-6'>
         Real words from real customers. Your satisfaction drives everything we
-        do at Ishkaara.
+        do at Lemon Fashion.
       </p>
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
         {testimonials.map((t) => (

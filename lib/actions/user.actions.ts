@@ -12,6 +12,7 @@ import { connectToDatabase } from '@/config/db'
 import User, { IUser } from '../models/user.model'
 import Order from '../models/order.model'
 import { formatError } from '../utils'
+import { isAdminRole } from '../roles'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -50,10 +51,13 @@ export async function sendOtp(
 
 export async function deleteUser(id: string) {
   try {
+    const session = await auth()
+    if (!isAdminRole(session?.user?.role))
+      throw new Error('Admin permission required')
     await connectToDatabase()
     const res = await User.findByIdAndDelete(id)
     if (!res) throw new Error('Use not found')
-    revalidatePath('/admin/users')
+    revalidatePath('/workspace/users')
     return {
       success: true,
       message: 'User deleted successfully',
@@ -66,6 +70,9 @@ export async function deleteUser(id: string) {
 
 export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
   try {
+    const session = await auth()
+    if (!isAdminRole(session?.user?.role))
+      throw new Error('Admin permission required')
     await connectToDatabase()
     const dbUser = await User.findById(user._id)
     if (!dbUser) throw new Error('User not found')
@@ -73,7 +80,7 @@ export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
     dbUser.email = user.email
     dbUser.role = user.role
     const updatedUser = await dbUser.save()
-    revalidatePath('/admin/users')
+    revalidatePath('/workspace/users')
     return {
       success: true,
       message: 'User updated successfully',
@@ -268,7 +275,7 @@ export async function getAllUsers({
   query?: string
 }) {
   const session = await auth()
-  if (session?.user?.role !== 'Admin')
+  if (!isAdminRole(session?.user?.role))
     throw new Error('Admin permission required')
 
   const {

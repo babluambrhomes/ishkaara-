@@ -41,6 +41,7 @@ import useIsMounted from '@/hooks/use-is-mounted'
 import useCartStore from '@/hooks/use-cart-store'
 import useSettingStore from '@/hooks/use-setting-store'
 import ProductPrice from '@/components/shared/product/product-price'
+import { startRazorpayCheckout } from '@/lib/razorpay-client'
 import { Badge } from '@/components/ui/badge'
 import {
   ArrowLeft,
@@ -347,25 +348,62 @@ const CheckoutForm = ({
       shippingAddress,
       expectedDeliveryDate: calculateFutureDate(DELIVERY_DAYS),
       paymentMethod,
+      coupon: appliedCoupon
+        ? {
+            code: appliedCoupon.code,
+            value: appliedCoupon.value,
+            minAmount: appliedCoupon.minAmount,
+          }
+        : undefined,
       itemsPrice,
       shippingPrice: displayShippingPrice,
       taxPrice: displayTaxPrice,
       totalPrice: finalTotalPrice,
     })
-    setIsPlacingOrder(false)
     if (!res.success) {
+      setIsPlacingOrder(false)
       toast({
         description: res.message,
         variant: 'destructive',
       })
-    } else {
-      toast({
-        description: res.message,
-        variant: 'default',
-      })
-      clearCart()
-      router.push(`/checkout/${res.data?.orderId}`)
+      return
     }
+
+    const orderId = res.data?.orderId
+    if (!orderId) {
+      setIsPlacingOrder(false)
+      toast({
+        description: 'Something went wrong. Please try again.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    clearCart()
+
+    if (paymentMethod === 'Cash On Delivery') {
+      setIsPlacingOrder(false)
+      router.push(`/order-success/${orderId}`)
+      return
+    }
+
+    await startRazorpayCheckout({
+      orderId,
+      siteName: site.name,
+      description: `Order #${orderId}`,
+      prefill: {
+        name: shippingAddress.fullName,
+        contact: shippingAddress.phone,
+      },
+      onSuccess: () => {
+        setIsPlacingOrder(false)
+        router.push(`/order-success/${orderId}`)
+      },
+      onFailure: () => {
+        setIsPlacingOrder(false)
+        router.push(`/order-failed/${orderId}`)
+      },
+    })
   }
 
   const NewAddressForm = ({ onCancel }: { onCancel?: () => void }) => (

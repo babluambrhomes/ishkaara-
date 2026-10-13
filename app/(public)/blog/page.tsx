@@ -15,7 +15,7 @@ import { getImageUrl } from '@/lib/image-url'
 export const metadata: Metadata = {
   title: 'Blog',
   description:
-    'Read the latest style guides, beauty routines, and shopping tips from the Ishkaara blog.',
+    'Read the latest style guides, beauty routines, and shopping tips from the Lemon Fashion blog.',
 }
 
 export default async function BlogPage(props: {
@@ -41,7 +41,7 @@ export default async function BlogPage(props: {
       <div className='border-b border-border/60 bg-gradient-to-br from-primary/[0.08] via-background to-gold/[0.12]'>
         <div className='px-3 py-8 '>
           <p className='mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-gold'>
-            The Ishkaara Journal
+            The Lemon Fashion Journal
           </p>
           <h1 className='premium-title text-3xl font-bold tracking-tight lg:text-4xl'>
             {category !== 'all'
@@ -50,7 +50,7 @@ export default async function BlogPage(props: {
           </h1>
           <p className='mt-3 max-w-2xl text-muted-foreground'>
             Trend reports, beauty routines, and thoughtful shopping tips —
-            curated by the Ishkaara team.
+            curated by the Lemon Fashion team.
           </p>
 
           {/* Category chips */}

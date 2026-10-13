@@ -9,7 +9,7 @@ export default {
       const protectedPaths = [
         /\/checkout(\/.*)?/,
         /\/account(\/.*)?/,
-        /\/admin(\/.*)?/,
+        /\/workspace(\/.*)?/,
       ]
       const { pathname } = request.nextUrl
       if (protectedPaths.some((p) => p.test(pathname))) return !!auth

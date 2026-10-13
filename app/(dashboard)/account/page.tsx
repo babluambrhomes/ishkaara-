@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { auth } from '@/auth'
 import { SignOut, getUserById } from '@/lib/actions/user.actions'
+import { isAdminRole, isStaffRole } from '@/lib/roles'
 import {
   ArrowRight,
   BadgeCheck,
@@ -32,7 +33,8 @@ export const metadata: Metadata = {
 
 export default async function AccountPage() {
   const session = await auth()
-  const isAdmin = session?.user.role === 'Admin'
+  const isStaff = isStaffRole(session?.user.role)
+  const isAdmin = isAdminRole(session?.user.role)
   let user: Awaited<ReturnType<typeof getUserById>> | null = null
   if (session?.user?.id) {
     try {
@@ -69,12 +71,14 @@ export default async function AccountPage() {
     },
   ]
 
-  const adminLinks = [
-    { href: '/admin/overview', icon: LayoutDashboard, label: 'Overview' },
-    { href: '/admin/orders', icon: Package, label: 'Orders' },
-    { href: '/admin/products', icon: Tags, label: 'Products' },
-    { href: '/admin/blog/posts', icon: FileText, label: 'Blog' },
-    { href: '/admin/users', icon: Users, label: 'Users' },
+  const workspaceLinks = [
+    { href: '/workspace/overview', icon: LayoutDashboard, label: 'Overview' },
+    { href: '/workspace/orders', icon: Package, label: 'Orders' },
+    { href: '/workspace/products', icon: Tags, label: 'Products' },
+    { href: '/workspace/blog/posts', icon: FileText, label: 'Blog' },
+    ...(isAdmin
+      ? [{ href: '/workspace/users', icon: Users, label: 'Users' }]
+      : []),
   ]
 
   return (
@@ -92,13 +96,13 @@ export default async function AccountPage() {
                 : 'Manage your orders, wishlist and account settings'}
           </p>
         </div>
-      {isAdmin && (
+      {isStaff && (
           <Link
-            href='/admin/overview'
+            href='/workspace/overview'
             className='inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:shadow-lift'
           >
             <ShieldCheck className='h-4 w-4' />
-            Admin Dashboard
+            Workspace
           </Link>
         )}
       </div>
@@ -116,10 +120,10 @@ export default async function AccountPage() {
                   <h2 className='text-xl font-bold tracking-tight'>
                     {user?.name || session.user.name}
                   </h2>
-                  {isAdmin && (
+                  {isStaff && (
                     <span className='inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-gold'>
                       <BadgeCheck className='h-3 w-3' />
-                      Admin
+                      {session.user.role}
                     </span>
                   )}
                 </div>
@@ -173,21 +177,21 @@ export default async function AccountPage() {
         ))}
       </div>
 
-      {isAdmin && (
+      {isStaff && (
         <section className='mt-8 rounded-3xl border border-border/60 bg-white p-6 shadow-soft'>
           <div className='mb-4 flex items-center gap-3'>
             <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
               <ShieldCheck className='h-5 w-5' />
             </span>
             <div>
-              <h2 className='font-bold tracking-tight'>Admin Panel</h2>
+              <h2 className='font-bold tracking-tight'>Workspace</h2>
               <p className='text-xs text-muted-foreground'>
                 Manage your store
               </p>
             </div>
           </div>
           <div className='flex flex-wrap gap-2.5'>
-            {adminLinks.map(({ href, icon: Icon, label }) => (
+            {workspaceLinks.map(({ href, icon: Icon, label }) => (
               <Link
                 key={label}
                 href={href}

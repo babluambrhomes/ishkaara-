@@ -5,7 +5,7 @@ const S3_BASE = (process.env.NEXT_PUBLIC_S3_BASE_URL || '').replace(/\/+$/, '')
  *
  * - Absolute URLs (legacy UploadThing, external) are returned untouched.
  * - Local public assets (`/images/...`) are returned as-is.
- * - Storage keys (`ishkaara/product/...`) are resolved against the CDN base.
+ * - Storage keys (`lemon-fashion/product/...`) are resolved against the CDN base.
  */
 export const getImageUrl = (value?: string | null): string => {
   const trimmed = (value ?? '').trim()

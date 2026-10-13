@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { formatNumberWithDecimal } from './utils'
+import { USER_ROLES } from './roles'
 
 // Common
 const MongoId = z
@@ -82,10 +83,12 @@ export const ProductUpdateSchema = ProductInputSchema.extend({
   _id: z.string(),
 })
 
-// Order Item
+// Order Item — snapshot of a product/variant stored on an order line.
+// `clientId` is intentionally NOT part of this shape: it only exists to
+// identify a line while it lives in the cart.
 export const OrderItemSchema = z.object({
-  clientId: z.string().min(1, 'clientId is required'),
   product: z.string().min(1, 'Product is required'),
+  variantId: z.string().optional(),
   name: z.string().min(1, 'Name is required'),
   slug: z.string().min(1, 'Slug is required'),
   category: z.string().min(1, 'Category is required'),
@@ -99,9 +102,16 @@ export const OrderItemSchema = z.object({
     .nonnegative('Quantity must be a non-negative number'),
   image: z.string().min(1, 'Image is required'),
   price: Price('Price'),
+  listPrice: Price('List price').optional(),
   size: z.string().optional(),
   color: z.string().optional(),
 })
+// Cart Item — order item plus the client-generated line id that identifies the
+// line inside the cart (used for update/remove before an order is created).
+export const CartItemSchema = OrderItemSchema.extend({
+  clientId: z.string().min(1, 'clientId is required'),
+})
+
 export const ShippingAddressSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
   street: z.string().min(1, 'Address is required'),
@@ -126,6 +136,55 @@ export const AddressInputSchema = AddressSchema.extend({
   _id: MongoId.optional(),
 })
 
+// Coupon snapshot applied to an order
+export const CouponSnapshotSchema = z.object({
+  code: z.string().min(1, 'Coupon code is required'),
+  value: z.coerce.number().min(0, 'Discount value must be 0 or more'),
+  minAmount: z.coerce.number().min(0, 'Minimum amount must be 0 or more'),
+})
+
+// Payment
+export const PaymentStatusEnum = z.enum([
+  'pending',
+  'paid',
+  'failed',
+  'refunded',
+])
+
+export const PaymentResultSchema = z.object({
+  id: z.string().optional(),
+  status: z.string().optional(),
+  email_address: z.string().optional(),
+  pricePaid: z.string().optional(),
+  razorpay_order_id: z.string().optional(),
+  razorpay_payment_id: z.string().optional(),
+  razorpay_signature: z.string().optional(),
+})
+
+export const PaymentSchema = z.object({
+  method: z.string().min(1, 'Payment method is required'),
+  status: PaymentStatusEnum.default('pending'),
+  result: PaymentResultSchema.optional(),
+  paidAt: z.date().optional(),
+})
+
+// Order status + history
+export const OrderStatusEnum = z.enum([
+  'success',
+  'shipped',
+  'out_for_delivery',
+  'delivered',
+  'cancelled',
+  'returned',
+])
+
+export const OrderStatusHistorySchema = z.object({
+  status: OrderStatusEnum,
+  at: z.date(),
+  note: z.string().optional(),
+  by: z.string().optional(),
+})
+
 // Order
 export const OrderInputSchema = z.object({
   user: z.union([
@@ -139,15 +198,8 @@ export const OrderInputSchema = z.object({
     .array(OrderItemSchema)
     .min(1, 'Order must contain at least one item'),
   shippingAddress: ShippingAddressSchema,
-  paymentMethod: z.string().min(1, 'Payment method is required'),
-  paymentResult: z
-    .object({
-      id: z.string(),
-      status: z.string(),
-      email_address: z.string(),
-      pricePaid: z.string(),
-    })
-    .optional(),
+  payment: PaymentSchema,
+  coupon: CouponSnapshotSchema.optional(),
   itemsPrice: Price('Items price'),
   shippingPrice: Price('Shipping price'),
   taxPrice: Price('Tax price'),
@@ -158,22 +210,21 @@ export const OrderInputSchema = z.object({
       (value) => value > new Date(),
       'Expected delivery date must be in the future'
     ),
-  isDelivered: z.boolean().default(false),
-  deliveredAt: z.date().optional(),
-  isPaid: z.boolean().default(false),
-  paidAt: z.date().optional(),
+  status: OrderStatusEnum.default('success'),
+  statusHistory: z.array(OrderStatusHistorySchema).default([]),
 })
 // Cart
 
 export const CartSchema = z.object({
   items: z
-    .array(OrderItemSchema)
+    .array(CartItemSchema)
     .min(1, 'Order must contain at least one item'),
   itemsPrice: z.number(),
   taxPrice: z.optional(z.number()),
   shippingPrice: z.optional(z.number()),
   totalPrice: z.number(),
   paymentMethod: z.optional(z.string()),
+  coupon: CouponSnapshotSchema.optional(),
   shippingAddress: z.optional(ShippingAddressSchema),
   expectedDeliveryDate: z.optional(z.date()),
 })
@@ -193,7 +244,7 @@ const Otp = z
   .string()
   .length(6, 'OTP must be exactly 6 digits')
   .regex(/^[0-9]{6}$/, 'OTP must contain only digits')
-const UserRole = z.string().min(1, 'role is required')
+const UserRole = z.enum(USER_ROLES)
 
 export const UserUpdateSchema = z.object({
   _id: MongoId,
@@ -260,7 +311,7 @@ export const BlogPostInputSchema = z.object({
   date: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
-  author: z.string().min(1, 'Author is required').default('Ishkaara'),
+  author: z.string().min(1, 'Author is required').default('Lemon Fashion'),
   status: ContentStatusSchema.default('draft'),
 })
 

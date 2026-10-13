@@ -8,9 +8,17 @@ import { revalidatePath } from 'next/cache'
 import { formatError, toSlug } from '../utils'
 import { CategoryInputSchema, CategoryUpdateSchema } from '../validator'
 import { z } from 'zod'
+import { auth } from '@/auth'
+import { isStaffRole } from '@/lib/roles'
+
+const assertStaff = async () => {
+  const session = await auth()
+  if (!isStaffRole(session?.user?.role))
+    throw new Error('Staff permission required')
+}
 
 const revalidateCategoryPaths = () => {
-  revalidatePath('/admin/categories')
+  revalidatePath('/workspace/categories')
   revalidatePath('/')
   revalidatePath('/search')
   revalidatePath('/blog')
@@ -33,6 +41,7 @@ export async function createCategory(
   data: z.infer<typeof CategoryInputSchema>
 ) {
   try {
+    await assertStaff()
     const values = CategoryInputSchema.parse(data)
     await connectToDatabase()
     if (await findDuplicate(values.name, values.type)) {
@@ -57,6 +66,7 @@ export async function updateCategory(
   data: z.infer<typeof CategoryUpdateSchema>
 ) {
   try {
+    await assertStaff()
     const values = CategoryUpdateSchema.parse(data)
     await connectToDatabase()
     const category = await Category.findById(values._id)
@@ -96,6 +106,7 @@ export async function updateCategory(
 // DELETE (soft delete; blocked while products/posts still use it)
 export async function deleteCategory(id: string) {
   try {
+    await assertStaff()
     await connectToDatabase()
     const category = await Category.findById(id)
     if (!category) throw new Error('Category not found')
@@ -137,6 +148,7 @@ export async function getCategoriesByType(
 
 // GET ALL CATEGORIES FOR ADMIN (both types, active + inactive)
 export async function getAllCategoriesForAdmin(): Promise<ICategory[]> {
+  await assertStaff()
   await connectToDatabase()
   const categories = await Category.find({ status: { $ne: 'delete' } }).sort({
     type: 1,

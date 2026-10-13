@@ -8,7 +8,15 @@ import { formatError, generateSlug, toSlug } from '../utils'
 import { BlogPostInputSchema, BlogPostUpdateSchema } from '../validator'
 import { IPostInput } from '@/types'
 import { z } from 'zod'
+import { auth } from '@/auth'
+import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
+
+const assertStaff = async () => {
+  const session = await auth()
+  if (!isStaffRole(session?.user?.role))
+    throw new Error('Staff permission required')
+}
 
 const resolveCategoryName = async (categoryId: string) => {
   const category = await Category.findById(categoryId).select('name')
@@ -29,12 +37,13 @@ const resolveSlug = async (slug: string, title: string, excludeId?: string) => {
 // CREATE
 export async function createBlogPost(data: IPostInput) {
   try {
+    await assertStaff()
     const post = BlogPostInputSchema.parse(data)
     await connectToDatabase()
     const categoryName = await resolveCategoryName(post.category)
     const slug = await resolveSlug(post.slug, post.title)
     await BlogPost.create({ ...post, slug, categoryName })
-    revalidatePath('/admin/blog/posts')
+    revalidatePath('/workspace/blog/posts')
     revalidatePath('/blog')
     return {
       success: true,
@@ -48,12 +57,13 @@ export async function createBlogPost(data: IPostInput) {
 // UPDATE
 export async function updateBlogPost(data: z.infer<typeof BlogPostUpdateSchema>) {
   try {
+    await assertStaff()
     const post = BlogPostUpdateSchema.parse(data)
     await connectToDatabase()
     const categoryName = await resolveCategoryName(post.category)
     const slug = await resolveSlug(post.slug, post.title, post._id)
     await BlogPost.findByIdAndUpdate(post._id, { ...post, slug, categoryName })
-    revalidatePath('/admin/blog/posts')
+    revalidatePath('/workspace/blog/posts')
     revalidatePath('/blog')
     revalidatePath(`/blog/${slug}`)
     return {
@@ -68,10 +78,11 @@ export async function updateBlogPost(data: z.infer<typeof BlogPostUpdateSchema>)
 // DELETE (soft delete)
 export async function deleteBlogPost(id: string) {
   try {
+    await assertStaff()
     await connectToDatabase()
     const res = await BlogPost.findByIdAndUpdate(id, { status: 'delete' })
     if (!res) throw new Error('Post not found')
-    revalidatePath('/admin/blog/posts')
+    revalidatePath('/workspace/blog/posts')
     revalidatePath('/blog')
     return {
       success: true,
@@ -190,6 +201,7 @@ export async function getAllBlogPostsForAdmin({
   sort?: string
   limit?: number
 }) {
+  await assertStaff()
   await connectToDatabase()
 
   const {

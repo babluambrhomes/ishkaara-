@@ -1,20 +1,24 @@
 'use server'
 
-import { Cart, IOrderList, OrderItem, ShippingAddress } from '@/types'
+import { Cart, IOrderList, OrderItem, OrderStatus, ShippingAddress } from '@/types'
 import { FREE_SHIPPING_MIN_PRICE, SHIPPING_PRICE, TAX_RATE } from '@/config/data'
 import { formatError, round2 } from '../utils'
 import { connectToDatabase } from '@/config/db'
 import { auth } from '@/auth'
 import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../models/order.model'
+import Coupon from '../models/coupon.model'
 import { revalidatePath } from 'next/cache'
+import crypto from 'crypto'
+import Razorpay from 'razorpay'
 import { sendAskReviewOrderItems, sendPurchaseReceipt } from '@/emails'
-import { paypal } from '../paypal'
 import { DateRange } from 'react-day-picker'
 import Product from '../models/product.model'
 import User from '../models/user.model'
 import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
+import { ORDER_STATUS_FLOW } from '../order-status'
+import { isStaffRole } from '../roles'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -36,28 +40,78 @@ export const createOrder = async (clientSideCart: Cart) => {
     return { success: false, message: formatError(error) }
   }
 }
+// Validate the coupon server-side (security) and return a snapshot + discount.
+async function resolveCoupon(
+  snapshot: Cart['coupon'],
+  itemsPrice: number
+): Promise<{ coupon?: { code: string; value: number; minAmount: number }; discount: number }> {
+  if (!snapshot?.code) return { discount: 0 }
+  const existing = await Coupon.findOne({ code: snapshot.code.toUpperCase() })
+  if (
+    !existing ||
+    existing.status !== 'Active' ||
+    existing.expiresAt < new Date() ||
+    existing.minAmount > itemsPrice
+  ) {
+    return { discount: 0 }
+  }
+  return {
+    coupon: {
+      code: existing.code,
+      value: existing.value,
+      minAmount: existing.minAmount,
+    },
+    discount: Math.min(existing.value, itemsPrice),
+  }
+}
+
 export const createOrderFromCart = async (
   clientSideCart: Cart,
   userId: string
 ) => {
-  const cart = {
-    ...clientSideCart,
-    ...calcDeliveryDateAndPrice({
-      items: clientSideCart.items,
-      shippingAddress: clientSideCart.shippingAddress,
-    }),
-  }
+  await connectToDatabase()
+
+  // Recalculate everything on the server so client-supplied prices/coupons
+  // cannot be tampered with.
+  const itemsPrice = round2(
+    clientSideCart.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    )
+  )
+  const shippingPrice =
+    itemsPrice >= FREE_SHIPPING_MIN_PRICE ? 0 : SHIPPING_PRICE
+  const taxPrice = round2(itemsPrice * TAX_RATE)
+
+  const { coupon, discount } = await resolveCoupon(
+    clientSideCart.coupon,
+    itemsPrice
+  )
+  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice - discount)
 
   const order = OrderInputSchema.parse({
     user: userId,
-    items: cart.items,
-    shippingAddress: cart.shippingAddress,
-    paymentMethod: cart.paymentMethod,
-    itemsPrice: cart.itemsPrice,
-    shippingPrice: cart.shippingPrice,
-    taxPrice: cart.taxPrice,
-    totalPrice: cart.totalPrice,
-    expectedDeliveryDate: cart.expectedDeliveryDate,
+    items: clientSideCart.items,
+    shippingAddress: clientSideCart.shippingAddress,
+    payment: {
+      method: clientSideCart.paymentMethod,
+      status: 'pending',
+    },
+    coupon,
+    itemsPrice,
+    shippingPrice,
+    taxPrice,
+    totalPrice,
+    expectedDeliveryDate: clientSideCart.expectedDeliveryDate,
+    status: 'success',
+    statusHistory: [
+      {
+        status: 'success',
+        at: new Date(),
+        note: 'Order placed',
+        by: 'system',
+      },
+    ],
   })
   return await Order.create(order)
 }
@@ -69,9 +123,11 @@ export async function updateOrderToPaid(orderId: string) {
       user: { email: string; name: string }
     }>('user', 'name email')
     if (!order) throw new Error('Order not found')
-    if (order.isPaid) throw new Error('Order is already paid')
-    order.isPaid = true
-    order.paidAt = new Date()
+    if (order.payment.status === 'paid')
+      throw new Error('Order is already paid')
+    order.payment.status = 'paid'
+    order.payment.paidAt = new Date()
+    order.markModified('payment')
     await order.save()
     if (!process.env.MONGODB_URI?.startsWith('mongodb://localhost'))
       await updateProductStock(order._id)
@@ -87,20 +143,23 @@ const updateProductStock = async (orderId: string) => {
 
   try {
     session.startTransaction()
-    const opts = { session }
 
-    const order = await Order.findOneAndUpdate(
-      { _id: orderId },
-      { isPaid: true, paidAt: new Date() },
-      opts
-    )
+    const order = await Order.findById(orderId).session(session)
     if (!order) throw new Error('Order not found')
 
     for (const item of order.items) {
       const product = await Product.findById(item.product).session(session)
       if (!product) throw new Error('Product not found')
 
-      const variant = product.variants?.[0]
+      const variants = product.variants ?? []
+      const variant =
+        (item.variantId &&
+          variants.find(
+            (v) =>
+              (v as { _id?: { toString(): string } })._id?.toString() ===
+              item.variantId
+          )) ||
+        variants[0]
       if (!variant) throw new Error('Product variant not found')
 
       variant.countInStock = Math.max(0, variant.countInStock - item.quantity)
@@ -115,20 +174,52 @@ const updateProductStock = async (orderId: string) => {
     throw error
   }
 }
-export async function deliverOrder(orderId: string) {
+// Admin only: change order status and record it in the history timeline
+export async function updateOrderStatus({
+  orderId,
+  status,
+  note,
+}: {
+  orderId: string
+  status: OrderStatus
+  note?: string
+}) {
   try {
+    const session = await auth()
+    if (!isStaffRole(session?.user?.role))
+      throw new Error('Staff permission required')
     await connectToDatabase()
+
     const order = await Order.findById(orderId).populate<{
       user: { email: string; name: string }
     }>('user', 'name email')
     if (!order) throw new Error('Order not found')
-    if (!order.isPaid) throw new Error('Order is not paid')
-    order.isDelivered = true
-    order.deliveredAt = new Date()
+    if (order.status === status) throw new Error(`Order is already ${status}`)
+
+    const allowed = ORDER_STATUS_FLOW[order.status as OrderStatus] ?? []
+    if (!allowed.includes(status))
+      throw new Error(`Cannot change status from ${order.status} to ${status}`)
+
+    order.status = status
+    order.statusHistory.push({
+      status,
+      at: new Date(),
+      note: note?.trim() || undefined,
+      by: session?.user?.name || session?.user?.email || 'admin',
+    })
     await order.save()
-    if (order.user.email) await sendAskReviewOrderItems({ order })
+
+    if (status === 'delivered' && order.user?.email) {
+      try {
+        await sendAskReviewOrderItems({ order })
+      } catch {
+        // email failure should not fail the status update
+      }
+    }
+
+    revalidatePath(`/workspace/orders/${orderId}`)
     revalidatePath(`/account/orders/${orderId}`)
-    return { success: true, message: 'Order delivered successfully' }
+    return { success: true, message: `Order status updated to ${status}` }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }
@@ -140,7 +231,7 @@ export async function deleteOrder(id: string) {
     await connectToDatabase()
     const res = await Order.findByIdAndDelete(id)
     if (!res) throw new Error('Order not found')
-    revalidatePath('/admin/orders')
+    revalidatePath('/workspace/orders')
     return {
       success: true,
       message: 'Order deleted successfully',
@@ -212,64 +303,97 @@ export async function getOrderById(orderId: string): Promise<IOrder> {
   return JSON.parse(JSON.stringify(order))
 }
 
-export async function createPayPalOrder(orderId: string) {
-  await connectToDatabase()
+export async function createRazorpayOrder(orderId: string) {
   try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) throw new Error('User not authenticated')
+
+    const keyId = process.env.RAZORPAY_KEY_ID
+    const keySecret = process.env.RAZORPAY_KEY_SECRET
+    if (!keyId || !keySecret)
+      throw new Error('Razorpay keys are not configured')
+
     const order = await Order.findById(orderId)
-    if (order) {
-      const paypalOrder = await paypal.createOrder(order.totalPrice)
-      order.paymentResult = {
-        id: paypalOrder.id,
-        email_address: '',
-        status: '',
-        pricePaid: '0',
-      }
-      await order.save()
-      return {
-        success: true,
-        message: 'PayPal order created successfully',
-        data: paypalOrder.id,
-      }
-    } else {
-      throw new Error('Order not found')
+    if (!order) throw new Error('Order not found')
+    const isOwner =
+      typeof order.user === 'string' && order.user === session.user.id
+    if (session.user.role !== 'Admin' && !isOwner)
+      throw new Error('Not authorized')
+    if (order.payment.status === 'paid')
+      throw new Error('Order is already paid')
+
+    const instance = new Razorpay({ key_id: keyId, key_secret: keySecret })
+    const razorpayOrder = await instance.orders.create({
+      amount: Math.round(order.totalPrice * 100),
+      currency: 'INR',
+      receipt: order._id.toString(),
+      notes: { orderId: order._id.toString() },
+    })
+
+    return {
+      success: true,
+      message: 'Razorpay order created successfully',
+      data: {
+        id: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        keyId,
+      },
     }
   } catch (err) {
     return { success: false, message: formatError(err) }
   }
 }
 
-export async function approvePayPalOrder(
-  orderId: string,
-  data: { orderID: string }
-) {
-  await connectToDatabase()
+export async function verifyRazorpayPayment({
+  orderId,
+  razorpay_order_id,
+  razorpay_payment_id,
+  razorpay_signature,
+}: {
+  orderId: string
+  razorpay_order_id: string
+  razorpay_payment_id: string
+  razorpay_signature: string
+}) {
   try {
-    const order = await Order.findById(orderId).populate('user', 'email')
-    if (!order) throw new Error('Order not found')
+    await connectToDatabase()
+    const session = await auth()
+    if (!session) throw new Error('User not authenticated')
 
-    const captureData = await paypal.capturePayment(data.orderID)
-    if (
-      !captureData ||
-      captureData.id !== order.paymentResult?.id ||
-      captureData.status !== 'COMPLETED'
-    )
-      throw new Error('Error in paypal payment')
-    order.isPaid = true
-    order.paidAt = new Date()
-    order.paymentResult = {
-      id: captureData.id,
-      status: captureData.status,
-      email_address: captureData.payer.email_address,
-      pricePaid:
-        captureData.purchase_units[0]?.payments?.captures[0]?.amount?.value,
+    const keySecret = process.env.RAZORPAY_KEY_SECRET
+    if (!keySecret) throw new Error('Razorpay keys are not configured')
+
+    const order = await Order.findById(orderId)
+    if (!order) throw new Error('Order not found')
+    const isOwner =
+      typeof order.user === 'string' && order.user === session.user.id
+    if (session.user.role !== 'Admin' && !isOwner)
+      throw new Error('Not authorized')
+    if (order.payment.status === 'paid')
+      return { success: true, message: 'Order is already paid' }
+
+    const expectedSignature = crypto
+      .createHmac('sha256', keySecret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex')
+    if (expectedSignature !== razorpay_signature)
+      throw new Error('Payment verification failed')
+
+    order.payment.result = {
+      id: razorpay_payment_id,
+      status: 'paid',
+      email_address: session.user.email ?? '',
+      pricePaid: order.totalPrice.toString(),
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
     }
+    order.markModified('payment')
     await order.save()
-    await sendPurchaseReceipt({ order })
-    revalidatePath(`/account/orders/${orderId}`)
-    return {
-      success: true,
-      message: 'Your order has been successfully paid by PayPal',
-    }
+
+    return await updateOrderToPaid(orderId)
   } catch (err) {
     return { success: false, message: formatError(err) }
   }

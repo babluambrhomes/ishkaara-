@@ -9,17 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import useCartStore from '@/hooks/use-cart-store'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 import { CartItem } from '@/types'
+import { Minus, Plus, ShoppingBag, ShoppingCart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
@@ -41,7 +35,6 @@ export default function AddToCart({
 
   const hasSizes = sizes.length > 0
 
-  //PROMPT: add quantity state
   const [quantity, setQuantity] = useState(1)
 
   const [sizePromptOpen, setSizePromptOpen] = useState(false)
@@ -87,7 +80,7 @@ export default function AddToCart({
   const buyNow = async () => {
     if (!resolveSize('buy')) return
     try {
-      await addItem(itemToAdd(), 1)
+      await addItem(itemToAdd(), quantity)
       router.push('/checkout')
     } catch (error: any) {
       toast({
@@ -96,6 +89,11 @@ export default function AddToCart({
       })
     }
   }
+
+  const increaseQuantity = () =>
+    setQuantity((q) => Math.min(item.countInStock, q + 1))
+
+  const decreaseQuantity = () => setQuantity((q) => Math.max(1, q - 1))
 
   const confirmFromDialog = async () => {
     setSizePromptOpen(false)
@@ -146,8 +144,9 @@ export default function AddToCart({
         <Button
           size='sm'
           onClick={addToCart}
-          className='flex-1 rounded-full'
+          className='flex-1 gap-1.5 rounded-full'
         >
+          <ShoppingCart className='h-4 w-4' />
           Add to Cart
         </Button>
         <Button
@@ -155,7 +154,7 @@ export default function AddToCart({
           size='sm'
           variant='outline'
           onClick={buyNow}
-          className='flex-1 rounded-full border-gold/60 text-primary hover:bg-gold hover:text-[#3d1a00]'
+          className='flex-1 gap-1.5 rounded-full border-gold/60 text-primary hover:bg-gold hover:text-[#3d1a00]'
         >
           Buy Now
         </Button>
@@ -165,57 +164,56 @@ export default function AddToCart({
   ) : minimal ? (
     <>
       <Button
-        className='rounded-full w-auto'
+        className='w-auto gap-1.5 rounded-full'
         onClick={addToCart}
       >
+        <ShoppingCart className='h-4 w-4' />
         Add to Cart
       </Button>
       <SizePrompt />
     </>
   ) : (
     <>
-      <div className='w-full space-y-2'>
-        <Select
-          value={quantity.toString()}
-          onValueChange={(i) => setQuantity(Number(i))}
-        >
-          <SelectTrigger className=''>
-            <SelectValue>
-              Quantity: {quantity}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent position='popper'>
-            {Array.from({ length: item.countInStock }).map((_, i) => (
-              <SelectItem key={i + 1} value={`${i + 1}`}>
-                {i + 1}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
+      <div className='space-y-3'>
+        <div className='flex items-center gap-2'>
+          <button
+            type='button'
+            aria-label='Decrease quantity'
+            disabled={quantity <= 1}
+            onClick={decreaseQuantity}
+            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
+          >
+            <Minus className='h-4 w-4' />
+          </button>
+          <span className='w-8 text-center text-sm font-bold text-foreground'>
+            {quantity}
+          </span>
+          <button
+            type='button'
+            aria-label='Increase quantity'
+            disabled={quantity >= item.countInStock}
+            onClick={increaseQuantity}
+            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
+          >
+            <Plus className='h-4 w-4' />
+          </button>
+          <Button
+            type='button'
+            onClick={addToCart}
+            disabled={item.countInStock <= 0}
+            className='h-11 flex-1 gap-2 rounded-full'
+          >
+            <ShoppingCart className='h-4 w-4' />
+            Add to Cart
+          </Button>
+        </div>
         <Button
-          className='rounded-full w-full'
           type='button'
-          onClick={async () => {
-            if (!resolveSize('add')) return
-            try {
-              await addItem(itemToAdd(), quantity)
-              router.push('/cart')
-            } catch (error: any) {
-              toast({
-                variant: 'destructive',
-                description: error.message,
-              })
-            }
-          }}
-        >
-          Add to Cart
-        </Button>
-        <Button
-          variant='secondary'
           onClick={buyNow}
-          className='w-full rounded-full '
+          disabled={item.countInStock <= 0}
+          className='h-11 w-full gap-2 rounded-full bg-gradient-to-r from-gold to-[#d4af37] font-bold text-[#3d1a00] shadow-soft transition-all hover:from-[#d4af37] hover:to-gold hover:shadow-lg'
         >
+          <ShoppingBag className='h-4 w-4' />
           Buy Now
         </Button>
       </div>

@@ -17,7 +17,7 @@ import { getSetting } from '@/lib/actions/setting.actions'
 export const metadata: Metadata = {
   title: 'Contact Us',
   description:
-    'Get in touch with the Ishkaara team. We are here to help with orders, products, returns and feedback.',
+    'Get in touch with the Lemon Fashion team. We are here to help with orders, products, returns and feedback.',
 }
 
 const socialLinks = [

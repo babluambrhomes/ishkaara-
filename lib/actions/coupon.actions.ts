@@ -7,6 +7,7 @@ import { formatError } from '@/lib/utils'
 import { CouponInputSchema, CouponUpdateSchema } from '@/lib/validator'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
 
 export type CouponListData = {
@@ -34,8 +35,8 @@ export async function getAllCouponsForAdmin({
   status?: string
 }): Promise<CouponListData> {
   const session = await auth()
-  if (session?.user?.role !== 'Admin') {
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role)) {
+    throw new Error('Staff permission required')
   }
 
   const {
@@ -79,8 +80,8 @@ export async function getAllCouponsForAdmin({
 export async function createCoupon(data: z.infer<typeof CouponInputSchema>) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     const validated = CouponInputSchema.parse(data)
@@ -96,7 +97,7 @@ export async function createCoupon(data: z.infer<typeof CouponInputSchema>) {
       expiresAt: toExpiryDate(validated.expiresAt),
     })
 
-    revalidatePath('/admin/coupons')
+    revalidatePath('/workspace/coupons')
     return {
       success: true,
       message: 'Coupon created successfully',
@@ -110,8 +111,8 @@ export async function createCoupon(data: z.infer<typeof CouponInputSchema>) {
 export async function updateCoupon(data: z.infer<typeof CouponUpdateSchema>) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     const { _id, ...fields } = CouponUpdateSchema.parse(data)
@@ -133,7 +134,7 @@ export async function updateCoupon(data: z.infer<typeof CouponUpdateSchema>) {
     )
     if (!coupon) throw new Error('Coupon not found')
 
-    revalidatePath('/admin/coupons')
+    revalidatePath('/workspace/coupons')
     return {
       success: true,
       message: 'Coupon updated successfully',
@@ -147,8 +148,8 @@ export async function updateCoupon(data: z.infer<typeof CouponUpdateSchema>) {
 export async function toggleCouponStatus(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
@@ -158,7 +159,7 @@ export async function toggleCouponStatus(id: string) {
     coupon.status = coupon.status === 'Active' ? 'Inactive' : 'Active'
     await coupon.save()
 
-    revalidatePath('/admin/coupons')
+    revalidatePath('/workspace/coupons')
     return {
       success: true,
       message: `Coupon marked as ${coupon.status}`,
@@ -172,15 +173,15 @@ export async function toggleCouponStatus(id: string) {
 export async function deleteCoupon(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
     const res = await Coupon.findByIdAndDelete(id)
     if (!res) throw new Error('Coupon not found')
 
-    revalidatePath('/admin/coupons')
+    revalidatePath('/workspace/coupons')
     return {
       success: true,
       message: 'Coupon deleted successfully',

@@ -10,7 +10,7 @@ import { TiptapContent } from '@/components/editor/tiptap-content'
 export const metadata: Metadata = {
   title: 'About Us',
   description:
-    'Discover the story behind Ishkaara — our mission, vision and the values that drive every order we deliver.',
+    'Discover the story behind Lemon Fashion — our mission, vision and the values that drive every order we deliver.',
 }
 
 const values = [
@@ -72,7 +72,7 @@ export default async function AboutUsPage() {
         <div className='relative overflow-hidden rounded-2xl shadow-soft'>
           <Image
             src='/images/wrist-watches.jpg'
-            alt='Ishkaara collection'
+            alt='Lemon Fashion collection'
             width={640}
             height={480}
             sizes='(min-width: 1024px) 40vw, 100vw'
@@ -88,13 +88,13 @@ export default async function AboutUsPage() {
           </h2>
           <div className='mt-4 text-justify text-lg leading-relaxed web-page-content'>
             <TiptapContent
-              html={`<p>Welcome to <strong>Ishkaara</strong>, your trusted destination for quality products and exceptional service.</p>
+              html={`<p>Welcome to <strong>Lemon Fashion</strong>, your trusted destination for quality products and exceptional service.</p>
 
 <p>Our journey began with a mission to bring you the best shopping experience by offering a wide range of products at competitive prices, all in one convenient platform.</p>
 
-<p>At Ishkaara, we prioritize customer satisfaction and innovation. Our team works tirelessly to curate a diverse selection of items, from everyday essentials to exclusive deals, ensuring there's something for everyone. We also make your shopping experience seamless with fast shipping, secure payments, and excellent customer support.</p>
+<p>At Lemon Fashion, we prioritize customer satisfaction and innovation. Our team works tirelessly to curate a diverse selection of items, from everyday essentials to exclusive deals, ensuring there's something for everyone. We also make your shopping experience seamless with fast shipping, secure payments, and excellent customer support.</p>
 
-<p>As we continue to grow, our commitment to quality and service remains unwavering. Thank you for choosing Ishkaara - we look forward to being a part of your journey and delivering value every step of the way.</p>`}
+<p>As we continue to grow, our commitment to quality and service remains unwavering. Thank you for choosing Lemon Fashion - we look forward to being a part of your journey and delivering value every step of the way.</p>`}
             />
           </div>
         </div>

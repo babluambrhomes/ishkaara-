@@ -33,7 +33,7 @@ export default async function SignInPage(props: {
       <Card>
         <CardHeader>
          <Image
-                  src='/logo.avif'
+                  src='/logo.png'
                   alt='About us'
                   width={100}
                   height={100}

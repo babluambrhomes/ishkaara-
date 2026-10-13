@@ -179,7 +179,7 @@ export default function Footer() {
         <div className='border-t border-white/10'>
           <div className='flex flex-col items-center justify-between gap-4  px-3 py-8 md:flex-row '>
             <Image
-              src='/logo.avif'
+              src='/logo.png'
               alt={`${site.name} logo`}
               width={56}
               height={32}

@@ -6,6 +6,7 @@ import NewsletterSubscriber, {
   INewsletterSubscriber,
 } from '@/lib/models/newsletter-subscriber.model'
 import { formatError } from '@/lib/utils'
+import { isStaffRole } from '@/lib/roles'
 import { revalidatePath } from 'next/cache'
 import { getSetting } from './setting.actions'
 
@@ -28,8 +29,8 @@ export async function getAllNewsletterSubscribers({
   status?: string
 }): Promise<NewsletterSubscriberListData> {
   const session = await auth()
-  if (session?.user?.role !== 'Admin') {
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role)) {
+    throw new Error('Staff permission required')
   }
 
   const {
@@ -75,8 +76,8 @@ export async function getAllNewsletterSubscribers({
 
 export async function getAllActiveSubscriberEmails(): Promise<string[]> {
   const session = await auth()
-  if (session?.user?.role !== 'Admin') {
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role)) {
+    throw new Error('Staff permission required')
   }
 
   await connectToDatabase()
@@ -90,8 +91,8 @@ export async function getAllActiveSubscriberEmails(): Promise<string[]> {
 export async function toggleNewsletterSubscription(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
@@ -101,7 +102,7 @@ export async function toggleNewsletterSubscription(id: string) {
     subscriber.isSubscribed = !subscriber.isSubscribed
     await subscriber.save()
 
-    revalidatePath('/admin/newsletter')
+    revalidatePath('/workspace/newsletter')
     return {
       success: true,
       message: `Subscriber ${
@@ -116,15 +117,15 @@ export async function toggleNewsletterSubscription(id: string) {
 export async function deleteNewsletterSubscriber(id: string) {
   try {
     const session = await auth()
-    if (session?.user?.role !== 'Admin') {
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role)) {
+      throw new Error('Staff permission required')
     }
 
     await connectToDatabase()
     const res = await NewsletterSubscriber.findByIdAndDelete(id)
     if (!res) throw new Error('Subscriber not found')
 
-    revalidatePath('/admin/newsletter')
+    revalidatePath('/workspace/newsletter')
     return {
       success: true,
       message: 'Subscriber deleted successfully',

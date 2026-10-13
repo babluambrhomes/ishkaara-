@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
-import React from 'react'
+import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 
 import { auth } from '@/auth'
 import { getOrderById } from '@/lib/actions/order.actions'
 import OrderDetailsForm from '@/components/shared/order/order-details-form'
-import Link from 'next/link'
 import { formatId } from '@/lib/utils'
 
 export async function generateMetadata(props: {
@@ -31,20 +31,32 @@ export default async function OrderDetailsPage(props: {
 
   const session = await auth()
 
+  if (
+    order.user !== session?.user?.id &&
+    session?.user?.role !== 'Admin'
+  ) {
+    notFound()
+  }
+
   return (
-    <>
-      <div className='flex gap-2'>
-        <Link href='/account'>Your Account</Link>
-        <span>›</span>
-        <Link href='/account/orders'>Your Orders</Link>
-        <span>›</span>
-        <span>Order {formatId(order._id)}</span>
-      </div>
-      <h1 className='h1-bold py-4'>Order {formatId(order._id)}</h1>
-      <OrderDetailsForm
-        order={order}
-        isAdmin={session?.user?.role === 'Admin' || false}
-      />
-    </>
+    <div>
+      <nav className='mb-6 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground'>
+        <Link href='/account' className='transition-colors hover:text-primary'>
+          Your Account
+        </Link>
+        <ChevronRight className='h-3.5 w-3.5' />
+        <Link
+          href='/account/orders'
+          className='transition-colors hover:text-primary'
+        >
+          Your Orders
+        </Link>
+        <ChevronRight className='h-3.5 w-3.5' />
+        <span className='font-medium text-foreground'>
+          Order {formatId(order._id)}
+        </span>
+      </nav>
+      <OrderDetailsForm order={order} variant='customer' />
+    </div>
   )
 }

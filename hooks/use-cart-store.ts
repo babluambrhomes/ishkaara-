@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import { Cart, CartItem, OrderItem, ShippingAddress } from '@/types'
+import { Cart, CartItem, ShippingAddress } from '@/types'
 import { calcDeliveryDateAndPrice } from '@/lib/actions/order.actions'
 
 const initialState: Cart = {
@@ -18,8 +18,8 @@ interface CartState {
   applyItems: (items: CartItem[]) => Promise<void>
   loadCart: () => Promise<void>
   addItem: (item: CartItem, quantity: number) => Promise<string>
-  updateItem: (item: OrderItem, quantity: number) => Promise<void>
-  removeItem: (item: OrderItem) => Promise<void>
+  updateItem: (item: CartItem, quantity: number) => Promise<void>
+  removeItem: (item: CartItem) => Promise<void>
   clearCart: () => Promise<void>
   setShippingAddress: (shippingAddress: ShippingAddress) => Promise<void>
   setPaymentMethod: (paymentMethod: string) => void
@@ -87,7 +87,7 @@ const useCartStore = create<CartState>((set, get) => ({
     return foundItem.clientId
   },
 
-  updateItem: async (item: OrderItem, quantity: number) => {
+  updateItem: async (item: CartItem, quantity: number) => {
     const exist = get().cart.items.find((x) => x.clientId === item.clientId)
     if (!exist) return
     const res = await fetch(`/api/cart/items/${item.clientId}`, {
@@ -100,7 +100,7 @@ const useCartStore = create<CartState>((set, get) => ({
     await get().applyItems(data.cart.items)
   },
 
-  removeItem: async (item: OrderItem) => {
+  removeItem: async (item: CartItem) => {
     const res = await fetch(`/api/cart/items/${item.clientId}`, {
       method: 'DELETE',
     })

@@ -28,10 +28,10 @@ export const S3_MAX_UPLOAD_SIZE_BYTES = positiveNumber(
 export const S3_CACHE_CONTROL = 'public, max-age=31536000, immutable'
 
 export const STORAGE_FOLDERS = {
-  user: 'ishkaara/user',
-  product: 'ishkaara/product',
-  category: 'ishkaara/category',
-  blog: 'ishkaara/blog',
+  user: 'lemon-fashion/user',
+  product: 'lemon-fashion/product',
+  category: 'lemon-fashion/category',
+  blog: 'lemon-fashion/blog',
 } as const
 
 let client: S3Client | null = null

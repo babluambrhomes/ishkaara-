@@ -8,11 +8,19 @@ import { formatError, generateSlug, toSlug } from '../utils'
 import { ProductInputSchema, ProductUpdateSchema } from '../validator'
 import { IProductInput } from '@/types'
 import { z } from 'zod'
+import { auth } from '@/auth'
+import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
 import {
   toPublicProduct,
   toPublicProducts as toPublicProductsList,
 } from '../utils/product-transform'
+
+const assertStaff = async () => {
+  const session = await auth()
+  if (!isStaffRole(session?.user?.role))
+    throw new Error('Staff permission required')
+}
 
 // Price of the display (first) variant. Kept in one place so listings always
 // sort/filter on the same value they show.
@@ -48,12 +56,13 @@ const orderBy = (sort?: string): Record<string, 1 | -1> =>
 // CREATE
 export async function createProduct(data: IProductInput) {
   try {
+    await assertStaff()
     const product = ProductInputSchema.parse(data)
     await connectToDatabase()
     const categoryName = await resolveCategoryName(product.category)
     const slug = await resolveSlug(product.slug, product.name)
     await Product.create({ ...product, slug, categoryName })
-    revalidatePath('/admin/products')
+    revalidatePath('/workspace/products')
     return {
       success: true,
       message: 'Product created successfully',
@@ -66,6 +75,7 @@ export async function createProduct(data: IProductInput) {
 // UPDATE
 export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
   try {
+    await assertStaff()
     const product = ProductUpdateSchema.parse(data)
     await connectToDatabase()
     const categoryName = await resolveCategoryName(product.category)
@@ -75,7 +85,7 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
       slug,
       categoryName,
     })
-    revalidatePath('/admin/products')
+    revalidatePath('/workspace/products')
     revalidatePath('/product/[slug]', 'page')
     return {
       success: true,
@@ -88,10 +98,11 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
 // DELETE (soft delete)
 export async function deleteProduct(id: string) {
   try {
+    await assertStaff()
     await connectToDatabase()
     const res = await Product.findByIdAndUpdate(id, { status: 'delete' })
     if (!res) throw new Error('Product not found')
-    revalidatePath('/admin/products')
+    revalidatePath('/workspace/products')
     return {
       success: true,
       message: 'Product deleted successfully',
@@ -121,6 +132,7 @@ export async function getAllProductsForAdmin({
   sort?: string
   limit?: number
 }) {
+  await assertStaff()
   await connectToDatabase()
 
   const {

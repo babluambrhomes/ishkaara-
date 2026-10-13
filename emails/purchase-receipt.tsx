@@ -26,8 +26,6 @@ type OrderInformationProps = {
 PurchaseReceiptEmail.PreviewProps = {
   order: {
     _id: '123',
-    isPaid: true,
-    paidAt: new Date(),
     totalPrice: 100,
     itemsPrice: 100,
     taxPrice: 0,
@@ -47,7 +45,6 @@ PurchaseReceiptEmail.PreviewProps = {
     },
     items: [
       {
-        clientId: '123',
         name: 'Product 1',
         image: 'https://via.placeholder.com/150',
         price: 100,
@@ -56,11 +53,21 @@ PurchaseReceiptEmail.PreviewProps = {
         slug: 'product-1',
         category: 'Category 1',
         countInStock: 10,
+        variantId: 'v1',
       },
     ],
-    paymentMethod: 'PayPal',
+    payment: {
+      method: 'Razorpay',
+      status: 'paid',
+      result: { id: 'pay_123', status: 'paid', pricePaid: '100' },
+      paidAt: new Date(),
+    },
+    coupon: { code: 'WELCOME100', value: 100, minAmount: 999 },
     expectedDeliveryDate: new Date(),
-    isDelivered: true,
+    status: 'success',
+    statusHistory: [
+      { status: 'success', at: new Date(), note: 'Order placed', by: 'system' },
+    ],
   } as IOrder,
 } satisfies OrderInformationProps
 const dateFormatter = new Intl.DateTimeFormat('en', { dateStyle: 'medium' })
