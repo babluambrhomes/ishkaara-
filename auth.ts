@@ -1,12 +1,15 @@
 import { MongoDBAdapter } from '@auth/mongodb-adapter'
 import Google from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import { headers } from 'next/headers'
 import { connectToDatabase } from './config/db'
 import client from './config/db'
 import User from './lib/models/user.model'
+import { getClientIpFromHeaders, rateLimit } from './lib/ratelimit'
 
 import NextAuth, { type DefaultSession } from 'next-auth'
 import authConfig from './config/auth.config'
+import { ACCESS_TOKEN_TTL_MS, REFRESH_TOKEN_TTL_MS } from './lib/auth-token'
 
 declare module 'next-auth' {
   interface Session {
@@ -26,7 +29,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 15 * 24 * 60 * 60,
+  },
+  jwt: {
+    maxAge: 15 * 24 * 60 * 60,
   },
   adapter: MongoDBAdapter(client),
   providers: [
@@ -43,6 +49,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         await connectToDatabase()
         if (credentials == null) return null
+
+        const ip = getClientIpFromHeaders(await headers())
+        const rl = await rateLimit('auth', ip)
+        if (!rl.success) return null
 
         const user = await User.findOne({ phone: credentials.phone })
 
@@ -90,6 +100,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = dbUser?.role || (user as { role?: string }).role || 'User'
         token.phone = dbUser?.phone ?? null
         token.phoneVerified = dbUser?.phoneVerified ?? false
+        token.accessUntil = Date.now() + ACCESS_TOKEN_TTL_MS
+        token.refreshUntil = Date.now() + REFRESH_TOKEN_TTL_MS
       }
 
       if (trigger === 'update') {

@@ -1,1 +1,5 @@
-﻿
+﻿# Redis (rate limiting)
+# Standard Redis connection string. If set, API rate limiting is enabled.
+# If missing/unreachable, rate limiting fails open (requests are allowed).
+# Example: redis://default:password@host:6379
+REDIS_URL=

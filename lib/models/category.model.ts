@@ -4,7 +4,7 @@ export type CategoryType = 'product' | 'blog'
 
 export type CategoryStatus = 'public' | 'draft' | 'delete'
 
-export interface ICategory extends Document {
+export interface ICategory extends Omit<Document, '_id'> {
   _id: string
   name: string
   slug: string

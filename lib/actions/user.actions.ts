@@ -14,10 +14,11 @@ import Order from '../models/order.model'
 import { formatError } from '../utils'
 import { isAdminRole } from '../roles'
 import { redirect } from 'next/navigation'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { getSetting } from './setting.actions'
+import { assertRateLimit, getClientIpFromHeaders } from '../ratelimit'
 
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString()
@@ -32,6 +33,10 @@ export async function sendOtp(
 > {
   try {
     const { phone } = UserOtpSendSchema.parse(user)
+
+    const ip = getClientIpFromHeaders(await headers())
+    await assertRateLimit('otp', `ip:${ip}`)
+    await assertRateLimit('otp', `phone:${phone}`)
 
     await connectToDatabase()
     const dbUser = await User.findOneAndUpdate(
@@ -130,6 +135,8 @@ export async function updateProfile(
 export async function sendPhoneVerificationOtp(phone: string) {
   try {
     UserOtpSendSchema.parse({ phone })
+    const ip = getClientIpFromHeaders(await headers())
+    await assertRateLimit('otp', `ip:${ip}`)
     await connectToDatabase()
     const session = await auth()
     const currentUser = await User.findById(session?.user?.id)

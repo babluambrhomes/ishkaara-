@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { connectToDatabase } from '@/config/db'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import {
   CartApiError,
   cartToPlain,
@@ -15,6 +16,9 @@ export const PATCH = async (
   { params }: { params: Promise<{ clientId: string }> }
 ) => {
   try {
+    const rl = await rateLimit('cart', getClientIp(request))
+    if (!rl.success) return rateLimitResponse(rl)
+
     const { clientId } = await params
     const body = await request.json().catch(() => ({}))
     const quantity = Math.max(1, Math.floor(body.quantity ?? 1))
@@ -54,10 +58,13 @@ export const PATCH = async (
 }
 
 export const DELETE = async (
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ clientId: string }> }
 ) => {
   try {
+    const rl = await rateLimit('cart', getClientIp(request))
+    if (!rl.success) return rateLimitResponse(rl)
+
     const { clientId } = await params
     const owner = await getCartOwner()
     if (!owner.userId && !owner.guestId) {

@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import Product from '@/lib/models/product.model'
 import { connectToDatabase } from '@/config/db'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import { toPublicProducts } from '@/lib/utils/product-transform'
 
 export const GET = async (request: NextRequest) => {
+  const rl = await rateLimit('api', getClientIp(request))
+  if (!rl.success) return rateLimitResponse(rl)
+
   const listType = request.nextUrl.searchParams.get('type') || 'history'
   const productIdsParam = request.nextUrl.searchParams.get('ids')
   const categoriesParam = request.nextUrl.searchParams.get('categories')

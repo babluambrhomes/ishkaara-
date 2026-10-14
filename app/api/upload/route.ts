@@ -4,6 +4,7 @@ import { S3_MAX_UPLOAD_SIZE_BYTES } from '@/config/s3'
 import { uploadImage, type StorageEntity } from '@/lib/storage'
 import { formatError } from '@/lib/utils'
 import { isStaffRole } from '@/lib/roles'
+import { rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 export const runtime = 'nodejs'
 
@@ -15,6 +16,9 @@ export async function POST(req: NextRequest) {
     if (!isStaffRole(session?.user?.role)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const rl = await rateLimit('upload', session?.user?.id as string)
+    if (!rl.success) return rateLimitResponse(rl)
 
     const formData = await req.formData()
     const file = formData.get('file')

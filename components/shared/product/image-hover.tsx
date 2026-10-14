@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import Image from 'next/image'
 import { getImageUrl } from '@/lib/image-url'
-import { useState } from 'react'
 
 const ImageHover = ({
   src,
@@ -13,40 +11,21 @@ const ImageHover = ({
   hoverSrc: string
   alt: string
 }) => {
-  const [isHovered, setIsHovered] = useState(false)
-  let hoverTimeout: any
-  const handleMouseEnter = () => {
-    hoverTimeout = setTimeout(() => setIsHovered(true), 1000) // 1 second delay
-  }
-
-  const handleMouseLeave = () => {
-    clearTimeout(hoverTimeout)
-    setIsHovered(false)
-  }
-
   return (
-    <div
-      className='relative h-52'
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className='relative h-full w-full overflow-hidden'>
       <Image
         src={getImageUrl(src)}
         alt={alt}
         fill
         sizes='80vw'
-        className={`object-contain transition-opacity duration-500 ${
-          isHovered ? 'opacity-0' : 'opacity-100'
-        }`}
+        className='object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:-translate-y-full motion-reduce:transition-none'
       />
       <Image
         src={getImageUrl(hoverSrc)}
         alt={alt}
         fill
         sizes='80vw'
-        className={`absolute inset-0 object-contain transition-opacity duration-500 ${
-          isHovered ? 'opacity-100' : 'opacity-0'
-        }`}
+        className='absolute inset-0 object-contain mix-blend-multiply translate-y-full transition-transform duration-700 ease-out group-hover:translate-y-0 motion-reduce:transition-none'
       />
     </div>
   )

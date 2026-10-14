@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Cart from '@/lib/models/cart.model'
 import { connectToDatabase } from '@/config/db'
 import { generateId } from '@/lib/utils'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import {
   CartApiError,
   CART_GUEST_COOKIE,
@@ -17,6 +18,9 @@ import { CartItem } from '@/types'
 
 export const POST = async (request: NextRequest) => {
   try {
+    const rl = await rateLimit('cart', getClientIp(request))
+    if (!rl.success) return rateLimitResponse(rl)
+
     const body = await request.json().catch(() => ({}))
     const { productId } = body as {
       productId?: string

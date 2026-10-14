@@ -9,6 +9,7 @@ import { OrderInputSchema } from '../validator'
 import Order, { IOrder } from '../models/order.model'
 import Coupon from '../models/coupon.model'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import crypto from 'crypto'
 import Razorpay from 'razorpay'
 import { sendAskReviewOrderItems, sendPurchaseReceipt } from '@/emails'
@@ -19,6 +20,7 @@ import mongoose from 'mongoose'
 import { getSetting } from './setting.actions'
 import { ORDER_STATUS_FLOW } from '../order-status'
 import { isStaffRole } from '../roles'
+import { assertRateLimit, getClientIpFromHeaders } from '../ratelimit'
 
 // CREATE
 export const createOrder = async (clientSideCart: Cart) => {
@@ -70,6 +72,7 @@ export const createOrderFromCart = async (
   userId: string
 ) => {
   await connectToDatabase()
+  await assertRateLimit('payment', `user:${userId}`)
 
   // Recalculate everything on the server so client-supplied prices/coupons
   // cannot be tampered with.
@@ -118,6 +121,9 @@ export const createOrderFromCart = async (
 
 export async function updateOrderToPaid(orderId: string) {
   try {
+    const ip = getClientIpFromHeaders(await headers())
+    await assertRateLimit('payment', `ip:${ip}`)
+
     await connectToDatabase()
     const order = await Order.findById(orderId).populate<{
       user: { email: string; name: string }
@@ -308,6 +314,7 @@ export async function createRazorpayOrder(orderId: string) {
     await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('User not authenticated')
+    await assertRateLimit('payment', `user:${session.user.id}`)
 
     const keyId = process.env.RAZORPAY_KEY_ID
     const keySecret = process.env.RAZORPAY_KEY_SECRET
@@ -361,6 +368,7 @@ export async function verifyRazorpayPayment({
     await connectToDatabase()
     const session = await auth()
     if (!session) throw new Error('User not authenticated')
+    await assertRateLimit('payment', `user:${session.user.id}`)
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET
     if (!keySecret) throw new Error('Razorpay keys are not configured')

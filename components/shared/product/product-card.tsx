@@ -29,7 +29,6 @@ function ProductCardImage({
   isDeal,
   discountPercent,
   wishlistItem,
-  hover = true,
 }: {
   name: string
   slug: string
@@ -38,31 +37,16 @@ function ProductCardImage({
   isDeal: boolean
   discountPercent: number
   wishlistItem: WishlistItem
-  hover?: boolean
 }) {
   return (
     <div className='relative'>
       <Link href={`/product/${slug}`} className='block'>
         <div className='relative h-36 overflow-hidden rounded-xl bg-gradient-to-br from-grey-500/10 via-background to-primary/[0.05]'>
-          {hover && images.length > 1 ? (
-            <div className='transition-transform duration-500 group-hover:scale-105'>
-              <ImageHover
-                src={images[0]}
-                hoverSrc={images[1]}
-                alt={name}
-              />
-            </div>
-          ) : (
-            <div className='relative h-36'>
-              <Image
-                src={getImageUrl(images[0])}
-                alt={name}
-                fill
-                sizes='80vw'
-                className='object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105'
-              />
-            </div>
-          )}
+          <ImageHover
+            src={images[0]}
+            hoverSrc={images[1] ?? images[0]}
+            alt={name}
+          />
         </div>
       </Link>
 
@@ -203,7 +187,6 @@ export default function ProductCard({
           isDeal={isDeal}
           discountPercent={discountPercent}
           wishlistItem={wishlistItem}
-          hover={isProductData(product)}
         />
       </CardHeader>
       <CardContent className='flex-1 px-3 pb-2 pt-2'>

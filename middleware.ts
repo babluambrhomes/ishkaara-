@@ -1,6 +1,13 @@
 import NextAuth from 'next-auth'
 import { NextResponse } from 'next/server'
+import { encode, getToken } from 'next-auth/jwt'
 import authConfig from './config/auth.config'
+import {
+  ACCESS_TOKEN_TTL_MS,
+  JWT_MAX_AGE_SECONDS,
+  getSessionCookieName,
+  getSessionCookieOptions,
+} from './lib/auth-token'
 
 const publicPages = [
   '/',
@@ -25,25 +32,57 @@ const publicPages = [
 
 const { auth } = NextAuth(authConfig)
 
-export default auth((req) => {
+export default auth(async (req) => {
   const publicPathnameRegex = RegExp(
     `^(${publicPages.flatMap((p) => (p === '/' ? ['', '/'] : p)).join('|')})/?$`,
     'i'
   )
-  const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname)
+  const { pathname, origin } = req.nextUrl
+  const isPublicPage = publicPathnameRegex.test(pathname)
 
-  if (isPublicPage) {
-    return NextResponse.next()
-  }
+  const secureCookieName = getSessionCookieName(true)
+  const cookieName = req.cookies.has(secureCookieName)
+    ? secureCookieName
+    : getSessionCookieName(false)
+  const isSecure = cookieName === secureCookieName
+
+  const signInUrl = () =>
+    NextResponse.redirect(
+      new URL(
+        `/sign-in?callbackUrl=${encodeURIComponent(pathname) || '/'}`,
+        origin
+      )
+    )
 
   if (!req.auth) {
-    const newUrl = new URL(
-      `/sign-in?callbackUrl=${
-        encodeURIComponent(req.nextUrl.pathname) || '/'
-      }`,
-      req.nextUrl.origin
-    )
-    return Response.redirect(newUrl)
+    return isPublicPage ? NextResponse.next() : signInUrl()
+  }
+
+  const token = await getToken({ req, cookieName })
+  if (!token) {
+    return isPublicPage ? NextResponse.next() : signInUrl()
+  }
+
+  const now = Date.now()
+  const accessUntil = token.accessUntil as number | undefined
+  const refreshUntil = token.refreshUntil as number | undefined
+
+  if (refreshUntil && now >= refreshUntil) {
+    const res = isPublicPage ? NextResponse.next() : signInUrl()
+    res.cookies.delete(cookieName)
+    return res
+  }
+
+  if (accessUntil && now >= accessUntil) {
+    const refreshed = await encode({
+      token: { ...token, accessUntil: now + ACCESS_TOKEN_TTL_MS },
+      secret: process.env.AUTH_SECRET!,
+      salt: cookieName,
+      maxAge: JWT_MAX_AGE_SECONDS,
+    })
+    const res = NextResponse.next()
+    res.cookies.set(cookieName, refreshed, getSessionCookieOptions(isSecure))
+    return res
   }
 
   return NextResponse.next()

@@ -3,15 +3,22 @@ import { Types } from 'mongoose'
 
 import { auth } from '@/auth'
 import { connectToDatabase } from '@/config/db'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import Wishlist from '@/lib/models/wishlist.model'
 import { getWishlistProducts } from '@/lib/utils/wishlist-api'
 
 export const DELETE = async (
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ productId: string }> }
 ) => {
   try {
     const session = await auth()
+    const rl = await rateLimit(
+      'wishlist',
+      session?.user?.id ?? getClientIp(request)
+    )
+    if (!rl.success) return rateLimitResponse(rl)
+
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Please sign in' }, { status: 401 })
     }

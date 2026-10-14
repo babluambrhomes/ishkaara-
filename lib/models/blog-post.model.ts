@@ -3,7 +3,7 @@ import { Document, Model, model, models, Schema } from 'mongoose'
 
 export type BlogPostStatus = 'public' | 'draft' | 'delete'
 
-export interface IPost extends Document, IPostInput {
+export interface IPost extends Omit<Document, '_id'>, IPostInput {
   _id: string
   categoryName: string
   createdAt: Date

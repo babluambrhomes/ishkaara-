@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 import Cart from '@/lib/models/cart.model'
 import { connectToDatabase } from '@/config/db'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import {
   CART_GUEST_COOKIE,
   cartToPlain,
@@ -11,8 +12,11 @@ import {
   toServerCart,
 } from '@/lib/utils/cart-api'
 
-export const GET = async () => {
+export const GET = async (request: NextRequest) => {
   try {
+    const rl = await rateLimit('cart', getClientIp(request))
+    if (!rl.success) return rateLimitResponse(rl)
+
     const owner = await getCartOwner()
     await connectToDatabase()
 
@@ -47,8 +51,11 @@ export const GET = async () => {
   }
 }
 
-export const DELETE = async () => {
+export const DELETE = async (request: NextRequest) => {
   try {
+    const rl = await rateLimit('cart', getClientIp(request))
+    if (!rl.success) return rateLimitResponse(rl)
+
     const owner = await getCartOwner()
     if (!owner.userId && !owner.guestId) {
       return NextResponse.json({ cart: await toServerCart([]) })

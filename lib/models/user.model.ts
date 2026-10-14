@@ -2,7 +2,7 @@
 import { IAddress, IUserInput } from '@/types'
 import { Document, Model, Schema, model, models } from 'mongoose'
 
-export interface IUser extends Document, IUserInput {
+export interface IUser extends Omit<Document, '_id'>, IUserInput {
   _id: string
   otp: string | null
   profile: string | null

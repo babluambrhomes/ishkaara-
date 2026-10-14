@@ -12,7 +12,7 @@ export interface IProductVariant {
   countInStock: number
 }
 
-export interface IProduct extends Document, IProductInput {
+export interface IProduct extends Omit<Document, '_id'>, IProductInput {
   _id: string
   categoryName: string
   siteBanner: string

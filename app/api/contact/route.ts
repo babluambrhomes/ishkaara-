@@ -2,8 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import ContactMessage from '@/lib/models/contact-message.model'
 import { connectToDatabase } from '@/config/db'
+import { getClientIp, rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 export const POST = async (request: NextRequest) => {
+  const rl = await rateLimit('write', getClientIp(request))
+  if (!rl.success) return rateLimitResponse(rl)
+
   const body = (await request.json().catch(() => null)) as {
     name?: string
     email?: string

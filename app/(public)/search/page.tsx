@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { cn, getFilterUrl, toSlug } from '@/lib/utils'
+import { cn, getFilterUrl } from '@/lib/utils'
 
 import Pagination from '@/components/shared/pagination'
 import ProductCard from '@/components/shared/product/product-card'
@@ -9,6 +9,7 @@ import ProductSortSelector from '@/components/shared/product/product-sort-select
 import Rating from '@/components/shared/product/rating'
 import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 import SearchBox from '@/components/shared/search/search-box'
+import TagFilter from '@/components/shared/search/tag-filter'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -128,28 +129,6 @@ const FilterLink = ({
   >
     {children}
     {active && <Check className='h-3.5 w-3.5 text-primary' />}
-  </Link>
-)
-
-const TagChip = ({
-  href,
-  active,
-  children,
-}: {
-  href: string
-  active: boolean
-  children: React.ReactNode
-}) => (
-  <Link
-    href={href}
-    className={cn(
-      'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-200',
-      active
-        ? 'border-primary bg-primary text-primary-foreground shadow-soft'
-        : 'border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-foreground'
-    )}
-  >
-    {children}
   </Link>
 )
 
@@ -321,23 +300,7 @@ export default async function SearchPage(props: {
                   <Separator />
 
                   <FilterSection title='Tag'>
-                    <div className='flex flex-wrap gap-2'>
-                      <TagChip
-                        href={getFilterUrl({ tag: 'all', params })}
-                        active={tag === 'all' || tag === ''}
-                      >
-                        All
-                      </TagChip>
-                      {tags.map((t: string) => (
-                        <TagChip
-                          key={t}
-                          href={getFilterUrl({ tag: t, params })}
-                          active={toSlug(t) === tag}
-                        >
-                          {t}
-                        </TagChip>
-                      ))}
-                    </div>
+                    <TagFilter tags={tags} params={params} activeTag={tag} />
                   </FilterSection>
                 </div>
               </CardContent>
