@@ -28,7 +28,13 @@ import { USER_ROLES } from '@/config/data'
 import { IUser } from '@/lib/models/user.model'
 import { UserUpdateSchema } from '@/lib/validator'
 
-const UserEditForm = ({ user }: { user: IUser }) => {
+const UserEditForm = ({
+  user,
+  canChangeRole,
+}: {
+  user: IUser
+  canChangeRole: boolean
+}) => {
   const router = useRouter()
 
   const form = useForm<z.infer<typeof UserUpdateSchema>>({
@@ -98,36 +104,38 @@ const UserEditForm = ({ user }: { user: IUser }) => {
             )}
           />
         </div>
-        <div>
-          <FormField
-            control={form.control}
-            name='role'
-            render={({ field }) => (
-              <FormItem className='space-x-2 items-center'>
-                <FormLabel>Role</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value.toString()}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select a role' />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {USER_ROLES.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {role}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        {canChangeRole && (
+          <div>
+            <FormField
+              control={form.control}
+              name='role'
+              render={({ field }) => (
+                <FormItem className='space-x-2 items-center'>
+                  <FormLabel>Role</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value.toString()}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select a role' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {USER_ROLES.map((role) => (
+                        <SelectItem key={role} value={role}>
+                          {role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
         <div className='flex-between'>
           <Button type='submit' disabled={form.formState.isSubmitting}>
             {form.formState.isSubmitting ? 'Submitting...' : `Update User `}

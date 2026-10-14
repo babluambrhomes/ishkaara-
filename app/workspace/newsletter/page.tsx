@@ -252,7 +252,7 @@ export default function WorkspaceNewsletterPage() {
               </TableRow>
             ) : (
               data?.data.map((sub) => (
-                <TableRow key={sub._id as string}>
+                <TableRow key={String(sub._id)}>
                   <TableCell>
                     <div className='flex items-center gap-2'>
                       <Mail className='h-4 w-4 text-muted-foreground' />
@@ -283,12 +283,12 @@ export default function WorkspaceNewsletterPage() {
                       <Button
                         variant='outline'
                         size='sm'
-                        onClick={() => handleToggle(sub._id as string)}
+                        onClick={() => handleToggle(String(sub._id))}
                       >
                         {sub.isSubscribed ? 'Deactivate' : 'Activate'}
                       </Button>
                       <DeleteDialog
-                        id={sub._id as string}
+                        id={String(sub._id)}
                         action={deleteNewsletterSubscriber}
                         callbackAction={() =>
                           loadData(debouncedQuery, page, statusFilter)

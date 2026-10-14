@@ -13,11 +13,12 @@ const ENTITIES: StorageEntity[] = ['user', 'product', 'category', 'blog']
 export async function POST(req: NextRequest) {
   try {
     const session = await auth()
-    if (!isStaffRole(session?.user?.role)) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    const isStaff = isStaffRole(session.user.role)
 
-    const rl = await rateLimit('upload', session?.user?.id as string)
+    const rl = await rateLimit('upload', session.user.id)
     if (!rl.success) return rateLimitResponse(rl)
 
     const formData = await req.formData()
@@ -30,6 +31,10 @@ export async function POST(req: NextRequest) {
 
     if (typeof entity !== 'string' || !ENTITIES.includes(entity as StorageEntity)) {
       return NextResponse.json({ error: 'Invalid entity type' }, { status: 400 })
+    }
+
+    if (!isStaff && entity !== 'user') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     if (!file.type.startsWith('image/')) {
@@ -55,6 +60,7 @@ export async function POST(req: NextRequest) {
       entity: entity as StorageEntity,
       buffer,
       originalName: file.name,
+      subPath: entity === 'user' ? session.user.id : undefined,
     })
 
     return NextResponse.json({ key })

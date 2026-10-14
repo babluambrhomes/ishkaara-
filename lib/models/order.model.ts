@@ -86,6 +86,22 @@ const statusHistorySchema = new Schema(
   { _id: false }
 )
 
+const cancellationSchema = new Schema(
+  {
+    reason: { type: String, required: true, trim: true },
+    date: { type: Date, default: Date.now },
+  },
+  { _id: false }
+)
+
+const returnRequestSchema = new Schema(
+  {
+    reason: { type: String, required: true, trim: true },
+    date: { type: Date, default: Date.now },
+  },
+  { _id: false }
+)
+
 const orderSchema = new Schema<IOrder>(
   {
     user: {
@@ -123,6 +139,8 @@ const orderSchema = new Schema<IOrder>(
       default: 'success',
     },
     statusHistory: { type: [statusHistorySchema], default: [] },
+    cancellation: { type: cancellationSchema },
+    returnRequest: { type: returnRequestSchema },
     createdAt: { type: Date, default: Date.now },
   },
   {

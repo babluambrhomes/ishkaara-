@@ -146,7 +146,7 @@ export default function WorkspaceCouponsPage() {
       const res = editingCoupon
         ? await updateCoupon({
             ...values,
-            _id: editingCoupon._id as string,
+            _id: String(editingCoupon._id),
           })
         : await createCoupon(values)
 
@@ -289,7 +289,7 @@ export default function WorkspaceCouponsPage() {
               </TableRow>
             ) : (
               data?.data.map((coupon) => (
-                <TableRow key={coupon._id as string}>
+                <TableRow key={String(coupon._id)}>
                   <TableCell className='font-mono font-semibold align-top'>
                     {coupon.code}
                     <span className='block font-sans text-[11px] font-normal text-muted-foreground'>
@@ -338,7 +338,7 @@ export default function WorkspaceCouponsPage() {
                             : 'Activate coupon'
                         }
                         onClick={() =>
-                          handleToggleStatus(coupon._id as string)
+                          handleToggleStatus(String(coupon._id))
                         }
                       >
                         {coupon.status === 'Active' ? (
@@ -355,7 +355,7 @@ export default function WorkspaceCouponsPage() {
                         <Pencil className='h-3.5 w-3.5' />
                       </Button>
                       <DeleteDialog
-                        id={coupon._id as string}
+                        id={String(coupon._id)}
                         action={deleteCoupon}
                         callbackAction={() =>
                           loadData(debouncedQuery, page, statusFilter)

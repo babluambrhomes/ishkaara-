@@ -2,7 +2,6 @@
 'use client'
 
 import ProductPrice from '@/components/shared/product/product-price'
-import { Card, CardContent } from '@/components/ui/card'
 import { formatDateTime } from '@/lib/utils'
 import React from 'react'
 import {
@@ -29,14 +28,14 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
 }) => {
   if (active && payload && payload.length) {
     return (
-      <Card>
-        <CardContent className='p-2'>
-          <p>{label && formatDateTime(new Date(label)).dateOnly}</p>
-          <p className='text-primary text-xl'>
-            <ProductPrice price={payload[0].value} plain />
-          </p>
-        </CardContent>
-      </Card>
+      <div className='rounded-xl border border-border/60 bg-card px-3 py-2 shadow-lift'>
+        <p className='text-xs font-medium text-muted-foreground'>
+          {label && formatDateTime(new Date(label)).dateOnly}
+        </p>
+        <p className='text-primary mt-0.5 text-lg font-bold'>
+          <ProductPrice price={payload[0].value} plain />
+        </p>
+      </div>
     )
   }
   return null
@@ -44,27 +43,76 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
 
 const CustomXAxisTick: React.FC<any> = ({ x, y, payload }) => {
   return (
-    <text x={x} y={y + 10} textAnchor='left' fill='#666' className='text-xs'>
+    <text
+      x={x}
+      y={y + 12}
+      textAnchor='middle'
+      fill='hsl(var(--muted-foreground))'
+      className='text-[11px]'
+    >
       {formatDateTime(new Date(payload.value)).dateOnly}
-      {/* {`${payload.value.split('/')[1]}/${payload.value.split('/')[2]}`} */}
     </text>
   )
 }
+
 export default function SalesAreaChart({ data }: { data: any[] }) {
   return (
     <ResponsiveContainer width='100%' height={400}>
-      <AreaChart data={data}>
-        <CartesianGrid horizontal={true} vertical={false} stroke='' />
-        <XAxis dataKey='date' tick={<CustomXAxisTick />} interval={3} />
-        <YAxis fontSize={12} tickFormatter={(value: number) => `$${value}`} />
-        <Tooltip content={<CustomTooltip />} />
+      <AreaChart
+        data={data}
+        margin={{ top: 12, right: 12, left: 0, bottom: 0 }}
+      >
+        <defs>
+          <linearGradient id='salesFill' x1='0' y1='0' x2='0' y2='1'>
+            <stop
+              offset='0%'
+              stopColor='hsl(var(--primary))'
+              stopOpacity={0.35}
+            />
+            <stop
+              offset='100%'
+              stopColor='hsl(var(--primary))'
+              stopOpacity={0}
+            />
+          </linearGradient>
+        </defs>
+        <CartesianGrid
+          vertical={false}
+          stroke='hsl(var(--border))'
+          strokeDasharray='4 4'
+        />
+        <XAxis
+          dataKey='date'
+          tick={<CustomXAxisTick />}
+          interval={3}
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
+        <YAxis
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value: number) => `$${value}`}
+          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          width={56}
+        />
+        <Tooltip
+          content={<CustomTooltip />}
+          cursor={{ stroke: 'hsl(var(--primary) / 0.35)', strokeWidth: 1 }}
+        />
         <Area
           type='monotone'
           dataKey='totalSales'
           stroke='hsl(var(--primary))'
-          strokeWidth={2}
-          fill='hsl(var(--primary))'
-          fillOpacity={0.8}
+          strokeWidth={2.5}
+          fill='url(#salesFill)'
+          activeDot={{
+            r: 5,
+            stroke: 'hsl(var(--card))',
+            strokeWidth: 2,
+            fill: 'hsl(var(--primary))',
+          }}
         />
       </AreaChart>
     </ResponsiveContainer>

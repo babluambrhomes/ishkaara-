@@ -31,6 +31,7 @@ import {
   updateProfile,
   verifyPhoneLink,
 } from '@/lib/actions/user.actions'
+import { ImageUpload } from '@/components/shared/image-upload'
 import { UserProfileUpdateSchema } from '@/lib/validator'
 import { BadgeCheck, Mail, ShieldX, Smartphone } from 'lucide-react'
 
@@ -170,6 +171,7 @@ function AddPhoneFlow() {
 
 export default function ProfileForm({
   name,
+  profile,
   email,
   emailVerified,
   phone,
@@ -177,6 +179,7 @@ export default function ProfileForm({
   attachError,
 }: {
   name: string
+  profile: string
   email: string
   emailVerified: boolean
   phone: string
@@ -186,6 +189,7 @@ export default function ProfileForm({
   const router = useRouter()
   const { toast } = useToast()
   const { update } = useSession()
+  const [profileImage, setProfileImage] = useState(profile || '')
 
   const form = useForm<z.infer<typeof UserProfileUpdateSchema>>({
     resolver: zodResolver(UserProfileUpdateSchema.pick({ name: true })),
@@ -195,7 +199,7 @@ export default function ProfileForm({
   })
 
   const onProfileSubmit = async (values: z.infer<typeof UserProfileUpdateSchema>) => {
-    const res = await updateProfile({ name: values.name })
+    const res = await updateProfile({ name: values.name, profile: profileImage })
     if (!res.success) {
       toast({ variant: 'destructive', description: res.message })
       return
@@ -228,6 +232,15 @@ export default function ProfileForm({
               onSubmit={form.handleSubmit(onProfileSubmit)}
               className='space-y-4'
             >
+              <div className='space-y-2'>
+                <p className='text-sm font-medium'>Profile photo</p>
+                <ImageUpload
+                  value={profileImage}
+                  onChange={setProfileImage}
+                  entity='user'
+                  label='Upload photo'
+                />
+              </div>
               <FormField
                 control={form.control}
                 name='name'

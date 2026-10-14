@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 
 import OverviewReport from './overview-report'
 import { auth } from '@/auth'
-import { isStaffRole } from '@/lib/roles'
+import { isAdminRole, isStaffRole } from '@/lib/roles'
 export const metadata: Metadata = {
   title: 'Workspace Dashboard',
 }
@@ -11,7 +11,9 @@ const DashboardPage = async () => {
   if (!isStaffRole(session?.user.role))
     throw new Error('Staff permission required')
 
-  return <OverviewReport />
+  const isAdmin = isAdminRole(session?.user?.role)
+
+  return <OverviewReport isAdmin={isAdmin} />
 }
 
 export default DashboardPage

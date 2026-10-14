@@ -11,8 +11,10 @@ import {
   Circle,
 } from 'lucide-react'
 
+import { auth } from '@/auth'
 import { getUserById } from '@/lib/actions/user.actions'
 import { UserAvatar } from '@/components/shared/user-avatar'
+import { isAdminRole } from '@/lib/roles'
 import { formatDateTime, formatId } from '@/lib/utils'
 
 import UserEditForm from './user-edit-form'
@@ -58,6 +60,9 @@ export default async function UserEditPage(props: {
 
   const user = await getUserById(id)
   if (!user) notFound()
+
+  const session = await auth()
+  const canChangeRole = isAdminRole(session?.user?.role)
 
   const joined = user.createdAt
     ? formatDateTime(new Date(user.createdAt)).dateOnly
@@ -123,7 +128,7 @@ export default async function UserEditPage(props: {
         {/* Edit form */}
         <div className='rounded-2xl border border-border/60 bg-card p-6 shadow-soft'>
           <h2 className='mb-6 text-lg font-bold tracking-tight'>Edit User</h2>
-          <UserEditForm user={user} />
+          <UserEditForm user={user} canChangeRole={canChangeRole} />
         </div>
       </div>
     </main>

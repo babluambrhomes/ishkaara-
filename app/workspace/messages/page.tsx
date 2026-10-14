@@ -140,7 +140,7 @@ export default function WorkspaceMessagesPage() {
     setIsUpdating(true)
     try {
       const res = await updateContactMessage({
-        id: selectedMessage._id as string,
+        id: String(selectedMessage._id),
         status: editStatus,
         comments: editComments,
       })
@@ -245,7 +245,7 @@ export default function WorkspaceMessagesPage() {
               </TableRow>
             ) : (
               data?.data.map((msg) => (
-                <TableRow key={msg._id as string}>
+                <TableRow key={String(msg._id)}>
                   <TableCell>
                     <div className='flex flex-col'>
                       <span className='font-medium text-foreground'>{msg.name}</span>
@@ -286,7 +286,7 @@ export default function WorkspaceMessagesPage() {
                         View
                       </Button>
                       <DeleteDialog
-                        id={msg._id as string}
+                        id={String(msg._id)}
                         action={deleteContactMessage}
                         callbackAction={() =>
                           loadData(debouncedQuery, page, statusFilter)

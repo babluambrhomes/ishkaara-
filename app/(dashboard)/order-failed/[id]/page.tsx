@@ -25,7 +25,7 @@ export default async function OrderFailedPage(props: {
   if (!order) notFound()
 
   const orderUserId =
-    typeof order.user === 'string' ? order.user : undefined
+    typeof order.user === 'object' ? order.user?._id : order.user
   const isOwner = !!orderUserId && orderUserId === session?.user?.id
   if (session?.user?.role !== 'Admin' && !isOwner) notFound()
 

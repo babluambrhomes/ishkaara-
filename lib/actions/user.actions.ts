@@ -12,7 +12,8 @@ import { connectToDatabase } from '@/config/db'
 import User, { IUser } from '../models/user.model'
 import Order from '../models/order.model'
 import { formatError } from '../utils'
-import { isAdminRole } from '../roles'
+import { isAdminRole, isStaffRole } from '../roles'
+import { deleteFiles } from '../storage'
 import { redirect } from 'next/navigation'
 import { cookies, headers } from 'next/headers'
 import { revalidatePath } from 'next/cache'
@@ -76,14 +77,14 @@ export async function deleteUser(id: string) {
 export async function updateUser(user: z.infer<typeof UserUpdateSchema>) {
   try {
     const session = await auth()
-    if (!isAdminRole(session?.user?.role))
-      throw new Error('Admin permission required')
+    if (!isStaffRole(session?.user?.role))
+      throw new Error('Staff permission required')
     await connectToDatabase()
     const dbUser = await User.findById(user._id)
     if (!dbUser) throw new Error('User not found')
     dbUser.name = user.name
     dbUser.email = user.email
-    dbUser.role = user.role
+    if (isAdminRole(session?.user?.role)) dbUser.role = user.role
     const updatedUser = await dbUser.save()
     revalidatePath('/workspace/users')
     return {
@@ -124,6 +125,11 @@ export async function updateProfile(
     if (!currentUser) throw new Error('User not found')
     currentUser.name = user.name
     if (user.email) currentUser.email = user.email
+    if (user.profile !== undefined && user.profile !== currentUser.profile) {
+      const oldProfile = currentUser.profile
+      currentUser.profile = user.profile || null
+      if (oldProfile) await deleteFiles([oldProfile])
+    }
     await currentUser.save()
     return { success: true, message: 'Profile updated successfully' }
   } catch (error) {
@@ -282,8 +288,8 @@ export async function getAllUsers({
   query?: string
 }) {
   const session = await auth()
-  if (!isAdminRole(session?.user?.role))
-    throw new Error('Admin permission required')
+  if (!isStaffRole(session?.user?.role))
+    throw new Error('Staff permission required')
 
   const {
     common: { pageSize },

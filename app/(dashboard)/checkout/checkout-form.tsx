@@ -746,7 +746,7 @@ const CheckoutForm = ({
                       return (
                         <button
                           type='button'
-                          key={coupon._id as string}
+                          key={String(coupon._id)}
                           disabled={!isEligible}
                           onClick={() => applyCoupon(coupon)}
                           className={`w-full rounded-lg border p-2 text-left transition-colors ${

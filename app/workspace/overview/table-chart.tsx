@@ -5,6 +5,7 @@ import { getMonthName } from '@/lib/utils'
 import { getImageUrl } from '@/lib/image-url'
 import Image from 'next/image'
 import Link from 'next/link'
+import React from 'react'
 
 type TableChartProps = {
   labelType: 'month' | 'product'
@@ -16,68 +17,58 @@ type TableChartProps = {
   }[]
 }
 
-import React from 'react'
-
-interface ProgressBarProps {
-  value: number // Accepts a number between 0 and 100
-  className?: string
-}
-
-const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
-  // Ensure value stays within 0-100 range
-  const boundedValue = Math.min(100, Math.max(0, value))
-
-  return (
-    <div className='relative w-full h-4 overflow-hidden'>
-      <div
-        className='bg-primary h-full transition-all duration-300 rounded-lg'
-        style={{
-          width: `${boundedValue}%`,
-          float: 'right', // Aligns the bar to start from the right
-        }}
-      />
-    </div>
-  )
-}
-
 export default function TableChart({
   labelType = 'month',
   data = [],
 }: TableChartProps) {
-  const max = Math.max(...data.map((item) => item.value))
-  const dataWithPercentage = data.map((x) => ({
+  const max = Math.max(...data.map((item) => item.value), 0)
+  const rows = data.map((x) => ({
     ...x,
     label: labelType === 'month' ? getMonthName(x.label) : x.label,
-    percentage: Math.round((x.value / max) * 100),
+    percentage: max ? Math.round((x.value / max) * 100) : 0,
   }))
+
+  if (rows.length === 0) {
+    return (
+      <div className='flex h-40 items-center justify-center text-sm text-muted-foreground'>
+        No data for this period
+      </div>
+    )
+  }
+
   return (
-    <div className='space-y-3'>
-      {dataWithPercentage.map(({ label, id, value, image, percentage }) => (
-        <div
-          key={label}
-          className='grid grid-cols-[100px_1fr_80px] md:grid-cols-[250px_1fr_80px] gap-2 space-y-4  '
-        >
-          {image ? (
-            <Link className='flex items-end' href={`/workspace/products/${id}`}>
-              <Image
-                className='rounded border  aspect-square object-scale-down max-w-full h-auto mx-auto mr-1'
-                src={getImageUrl(image!)}
-                alt={label}
-                width={36}
-                height={36}
-              />
-              <p className='text-center text-sm whitespace-nowrap overflow-hidden text-ellipsis'>
-                {label}
-              </p>
-            </Link>
-          ) : (
-            <div className='flex items-end text-sm'>{label}</div>
-          )}
+    <div className='space-y-4'>
+      {rows.map(({ label, id, value, image, percentage }) => (
+        <div key={`${label}-${id ?? ''}`} className='space-y-1.5'>
+          <div className='flex items-center justify-between gap-3 text-sm'>
+            {image ? (
+              <Link
+                href={`/workspace/products/${id}`}
+                className='flex min-w-0 items-center gap-2 hover:underline'
+              >
+                <Image
+                  className='h-7 w-7 shrink-0 rounded-md border object-cover'
+                  src={getImageUrl(image)}
+                  alt={label}
+                  width={28}
+                  height={28}
+                />
+                <span className='truncate font-medium'>{label}</span>
+              </Link>
+            ) : (
+              <span className='truncate font-medium'>{label}</span>
+            )}
 
-          <ProgressBar value={percentage} />
+            <div className='shrink-0 font-semibold tabular-nums'>
+              <ProductPrice price={value} plain />
+            </div>
+          </div>
 
-          <div className='text-sm text-right flex items-center'>
-            <ProductPrice price={value} plain />
+          <div className='h-2 w-full overflow-hidden rounded-full bg-muted'>
+            <div
+              className='h-full rounded-full bg-gradient-to-r from-primary to-gold transition-all duration-500'
+              style={{ width: `${Math.min(100, Math.max(0, percentage))}%` }}
+            />
           </div>
         </div>
       ))}

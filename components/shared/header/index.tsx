@@ -26,7 +26,7 @@ export default async function Header() {
               >
                 <Image
                   src={site.logo}
-                  className='w-full h-auto'
+                  className='w-full h-auto max-w-[120px] '
                   width={66}
                   height={30}
                   alt={`${site.name} logo`}

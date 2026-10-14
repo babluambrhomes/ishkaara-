@@ -84,20 +84,16 @@ function NavLinks({
 export function WorkspaceShell({
   siteLogo,
   menu,
-  isAdmin = false,
   children,
 }: {
   siteLogo: string
   menu: React.ReactNode
-  isAdmin?: boolean
   children: React.ReactNode
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const visibleLinks = isAdmin
-    ? links
-    : links.filter((item) => item.href !== '/workspace/users')
+  const visibleLinks = links
 
   return (
     <div className='flex min-h-screen bg-background'>

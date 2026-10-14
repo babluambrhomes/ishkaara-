@@ -137,7 +137,7 @@ export default function WorkspaceFaqsPage() {
     setIsSaving(true)
     try {
       const res = editingFaq
-        ? await updateFaq({ ...values, _id: editingFaq._id as string })
+        ? await updateFaq({ ...values, _id: String(editingFaq._id) })
         : await createFaq(values)
 
       if (!res.success) {
@@ -270,7 +270,7 @@ export default function WorkspaceFaqsPage() {
               </TableRow>
             ) : (
               data?.data.map((faq) => (
-                <TableRow key={faq._id as string}>
+                <TableRow key={String(faq._id)}>
                   <TableCell className='font-medium align-top'>
                     <div className='line-clamp-2'>{faq.question}</div>
                     <span className='text-[11px] text-muted-foreground'>
@@ -299,7 +299,7 @@ export default function WorkspaceFaqsPage() {
                         variant='ghost'
                         size='sm'
                         title={faq.is_public ? 'Hide from public' : 'Publish'}
-                        onClick={() => handleTogglePublic(faq._id as string)}
+                        onClick={() => handleTogglePublic(String(faq._id))}
                       >
                         {faq.is_public ? (
                           <EyeOff className='h-4 w-4 text-muted-foreground' />
@@ -315,7 +315,7 @@ export default function WorkspaceFaqsPage() {
                         <Pencil className='h-3.5 w-3.5' />
                       </Button>
                       <DeleteDialog
-                        id={faq._id as string}
+                        id={String(faq._id)}
                         action={deleteFaq}
                         callbackAction={() =>
                           loadData(debouncedQuery, page, statusFilter)

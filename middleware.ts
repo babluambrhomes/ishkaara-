@@ -58,7 +58,11 @@ export default auth(async (req) => {
     return isPublicPage ? NextResponse.next() : signInUrl()
   }
 
-  const token = await getToken({ req, cookieName })
+  const token = await getToken({
+    req,
+    cookieName,
+    secret: process.env.AUTH_SECRET,
+  })
   if (!token) {
     return isPublicPage ? NextResponse.next() : signInUrl()
   }

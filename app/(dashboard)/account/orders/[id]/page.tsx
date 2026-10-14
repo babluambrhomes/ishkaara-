@@ -31,10 +31,10 @@ export default async function OrderDetailsPage(props: {
 
   const session = await auth()
 
-  if (
-    order.user !== session?.user?.id &&
-    session?.user?.role !== 'Admin'
-  ) {
+  const orderUserId =
+    typeof order.user === 'object' ? order.user?._id : order.user
+
+  if (orderUserId !== session?.user?.id && session?.user?.role !== 'Admin') {
     notFound()
   }
 

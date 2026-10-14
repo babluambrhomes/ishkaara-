@@ -39,6 +39,7 @@ export default async function ProfilePage(props: {
       <SessionProvider>
         <ProfileForm
           name={user.name}
+          profile={user.profile || ''}
           email={user.email || ''}
           emailVerified={!!user.emailVerified}
           phone={user.phone || ''}

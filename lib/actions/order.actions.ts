@@ -231,6 +231,84 @@ export async function updateOrderStatus({
   }
 }
 
+// Customer: cancel an order before it is shipped
+export async function cancelOrder({
+  orderId,
+  reason,
+}: {
+  orderId: string
+  reason: string
+}) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session?.user?.id) throw new Error('User not authenticated')
+    await assertRateLimit('write', `user:${session.user.id}`)
+
+    const cleanedReason = reason?.trim()
+    if (!cleanedReason) throw new Error('Cancellation reason is required')
+
+    const order = await Order.findOne({ _id: orderId, user: session.user.id })
+    if (!order) throw new Error('Order not found or not authorized')
+    if (order.status === 'cancelled')
+      throw new Error('Order is already cancelled')
+    if (order.status !== 'success')
+      throw new Error('Order can only be cancelled before it is shipped')
+
+    order.status = 'cancelled'
+    order.cancellation = { reason: cleanedReason, date: new Date() }
+    order.statusHistory.push({
+      status: 'cancelled',
+      at: new Date(),
+      note: `Cancelled by customer: ${cleanedReason}`,
+      by: session.user.name || session.user.email || 'customer',
+    })
+    await order.save()
+
+    revalidatePath(`/account/orders/${orderId}`)
+    revalidatePath(`/workspace/orders/${orderId}`)
+    revalidatePath('/workspace/orders')
+    return { success: true, message: 'Order cancelled successfully' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
+// Customer: request a return after the order is delivered
+export async function requestReturn({
+  orderId,
+  reason,
+}: {
+  orderId: string
+  reason: string
+}) {
+  try {
+    await connectToDatabase()
+    const session = await auth()
+    if (!session?.user?.id) throw new Error('User not authenticated')
+    await assertRateLimit('write', `user:${session.user.id}`)
+
+    const cleanedReason = reason?.trim()
+    if (!cleanedReason) throw new Error('Return reason is required')
+
+    const order = await Order.findOne({ _id: orderId, user: session.user.id })
+    if (!order) throw new Error('Order not found or not authorized')
+    if (order.returnRequest)
+      throw new Error('Return request already submitted')
+    if (order.status !== 'delivered')
+      throw new Error('Return can only be requested after delivery')
+
+    order.returnRequest = { reason: cleanedReason, date: new Date() }
+    await order.save()
+
+    revalidatePath(`/account/orders/${orderId}`)
+    revalidatePath(`/workspace/orders/${orderId}`)
+    return { success: true, message: 'Return request submitted' }
+  } catch (err) {
+    return { success: false, message: formatError(err) }
+  }
+}
+
 // DELETE
 export async function deleteOrder(id: string) {
   try {
@@ -305,7 +383,10 @@ export async function getMyOrders({
 }
 export async function getOrderById(orderId: string): Promise<IOrder> {
   await connectToDatabase()
-  const order = await Order.findById(orderId)
+  const order = await Order.findById(orderId).populate(
+    'user',
+    'name email phone'
+  )
   return JSON.parse(JSON.stringify(order))
 }
 

@@ -185,13 +185,25 @@ export const OrderStatusHistorySchema = z.object({
   by: z.string().optional(),
 })
 
+export const CancellationSchema = z.object({
+  reason: z.string().min(1, 'Cancellation reason is required'),
+  date: z.date().optional(),
+})
+
+export const ReturnRequestSchema = z.object({
+  reason: z.string().min(1, 'Return reason is required'),
+  date: z.date().optional(),
+})
+
 // Order
 export const OrderInputSchema = z.object({
   user: z.union([
     MongoId,
     z.object({
+      _id: z.string().optional(),
       name: z.string(),
       email: z.string().email(),
+      phone: z.string().optional(),
     }),
   ]),
   items: z
@@ -212,6 +224,8 @@ export const OrderInputSchema = z.object({
     ),
   status: OrderStatusEnum.default('success'),
   statusHistory: z.array(OrderStatusHistorySchema).default([]),
+  cancellation: CancellationSchema.optional(),
+  returnRequest: ReturnRequestSchema.optional(),
 })
 // Cart
 
@@ -256,6 +270,7 @@ export const UserUpdateSchema = z.object({
 export const UserProfileUpdateSchema = z.object({
   name: UserName,
   email: Email.optional(),
+  profile: z.string().optional(),
 })
 
 export const UserInputSchema = z.object({

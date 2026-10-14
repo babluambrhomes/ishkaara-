@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Menu from '@/components/shared/header/menu'
 import { WorkspaceShell } from './workspace-shell'
 import { auth } from '@/auth'
-import { isAdminRole, isStaffRole } from '@/lib/roles'
+import { isStaffRole } from '@/lib/roles'
 import { getSetting } from '@/lib/actions/setting.actions'
 
 export default async function WorkspaceLayout({
@@ -18,11 +18,7 @@ export default async function WorkspaceLayout({
 
   const { site } = await getSetting()
   return (
-    <WorkspaceShell
-      siteLogo={site.logo}
-      menu={<Menu forAdmin />}
-      isAdmin={isAdminRole(role)}
-    >
+    <WorkspaceShell siteLogo={site.logo} menu={<Menu forAdmin />}>
       {children}
     </WorkspaceShell>
   )

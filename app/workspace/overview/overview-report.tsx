@@ -1,5 +1,11 @@
 'use client'
-import { BadgeDollarSign, Barcode, CreditCard, Users } from 'lucide-react'
+import {
+  ArrowUpRight,
+  BadgeDollarSign,
+  Barcode,
+  CreditCard,
+  Users,
+} from 'lucide-react'
 
 import Link from 'next/link'
 import {
@@ -17,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { calculatePastDate, formatDateTime, formatNumber } from '@/lib/utils'
+import { cn, calculatePastDate, formatDateTime, formatNumber } from '@/lib/utils'
 
 import SalesCategoryPieChart from './sales-category-pie-chart'
 
@@ -31,7 +37,61 @@ import ProductPrice from '@/components/shared/product/product-price'
 import { Skeleton } from '@/components/ui/skeleton'
 import TableChart from './table-chart'
 
-export default function OverviewReport() {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  linkHref,
+  linkLabel,
+  tint,
+  glow,
+}: {
+  title: string
+  value: React.ReactNode
+  icon: React.ElementType
+  linkHref: string
+  linkLabel: string
+  tint: string
+  glow: string
+}) {
+  return (
+    <Card className='group relative overflow-hidden rounded-2xl border-border/60 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift'>
+      <div
+        className={cn(
+          'pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full blur-2xl',
+          glow
+        )}
+      />
+      <CardHeader className='relative flex flex-row items-center justify-between space-y-0 pb-3'>
+        <CardTitle className='text-sm font-medium text-muted-foreground'>
+          {title}
+        </CardTitle>
+        <span
+          className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110',
+            tint
+          )}
+        >
+          <Icon className='h-5 w-5' />
+        </span>
+      </CardHeader>
+      <CardContent className='relative'>
+        <div className='text-2xl font-bold tracking-tight lg:text-3xl'>
+          {value}
+        </div>
+        <Link
+          href={linkHref}
+          className='mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline'
+        >
+          {linkLabel}
+          <ArrowUpRight className='h-3 w-3' />
+        </Link>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function OverviewReport({ isAdmin }: { isAdmin: boolean }) {
   const [date, setDate] = useState<DateRange | undefined>({
     from: calculatePastDate(30),
     to: new Date(),
@@ -52,200 +112,196 @@ export default function OverviewReport() {
 
   if (!data)
     return (
-      <div className='space-y-4'>
-        <div>
-          <h1 className='h1-bold'>Dashboard</h1>
+      <div className='space-y-6'>
+        <div className='flex items-center justify-between'>
+          <Skeleton className='h-9 w-40 rounded-lg' />
+          <Skeleton className='h-10 w-56 rounded-lg' />
         </div>
+
         {/* First Row */}
-        <div className='flex gap-4'>
+        <div
+          className={cn(
+            'grid grid-cols-2 gap-4',
+            isAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+          )}
+        >
           {[...Array(4)].map((_, index) => (
-            <Skeleton key={index} className='h-36 w-full' />
+            <Skeleton key={index} className='h-36 rounded-2xl' />
           ))}
         </div>
 
         {/* Second Row */}
-        <div>
-          <Skeleton className='h-[30rem] w-full' />
-        </div>
+        {isAdmin && <Skeleton className='h-[30rem] rounded-2xl' />}
 
         {/* Third Row */}
-        <div className='flex gap-4'>
+        <div className={cn('grid gap-4', isAdmin && 'md:grid-cols-2')}>
           {[...Array(2)].map((_, index) => (
-            <Skeleton key={index} className='h-60 w-full' />
+            <Skeleton key={index} className='h-72 rounded-2xl' />
           ))}
         </div>
 
         {/* Fourth Row */}
-        <div className='flex gap-4'>
+        <div className='grid gap-4 md:grid-cols-2'>
           {[...Array(2)].map((_, index) => (
-            <Skeleton key={index} className='h-60 w-full' />
+            <Skeleton key={index} className='h-72 rounded-2xl' />
           ))}
         </div>
       </div>
     )
+
   return (
-    <div>
-      <div className='flex items-center justify-between mb-2'>
-        <h1 className='h1-bold'>Dashboard</h1>
+    <div className='space-y-6'>
+      <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <h1 className='h1-bold'>Dashboard</h1>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            Overview of your store performance
+          </p>
+        </div>
         <CalendarDateRangePicker defaultDate={date} setDate={setDate} />
       </div>
-      <div className='space-y-4'>
-        <div className='grid gap-4  grid-cols-2 lg:grid-cols-4'>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Total Revenue
-              </CardTitle>
-              <BadgeDollarSign />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>
-                <ProductPrice price={data.totalSales} plain />
-              </div>
-              <div>
-                <Link className='text-xs' href='/workspace/orders'>
-                  View revenue
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Sales
-              </CardTitle>
-              <CreditCard />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>
-                {formatNumber(data.ordersCount)}
-              </div>
-              <div>
-                <Link className='text-xs' href='/workspace/orders'>
-                  View orders
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Customers
-              </CardTitle>
-              <Users />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>{data.usersCount}</div>
-              <div>
-                <Link className='text-xs' href='/workspace/users'>
-                  View customers
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-              <CardTitle className='text-sm font-medium'>
-                Products
-              </CardTitle>
-              <Barcode />
-            </CardHeader>
-            <CardContent className='space-y-2'>
-              <div className='text-2xl font-bold'>{data.productsCount}</div>
-              <div>
-                <Link className='text-xs' href='/workspace/products'>
-                  View products
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Sales Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SalesAreaChart data={data.salesChartData} />
-            </CardContent>
-          </Card>
-        </div>
 
-        <div className='grid gap-4 md:grid-cols-2'>
-          <Card>
+      <div
+        className={cn(
+          'grid grid-cols-2 gap-4',
+          isAdmin ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+        )}
+      >
+        {isAdmin && (
+          <StatCard
+            title='Total Revenue'
+            value={<ProductPrice price={data.totalSales} plain />}
+            icon={BadgeDollarSign}
+            linkHref='/workspace/orders'
+            linkLabel='View revenue'
+            tint='bg-primary/10 text-primary'
+            glow='bg-primary/20'
+          />
+        )}
+        <StatCard
+          title='Sales'
+          value={formatNumber(data.ordersCount)}
+          icon={CreditCard}
+          linkHref='/workspace/orders'
+          linkLabel='View orders'
+          tint='bg-gold/15 text-gold'
+          glow='bg-gold/20'
+        />
+        <StatCard
+          title='Customers'
+          value={data.usersCount}
+          icon={Users}
+          linkHref='/workspace/users'
+          linkLabel='View customers'
+          tint='bg-emerald-500/10 text-emerald-600'
+          glow='bg-emerald-500/20'
+        />
+        <StatCard
+          title='Products'
+          value={data.productsCount}
+          icon={Barcode}
+          linkHref='/workspace/products'
+          linkLabel='View products'
+          tint='bg-sky-500/10 text-sky-600'
+          glow='bg-sky-500/20'
+        />
+      </div>
+
+      {isAdmin && (
+        <Card className='rounded-2xl border-border/60'>
+          <CardHeader className='flex flex-row items-start justify-between space-y-0'>
+            <div className='space-y-1'>
+              <CardTitle>Sales Overview</CardTitle>
+              <CardDescription>
+                Daily revenue for the selected period
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <SalesAreaChart data={data.salesChartData} />
+          </CardContent>
+        </Card>
+      )}
+
+      <div className={cn('grid gap-4', isAdmin && 'md:grid-cols-2')}>
+        {isAdmin && (
+          <Card className='rounded-2xl border-border/60'>
             <CardHeader>
               <CardTitle>How much you’re earning</CardTitle>
-              <CardDescription>
-                Estimated · Last 6 months
-              </CardDescription>
+              <CardDescription>Estimated · Last 6 months</CardDescription>
             </CardHeader>
             <CardContent>
               <TableChart data={data.monthlySales} labelType='month' />
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Product performance</CardTitle>
-              <CardDescription>
-                {formatDateTime(date!.from!).dateOnly} to{' '}
-                {formatDateTime(date!.to!).dateOnly}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TableChart data={data.topSalesProducts} labelType='product' />
-            </CardContent>
-          </Card>
-        </div>
+        )}
+        <Card className='rounded-2xl border-border/60'>
+          <CardHeader>
+            <CardTitle>Product performance</CardTitle>
+            <CardDescription>
+              {formatDateTime(date!.from!).dateOnly} to{' '}
+              {formatDateTime(date!.to!).dateOnly}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TableChart data={data.topSalesProducts} labelType='product' />
+          </CardContent>
+        </Card>
+      </div>
 
-        <div className='grid gap-4 md:grid-cols-2'>
-          <Card>
-            <CardHeader>
-              <CardTitle>Best-Selling Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SalesCategoryPieChart data={data.topSalesCategories} />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Sales</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Buyer</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Actions</TableHead>
+      <div className='grid gap-4 md:grid-cols-2'>
+        <Card className='rounded-2xl border-border/60'>
+          <CardHeader>
+            <CardTitle>Best-Selling Categories</CardTitle>
+            <CardDescription>Share of total sales</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <SalesCategoryPieChart data={data.topSalesCategories} />
+          </CardContent>
+        </Card>
+        <Card className='rounded-2xl border-border/60'>
+          <CardHeader>
+            <CardTitle>Recent Sales</CardTitle>
+            <CardDescription>Latest orders in this period</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className='hover:bg-transparent'>
+                  <TableHead>Buyer</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className='text-right'>Total</TableHead>
+                  <TableHead className='text-right'>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.latestOrders.map((order: IOrderList) => (
+                  <TableRow key={order._id}>
+                    <TableCell className='font-medium'>
+                      {order.user ? order.user.name : 'Deleted User'}
+                    </TableCell>
+
+                    <TableCell className='text-muted-foreground'>
+                      {formatDateTime(order.createdAt).dateOnly}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <ProductPrice price={order.totalPrice} plain />
+                    </TableCell>
+
+                    <TableCell className='text-right'>
+                      <Link
+                        href={`/workspace/orders/${order._id}`}
+                        className='text-sm font-medium text-primary hover:underline'
+                      >
+                        Details
+                      </Link>
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.latestOrders.map((order: IOrderList) => (
-                    <TableRow key={order._id}>
-                      <TableCell>
-                        {order.user ? order.user.name : 'Deleted User'}
-                      </TableCell>
-
-                      <TableCell>
-                        {formatDateTime(order.createdAt).dateOnly}
-                      </TableCell>
-                      <TableCell>
-                        <ProductPrice price={order.totalPrice} plain />
-                      </TableCell>
-
-                      <TableCell>
-                        <Link href={`/workspace/orders/${order._id}`}>
-                          <span className='px-2'>Details</span>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

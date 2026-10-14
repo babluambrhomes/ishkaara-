@@ -2,18 +2,31 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
   CreditCard,
   MapPin,
   Package,
+  RotateCcw,
   ShoppingBag,
   TicketPercent,
+  User,
+  XCircle,
 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/hooks/use-toast'
 import { IOrder } from '@/lib/models/order.model'
 import { OrderStatus } from '@/types'
@@ -26,6 +39,8 @@ import OrderStatusBadge, { ORDER_STATUS_META } from './order-status-badge'
 import OrderProgress from './order-progress'
 import PayNowButton from './pay-now-button'
 import {
+  cancelOrder,
+  requestReturn,
   updateOrderStatus,
   updateOrderToPaid,
 } from '@/lib/actions/order.actions'
@@ -50,6 +65,144 @@ const PAYMENT_STATUS_META: Record<
     label: 'Refunded',
     className: 'border-slate-200 bg-slate-50 text-slate-700',
   },
+}
+
+function ReasonDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel,
+  tone = 'default',
+  action,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description: string
+  confirmLabel: string
+  tone?: 'default' | 'destructive'
+  action: (reason: string) => Promise<{ success: boolean; message: string }>
+}) {
+  const { toast } = useToast()
+  const router = useRouter()
+  const [reason, setReason] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const submit = async () => {
+    if (!reason.trim()) return
+    setSaving(true)
+    const res = await action(reason.trim())
+    setSaving(false)
+    toast({
+      description: res.message,
+      variant: res.success ? 'default' : 'destructive',
+    })
+    if (res.success) {
+      setReason('')
+      onOpenChange(false)
+      router.refresh()
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+        <Textarea
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          rows={3}
+          placeholder='Please tell us why…'
+        />
+        <DialogFooter>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => onOpenChange(false)}
+            className='rounded-full'
+          >
+            Cancel
+          </Button>
+          <Button
+            type='button'
+            onClick={submit}
+            disabled={!reason.trim() || saving}
+            variant={tone === 'destructive' ? 'destructive' : 'default'}
+            className='rounded-full font-bold'
+          >
+            {saving ? 'Submitting…' : confirmLabel}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function CustomerOrderActions({
+  orderId,
+  status,
+  hasReturnRequest,
+}: {
+  orderId: string
+  status: OrderStatus
+  hasReturnRequest: boolean
+}) {
+  const [cancelOpen, setCancelOpen] = useState(false)
+  const [returnOpen, setReturnOpen] = useState(false)
+
+  const canCancel = status === 'success'
+  const canReturn = status === 'delivered' && !hasReturnRequest
+
+  if (!canCancel && !canReturn) return null
+
+  return (
+    <div className='space-y-2 border-t border-border/60 pt-4'>
+      {canCancel && (
+        <Button
+          type='button'
+          variant='outline'
+          onClick={() => setCancelOpen(true)}
+          className='h-11 w-full gap-2 rounded-full font-bold text-destructive hover:text-destructive'
+        >
+          <XCircle className='h-4 w-4' />
+          Cancel Order
+        </Button>
+      )}
+      {canReturn && (
+        <Button
+          type='button'
+          variant='outline'
+          onClick={() => setReturnOpen(true)}
+          className='h-11 w-full gap-2 rounded-full font-bold'
+        >
+          <RotateCcw className='h-4 w-4' />
+          Request Return
+        </Button>
+      )}
+
+      <ReasonDialog
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        title='Cancel this order?'
+        description='This cannot be undone. Please share the reason for cancellation.'
+        confirmLabel='Confirm cancellation'
+        tone='destructive'
+        action={(reason) => cancelOrder({ orderId, reason })}
+      />
+      <ReasonDialog
+        open={returnOpen}
+        onOpenChange={setReturnOpen}
+        title='Request a return'
+        description='Tell us why you want to return this order. Our team will review your request.'
+        confirmLabel='Submit request'
+        action={(reason) => requestReturn({ orderId, reason })}
+      />
+    </div>
+  )
 }
 
 function WorkspaceStatusControl({
@@ -143,6 +296,8 @@ export default function OrderDetailsForm({
     statusHistory,
     expectedDeliveryDate,
     createdAt,
+    cancellation,
+    returnRequest,
   } = order
 
   const itemCount = items.reduce((count, item) => count + item.quantity, 0)
@@ -153,6 +308,10 @@ export default function OrderDetailsForm({
   const history = [...(statusHistory ?? [])].sort(
     (a, b) => new Date(a.at).getTime() - new Date(b.at).getTime()
   )
+  const customer =
+    order.user && typeof order.user === 'object'
+      ? (order.user as { name?: string; email?: string; phone?: string })
+      : null
 
   return (
     <div className='space-y-5'>
@@ -263,6 +422,91 @@ export default function OrderDetailsForm({
           )}
         </CardContent>
       </Card>
+
+      {(cancellation || returnRequest) && (
+        <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+          <CardContent className='space-y-4 p-6'>
+            <h2 className='font-bold tracking-tight'>
+              Cancellation &amp; Return
+            </h2>
+            {cancellation && (
+              <div className='flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/60 p-4'>
+                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600'>
+                  <XCircle className='h-4 w-4' />
+                </span>
+                <div>
+                  <p className='text-sm font-semibold text-red-700'>
+                    Order cancelled
+                  </p>
+                  <p className='mt-0.5 text-sm text-muted-foreground'>
+                    {cancellation.reason}
+                  </p>
+                  {cancellation.date && (
+                    <p className='mt-1 text-xs text-muted-foreground/70'>
+                      {formatDateTime(cancellation.date).dateTime}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+            {returnRequest && (
+              <div className='flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4'>
+                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600'>
+                  <RotateCcw className='h-4 w-4' />
+                </span>
+                <div>
+                  <p className='text-sm font-semibold text-amber-700'>
+                    Return requested
+                  </p>
+                  <p className='mt-0.5 text-sm text-muted-foreground'>
+                    {returnRequest.reason}
+                  </p>
+                  {returnRequest.date && (
+                    <p className='mt-1 text-xs text-muted-foreground/70'>
+                      {formatDateTime(returnRequest.date).dateTime}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && customer && (
+        <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+          <CardContent className='p-6'>
+            <div className='mb-4 flex items-center gap-3'>
+              <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
+                <User className='h-5 w-5' />
+              </span>
+              <h2 className='font-bold tracking-tight'>Customer</h2>
+            </div>
+            <dl className='grid gap-4 sm:grid-cols-3'>
+              <div>
+                <dt className='text-xs uppercase tracking-wide text-muted-foreground'>
+                  Name
+                </dt>
+                <dd className='mt-0.5 font-semibold'>{customer.name || '—'}</dd>
+              </div>
+              <div>
+                <dt className='text-xs uppercase tracking-wide text-muted-foreground'>
+                  Email
+                </dt>
+                <dd className='mt-0.5 break-all font-medium'>
+                  {customer.email || '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className='text-xs uppercase tracking-wide text-muted-foreground'>
+                  Phone
+                </dt>
+                <dd className='mt-0.5 font-medium'>{customer.phone || '—'}</dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
+      )}
 
       <div className='grid gap-5 md:grid-cols-3'>
         <div className='space-y-5 md:col-span-2'>
@@ -431,6 +675,14 @@ export default function OrderDetailsForm({
                 <ActionButton
                   caption='Mark as paid'
                   action={() => updateOrderToPaid(order._id)}
+                />
+              )}
+
+              {!isAdmin && (
+                <CustomerOrderActions
+                  orderId={order._id}
+                  status={status}
+                  hasReturnRequest={Boolean(returnRequest)}
                 />
               )}
             </CardContent>
