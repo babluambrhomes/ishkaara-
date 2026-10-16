@@ -1,4 +1,4 @@
-﻿import Image from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 
@@ -41,7 +41,7 @@ function ProductCardImage({
   return (
     <div className='relative'>
       <Link href={`/product/${slug}`} className='block'>
-        <div className='relative h-36 overflow-hidden rounded-xl bg-gradient-to-br from-grey-500/10 via-background to-primary/[0.05]'>
+        <div className='relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-to-br from-grey-500/10 via-background to-primary/[0.05]'>
           <ImageHover
             src={images[0]}
             hoverSrc={images[1] ?? images[0]}
@@ -53,11 +53,11 @@ function ProductCardImage({
       {/* Offer badge */}
       <div className='absolute left-2 top-2 z-10'>
         {isDeal ? (
-          <span className='rounded-full bg-gradient-to-r from-[#930202] to-[#560101] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-soft'>
+          <span className='rounded-full bg-gradient-to-r from-[#4f704d]/90 to-[#3b583c]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm'>
             Limited Deal
           </span>
         ) : discountPercent > 0 ? (
-          <span className='rounded-full bg-gold px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#3d1a00] shadow-soft'>
+          <span className='rounded-full bg-gold/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#0f0d0d] shadow-sm'>
             {discountPercent}% Off
           </span>
         ) : null}
@@ -66,7 +66,7 @@ function ProductCardImage({
       {/* Out of stock overlay */}
       {countInStock === 0 && (
         <div className='absolute inset-0 z-10 flex items-center justify-center bg-background/50 backdrop-blur-[1px]'>
-          <span className='rounded-full bg-destructive px-5 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow-lift'>
+          <span className='rounded-full bg-destructive px-5 py-1.5 text-xs font-bold uppercase tracking-widest text-white '>
             Out of Stock
           </span>
         </div>
@@ -100,12 +100,12 @@ function ProductCardDetails({
   const align = centered ? 'text-center' : 'text-left'
   return (
     <div className={`flex-1 space-y-1 ${align}`}>
-      <p className='text-[11px] font-bold uppercase tracking-[0.16em] text-gold'>
+      <p className='text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground'>
         {brand}
       </p>
       <Link
         href={`/product/${slug}`}
-        className='text-sm font-semibold leading-snug transition-colors group-hover:text-primary'
+        className='text-sm font-semibold leading-snug transition-colors'
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -177,7 +177,7 @@ export default function ProductCard({
   }
 
   return (
-    <Card className='group relative flex flex-col overflow-hidden rounded-2xl border-border/60 bg-background shadow-soft card-hover hover:border-primary/30'>
+    <Card className='group relative flex flex-col overflow-hidden rounded-2xl border-border/60 bg-background  card-hover hover:border-primary/30'>
       <CardHeader className='p-2 pb-0'>
         <ProductCardImage
           name={product.name}
@@ -247,6 +247,20 @@ export function ProductCardSlider({
     category: product.categoryName,
   }
 
+  const orderItem: CartItem = {
+    clientId: generateId(),
+    product: product._id,
+    variantId: product.variantId,
+    size: '',
+    countInStock: product.countInStock,
+    name: product.name,
+    slug: product.slug,
+    category: product.categoryName,
+    price: round2(product.price),
+    quantity: 1,
+    image: product.images[0],
+  }
+
   return (
     <div className='group flex flex-col bg-white overflow-hidden rounded-2xl'>
       <ProductCardImage
@@ -269,6 +283,13 @@ export function ProductCardSlider({
             isDeal={isDeal}
             centered={false}
           />
+          <div className='mt-3'>
+            <AddToCart
+              compact
+              item={orderItem}
+              sizes={product.size ?? []}
+            />
+          </div>
         </div>
       )}
     </div>
@@ -279,7 +300,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
   const { updateItem, removeItem } = useCartStore()
 
   return (
-    <div className='group flex flex-col gap-4 rounded-2xl border border-border/60 bg-white p-4 shadow-soft transition-all hover:border-primary/30 sm:flex-row sm:items-center sm:gap-6'>
+    <div className='group flex flex-col gap-4 rounded-2xl border border-border/60 bg-white p-4  transition-all hover:border-primary/30 sm:flex-row sm:items-center sm:gap-6'>
       <Link
         href={`/product/${item.slug}`}
         className='shrink-0 self-center sm:self-auto'
@@ -318,7 +339,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
               onClick={() =>
                 updateItem(item, Math.max(1, item.quantity - 1))
               }
-              className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+              className='flex h-9 w-9 items-center justify-center rounded-circle text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
             >
               <Minus className='h-4 w-4' />
             </button>
@@ -332,7 +353,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
               onClick={() =>
                 updateItem(item, Math.min(item.countInStock, item.quantity + 1))
               }
-              className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+              className='flex h-9 w-9 items-center justify-center rounded-circle text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
             >
               <Plus className='h-4 w-4' />
             </button>

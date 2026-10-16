@@ -31,7 +31,7 @@ export default function SelectVariant({
               href={`?variantId=${id}`}
               aria-label='Select this option'
               className={cn(
-                'inline-flex rounded-2xl border-2 p-1.5 transition-all shadow-none',
+                'inline-flex rounded-2xl border-2 p-1.5 transition-all ',
                 active
                   ? 'border-primary bg-primary/5'
                   : 'border-border bg-white hover:border-primary/40'

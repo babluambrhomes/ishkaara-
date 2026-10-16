@@ -80,7 +80,7 @@ const Pagination = ({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className='h-9 w-9 rounded-full'
+      className='h-9 w-9 rounded-circle'
     >
       {children}
     </Button>
@@ -116,7 +116,7 @@ const Pagination = ({
             onClick={() => goTo(p)}
             disabled={p === current}
             aria-label={`Page ${p}`}
-            className={cn('h-9 w-9 rounded-full', p === current && 'shadow-soft')}
+            className={cn('h-9 w-9 rounded-circle', p === current && '')}
           >
             {p}
           </Button>

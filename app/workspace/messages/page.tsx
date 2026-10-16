@@ -202,7 +202,7 @@ export default function WorkspaceMessagesPage() {
                 className={cn(
                   'rounded-md px-3 py-1.5 text-xs font-medium transition-colors whitespace-nowrap',
                   statusFilter === s
-                    ? 'bg-background text-foreground shadow-sm'
+                    ? 'bg-background text-foreground '
                     : 'text-muted-foreground hover:text-foreground'
                 )}
               >

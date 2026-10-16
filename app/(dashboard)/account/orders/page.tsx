@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, ChevronRight, PackageSearch, ShoppingBag } from 'lucide-react'
 
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import BrowsingHistory from '@/components/shared/browsing-history'
 import Pagination from '@/components/shared/pagination'
 import OrderItemImages from '@/components/shared/order/order-item-images'
 import OrderStatusBadge from '@/components/shared/order/order-status-badge'
@@ -20,8 +20,8 @@ export const metadata: Metadata = {
 
 function EmptyOrders() {
   return (
-    <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center shadow-soft'>
-      <span className='flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white shadow-soft'>
+    <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center '>
+      <span className='flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white '>
         <PackageSearch className='h-8 w-8' />
       </span>
       <h2 className='mt-5 text-xl font-bold tracking-tight'>No orders yet</h2>
@@ -78,7 +78,7 @@ export default async function OrdersPage(props: {
                 href={`/account/orders/${order._id}`}
                 className='group block'
               >
-                <Card className='overflow-hidden rounded-3xl border-border/60 bg-white transition-all group-hover:-translate-y-0.5 group-hover:border-primary/30 group-hover:shadow-lift'>
+                <Card className='overflow-hidden rounded-3xl border-border/60 bg-white transition-all group-hover:-translate-y-0.5 group-hover:border-primary/30 '>
                   <CardContent className='p-5 sm:p-6'>
                     <div className='flex flex-wrap items-start justify-between gap-4'>
                       <div className='flex items-start gap-4'>
@@ -131,7 +131,7 @@ export default async function OrdersPage(props: {
         </div>
       )}
 
-      <BrowsingHistoryList className='mt-16' />
+      <BrowsingHistory className='mt-16' />
     </div>
   )
 }

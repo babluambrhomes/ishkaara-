@@ -53,13 +53,15 @@ const data: Data = {
           'Lemon Fashion is a modern beauty & fashion e-commerce platform. Curated styles, timeless elegance.',
         keywords: 'Lemon Fashion, Beauty, Fashion, Clothing, Accessories, Ecommerce',
         url: 'https://lemonfashion.com',
-        logo: '/logo.png',
+        logoWhite: '/logo-white.png',
+        logoGreen: '/logo-green.png',
         slogan: 'Elegance in every detail.',
         author: 'Lemon Fashion',
         copyright: '2000-2025, Lemon Fashion. All rights reserved.',
         email: 'admin@example.com',
         address: '123, Main Street, Anytown, CA, Zip 12345',
         phone: '+1 (123) 456-7890',
+        whatsapp: '9217205968',
       },
   
       availablePaymentMethods: [

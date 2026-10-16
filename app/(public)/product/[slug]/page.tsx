@@ -22,7 +22,8 @@ import ProductBuyActions from '@/components/shared/product/product-buy-actions'
 import ProductPrice from '@/components/shared/product/product-price'
 import ProductGallery from '@/components/shared/product/product-gallery'
 import AddToBrowsingHistory from '@/components/shared/product/add-to-browsing-history'
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import RelatedToViewed from '@/components/shared/related-to-viewed'
+import BrowsingHistory from '@/components/shared/browsing-history'
 import RatingSummary from '@/components/shared/product/rating-summary'
 import ProductSlider from '@/components/shared/product/product-slider'
 import AddToWishlist from '@/components/shared/add-to-wishlist'
@@ -131,10 +132,10 @@ export default async function ProductDetails(props: {
         </div>
 
         <div>
-          <Card className='overflow-hidden rounded-3xl border-transparent bg-white shadow-none'>
+          <Card className='overflow-hidden rounded-3xl border-transparent bg-white '>
             <CardContent className='space-y-6 p-6 lg:p-8'>
               {isDeal && (
-                <span className='inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#9a2a04] to-[#f5b942] px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white shadow-soft'>
+                <span className='inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#344c35] to-[#5c7d5d] px-3.5 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white '>
                   <Sparkles className='h-3 w-3' />
                   Today&apos;s Deal
                 </span>
@@ -170,7 +171,7 @@ export default async function ProductDetails(props: {
                   {stockStatus.show && (
                     <span className='inline-flex items-center gap-2 rounded-full bg-destructive/10 px-3.5 py-1.5 text-sm font-semibold text-destructive'>
                       <span
-                        className={`h-2 w-2 rounded-full ${stockStatus.dot} ${
+                        className={`h-2 w-2 rounded-circle ${stockStatus.dot} ${
                           inStock ? 'animate-pulse' : ''
                         }`}
                       />
@@ -209,7 +210,7 @@ export default async function ProductDetails(props: {
 
               <div className='space-y-2 '>
                 <div className='flex items-center gap-3'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold'>
+                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-gold/15 text-gold'>
                     <PackageCheck className='h-4 w-4' />
                   </span>
                   <div>
@@ -232,7 +233,7 @@ export default async function ProductDetails(props: {
                     key={title}
                     className='flex items-start gap-3 p-2'
                   >
-                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold'>
+                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-gold/15 text-gold'>
                       <Icon className='h-4 w-4' />
                     </span>
                     <div>
@@ -270,7 +271,10 @@ export default async function ProductDetails(props: {
       </section>
 
       <section className='mt-10'>
-        <BrowsingHistoryList className='mt-10' />
+        <div className='mt-10 space-y-6'>
+          <RelatedToViewed />
+          <BrowsingHistory />
+        </div>
       </section>
     </div>
   )

@@ -17,7 +17,7 @@ export default function CartButton() {
     <Link
       href='/cart'
       aria-label='Cart'
-      className='self-center rounded-full p-2 transition-colors hover:bg-white/10'
+      className='self-center rounded-full p-2 transition-colors hover:bg-muted'
     >
       <div className='relative flex items-center'>
         <ShoppingCartIcon className='h-7 w-7' />
@@ -25,7 +25,7 @@ export default function CartButton() {
         {isMounted && (
           <span
             className={cn(
-              `bg-white px-1 rounded-full text-primary text-sm font-bold absolute left-[10px] top-[-4px] z-10`,
+              `bg-primary px-1 rounded-circle text-primary-foreground text-sm font-bold absolute left-[10px] top-[-4px] z-10`,
               cartItemsCount >= 10 && 'text-xs px-[2px]'
             )}
           >

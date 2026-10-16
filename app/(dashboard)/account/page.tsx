@@ -1,4 +1,4 @@
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import BrowsingHistory from '@/components/shared/browsing-history'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { auth } from '@/auth'
@@ -99,7 +99,7 @@ export default async function AccountPage() {
       {isStaff && (
           <Link
             href='/workspace/overview'
-            className='inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-soft transition-all hover:shadow-lift'
+            className='inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground  transition-all '
           >
             <ShieldCheck className='h-4 w-4' />
             Workspace
@@ -108,11 +108,11 @@ export default async function AccountPage() {
       </div>
 
       {session?.user && (
-        <Card className='mb-8 overflow-hidden rounded-3xl border-border/60 bg-white shadow-soft'>
-          <div className='h-14 bg-gradient-to-r from-primary via-[#a15111] to-gold' />
+        <Card className='mb-8 overflow-hidden rounded-3xl border-border/60 bg-white '>
+          <div className='h-14 bg-gradient-to-r from-primary via-[#344c35] to-gold' />
           <CardContent className='flex flex-wrap items-center justify-between gap-4 px-6 pb-6 pt-0'>
             <div className='flex items-center gap-4'>
-              <span className='-mt-7 flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-background bg-white text-2xl font-bold text-primary shadow-lift'>
+              <span className='-mt-7 flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-background bg-white text-2xl font-bold text-primary '>
                 {(user?.name || session.user.name || 'U').charAt(0).toUpperCase()}
               </span>
               <div className='min-w-0'>
@@ -156,9 +156,9 @@ export default async function AccountPage() {
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>
         {accountLinks.map(({ href, icon: Icon, title, desc }) => (
           <Link key={title} href={href} className='group'>
-            <Card className='h-full overflow-hidden rounded-3xl border-border/60 bg-white transition-all group-hover:-translate-y-1 group-hover:border-primary/30 group-hover:shadow-lift'>
+            <Card className='h-full overflow-hidden rounded-3xl border-border/60 bg-white transition-all group-hover:-translate-y-1 group-hover:border-primary/30 '>
               <CardContent className='flex h-full flex-col items-start gap-4 p-6'>
-                <span className='flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white shadow-soft'>
+                <span className='flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white '>
                   <Icon className='h-6 w-6' />
                 </span>
                 <div>
@@ -178,7 +178,7 @@ export default async function AccountPage() {
       </div>
 
       {isStaff && (
-        <section className='mt-8 rounded-3xl border border-border/60 bg-white p-6 shadow-soft'>
+        <section className='mt-8 rounded-3xl border border-border/60 bg-white p-6 '>
           <div className='mb-4 flex items-center gap-3'>
             <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
               <ShieldCheck className='h-5 w-5' />
@@ -229,7 +229,7 @@ export default async function AccountPage() {
         </section>
       )}
 
-      <BrowsingHistoryList className='mt-16' />
+      <BrowsingHistory className='mt-16' />
     </div>
   )
 }

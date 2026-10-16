@@ -23,7 +23,7 @@ export function UserAvatar({
         width={size}
         height={size}
         unoptimized
-        className={cn('shrink-0 rounded-full object-cover', className)}
+        className={cn('shrink-0 rounded-circle object-cover', className)}
         style={{ width: size, height: size }}
       />
     )
@@ -32,7 +32,7 @@ export function UserAvatar({
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-full bg-primary/10 font-bold text-primary',
+        'inline-flex shrink-0 items-center justify-center rounded-circle bg-primary/10 font-bold text-primary',
         className
       )}
       style={{ width: size, height: size, fontSize: Math.round(size / 2.4) }}

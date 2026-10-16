@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import {
   CreditCard,
+  LifeBuoy,
   MapPin,
+  MessageCircle,
   Package,
   RotateCcw,
   ShoppingBag,
@@ -33,6 +35,7 @@ import { OrderStatus } from '@/types'
 import { cn, formatDateTime, formatId } from '@/lib/utils'
 import { getImageUrl } from '@/lib/image-url'
 import { ORDER_STATUS_FLOW, ORDER_STATUS_LABELS } from '@/lib/order-status'
+import data from '@/config/data'
 import ProductPrice from '../product/product-price'
 import ActionButton from '../action-button'
 import OrderStatusBadge, { ORDER_STATUS_META } from './order-status-badge'
@@ -146,43 +149,81 @@ function CustomerOrderActions({
   orderId,
   status,
   hasReturnRequest,
+  whatsappLink,
 }: {
   orderId: string
   status: OrderStatus
   hasReturnRequest: boolean
+  whatsappLink: string
 }) {
+  const [helpOpen, setHelpOpen] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [returnOpen, setReturnOpen] = useState(false)
 
   const canCancel = status === 'success'
   const canReturn = status === 'delivered' && !hasReturnRequest
 
-  if (!canCancel && !canReturn) return null
-
   return (
     <div className='space-y-2 border-t border-border/60 pt-4'>
-      {canCancel && (
-        <Button
-          type='button'
-          variant='outline'
-          onClick={() => setCancelOpen(true)}
-          className='h-11 w-full gap-2 rounded-full font-bold text-destructive hover:text-destructive'
-        >
-          <XCircle className='h-4 w-4' />
-          Cancel Order
-        </Button>
-      )}
-      {canReturn && (
-        <Button
-          type='button'
-          variant='outline'
-          onClick={() => setReturnOpen(true)}
-          className='h-11 w-full gap-2 rounded-full font-bold'
-        >
-          <RotateCcw className='h-4 w-4' />
-          Request Return
-        </Button>
-      )}
+      <Button
+        type='button'
+        variant='outline'
+        onClick={() => setHelpOpen(true)}
+        className='h-10 w-full gap-2 rounded-full font-bold'
+      >
+        <LifeBuoy className='h-4 w-4' />
+        Need Help?
+      </Button>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Need help with this order?</DialogTitle>
+            <DialogDescription>
+              Chat with our support team on WhatsApp or pick an option below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className='space-y-2'>
+            <Button
+              asChild
+              className='h-11 w-full gap-2 rounded-full font-bold'
+            >
+              <a href={whatsappLink} target='_blank' rel='noreferrer'>
+                <MessageCircle className='h-4 w-4' />
+                Chat with Support
+              </a>
+            </Button>
+            {canCancel && (
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  setHelpOpen(false)
+                  setCancelOpen(true)
+                }}
+                className='h-11 w-full gap-2 rounded-full font-bold text-destructive hover:text-destructive'
+              >
+                <XCircle className='h-4 w-4' />
+                Cancel Order
+              </Button>
+            )}
+            {canReturn && (
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => {
+                  setHelpOpen(false)
+                  setReturnOpen(true)
+                }}
+                className='h-11 w-full gap-2 rounded-full font-bold'
+              >
+                <RotateCcw className='h-4 w-4' />
+                Request Return
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <ReasonDialog
         open={cancelOpen}
@@ -313,13 +354,30 @@ export default function OrderDetailsForm({
       ? (order.user as { name?: string; email?: string; phone?: string })
       : null
 
+  const site = data.settings[0]?.site
+  const whatsappNumber = (site?.whatsapp ?? '').replace(/\D/g, '')
+  const itemNames = items.map((item) => item.name).join(', ')
+  const whatsappMessage = [
+    `Hi ${site?.name ?? ''}, I need help with my order ${formatId(order._id)}.`,
+    `Items: ${itemNames}.`,
+    customer?.name ? `Name: ${customer.name}` : null,
+    customer?.email ? `Email: ${customer.email}` : null,
+    customer?.phone ? `Phone: ${customer.phone}` : null,
+    'Issue: ',
+  ]
+    .filter(Boolean)
+    .join('\n')
+  const whatsappLink = whatsappNumber
+    ? `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`
+    : '#'
+
   return (
     <div className='space-y-5'>
-      <Card className='overflow-hidden rounded-3xl border-border/60 bg-white shadow-soft'>
+      <Card className='overflow-hidden rounded-3xl border-border/60 bg-white '>
         <CardContent className='p-6'>
           <div className='flex flex-wrap items-center justify-between gap-4'>
             <div className='flex items-center gap-4'>
-              <span className='flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white shadow-soft'>
+              <span className='flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white '>
                 <Package className='h-7 w-7' />
               </span>
               <div>
@@ -353,7 +411,7 @@ export default function OrderDetailsForm({
         </CardContent>
       </Card>
 
-      <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+      <Card className='rounded-3xl border-border/60 bg-white '>
         <CardContent className='p-6'>
           <h2 className='font-bold tracking-tight'>
             {isAdmin ? 'Order Status' : 'Track your order'}
@@ -373,7 +431,7 @@ export default function OrderDetailsForm({
                       <li key={`${entry.status}-${index}`} className='relative'>
                         <span
                           className={cn(
-                            'absolute -left-[31px] flex h-6 w-6 items-center justify-center rounded-full border-2 bg-white',
+                            'absolute -left-[31px] flex h-6 w-6 items-center justify-center rounded-circle border-2 bg-white',
                             isLast
                               ? 'border-primary text-primary'
                               : 'border-border text-muted-foreground'
@@ -424,14 +482,14 @@ export default function OrderDetailsForm({
       </Card>
 
       {(cancellation || returnRequest) && (
-        <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+        <Card className='rounded-3xl border-border/60 bg-white '>
           <CardContent className='space-y-4 p-6'>
             <h2 className='font-bold tracking-tight'>
               Cancellation &amp; Return
             </h2>
             {cancellation && (
               <div className='flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/60 p-4'>
-                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600'>
+                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-circle bg-red-100 text-red-600'>
                   <XCircle className='h-4 w-4' />
                 </span>
                 <div>
@@ -451,7 +509,7 @@ export default function OrderDetailsForm({
             )}
             {returnRequest && (
               <div className='flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4'>
-                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600'>
+                <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-circle bg-amber-100 text-amber-600'>
                   <RotateCcw className='h-4 w-4' />
                 </span>
                 <div>
@@ -474,7 +532,7 @@ export default function OrderDetailsForm({
       )}
 
       {isAdmin && customer && (
-        <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+        <Card className='rounded-3xl border-border/60 bg-white '>
           <CardContent className='p-6'>
             <div className='mb-4 flex items-center gap-3'>
               <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
@@ -510,7 +568,7 @@ export default function OrderDetailsForm({
 
       <div className='grid gap-5 md:grid-cols-3'>
         <div className='space-y-5 md:col-span-2'>
-          <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+          <Card className='rounded-3xl border-border/60 bg-white '>
             <CardContent className='p-6'>
               <div className='mb-2 flex items-center gap-3'>
                 <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
@@ -568,7 +626,7 @@ export default function OrderDetailsForm({
           </Card>
 
           <div className='grid gap-5 sm:grid-cols-2'>
-            <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+            <Card className='rounded-3xl border-border/60 bg-white '>
               <CardContent className='p-6'>
                 <div className='mb-4 flex items-center gap-3'>
                   <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
@@ -588,7 +646,7 @@ export default function OrderDetailsForm({
               </CardContent>
             </Card>
 
-            <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+            <Card className='rounded-3xl border-border/60 bg-white '>
               <CardContent className='p-6'>
                 <div className='mb-4 flex items-center gap-3'>
                   <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-primary/5 text-primary'>
@@ -622,7 +680,7 @@ export default function OrderDetailsForm({
         </div>
 
         <div>
-          <Card className='rounded-3xl border-border/60 bg-white shadow-soft md:sticky md:top-24'>
+          <Card className='rounded-3xl border-border/60 bg-white  md:sticky md:top-24'>
             <CardContent className='space-y-4 p-6'>
               <h2 className='font-bold tracking-tight'>Order Summary</h2>
               <div className='flex justify-between text-sm'>
@@ -683,6 +741,7 @@ export default function OrderDetailsForm({
                   orderId={order._id}
                   status={status}
                   hasReturnRequest={Boolean(returnRequest)}
+                  whatsappLink={whatsappLink}
                 />
               )}
             </CardContent>

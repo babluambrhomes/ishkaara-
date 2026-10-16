@@ -51,8 +51,7 @@ export default function AddToWishlist({
         aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
         onClick={handleToggle}
         className={cn(
-          'flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-soft backdrop-blur transition-all duration-200 hover:scale-110',
-          active && 'bg-primary text-white',
+          'flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-all duration-200 hover:scale-110',
           className
         )}
       >
@@ -68,7 +67,7 @@ export default function AddToWishlist({
       className={cn(
         'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200',
         active
-          ? 'border-primary bg-primary text-white shadow-soft'
+          ? 'border-primary bg-primary text-white '
           : 'border-border bg-background text-foreground hover:border-primary/50 hover:text-primary',
         className
       )}

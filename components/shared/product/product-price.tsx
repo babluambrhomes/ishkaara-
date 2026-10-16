@@ -48,7 +48,7 @@ const ProductPrice = ({
       <div
         className={`flex ${center ? 'justify-center' : ''} items-center gap-2`}
       >
-        <span className='rounded-full bg-gradient-to-r from-[#930202] to-[#560101] px-3 py-1 text-white text-xs font-bold shadow-soft'>
+        <span className='rounded-full bg-gradient-to-r from-[#344c35] to-[#243526] px-3 py-1 text-white text-xs font-bold '>
           {discountPercent}% Off
         </span>
         <span className='text-gold text-xs font-semibold tracking-tight'>

@@ -30,7 +30,7 @@ export default async function AddressesPage() {
         </div>
         <Link
           href='/account'
-          className='inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground shadow-soft transition-all hover:border-primary/30 hover:text-primary'
+          className='inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-foreground  transition-all hover:border-primary/30 hover:text-primary'
         >
           <ArrowLeft className='h-4 w-4' />
           Back to Account

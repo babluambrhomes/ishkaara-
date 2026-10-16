@@ -32,7 +32,7 @@ export default function Footer() {
   } = useSettingStore()
 
   return (
-    <footer className='bg-gradient-to-b from-[#560101] to-[#350000] text-white'>
+    <footer className='bg-gradient-to-b from-[#243526] to-[#1a261b] text-white'>
       <div className='w-full'>
         <Button
           variant='ghost'
@@ -47,7 +47,7 @@ export default function Footer() {
           <div className='grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4'>
             <div>
               <Image
-                src={site.logo}
+                src={site.logoWhite}
                 alt={`${site.name} logo`}
                 width={96}
                 height={48}
@@ -63,7 +63,7 @@ export default function Footer() {
                     key={label}
                     href='#'
                     aria-label={label}
-                    className='flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/85 transition-all duration-200 hover:bg-gold hover:text-[#3d1a00] hover:shadow-lift'
+                    className='flex h-9 w-9 items-center justify-center rounded-circle bg-white/10 text-white/85 transition-all duration-200 hover:bg-gold hover:text-[#0f0d0d] '
                   >
                     <Icon className='h-4 w-4' />
                   </a>
@@ -72,7 +72,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f0d9a8]'>
+              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#d4d4d8]'>
                 Shop
               </h3>
               <ul className='space-y-2.5'>
@@ -95,7 +95,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f0d9a8]'>
+              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#d4d4d8]'>
                 Company
               </h3>
               <ul className='space-y-2.5'>
@@ -123,7 +123,7 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#f0d9a8]'>
+              <h3 className='mb-5 border-b border-white/10 pb-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#d4d4d8]'>
                 Let Us Help You
               </h3>
               <ul className='space-y-2.5'>
@@ -145,15 +145,15 @@ export default function Footer() {
               </ul>
               <ul className='mt-5 space-y-2.5 border-t border-white/10 pt-4'>
                 <li className='flex items-start gap-2 text-sm text-white/70'>
-                  <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-[#f0d9a8]' />
+                  <MapPin className='mt-0.5 h-4 w-4 shrink-0 text-[#d4d4d8]' />
                   {site.address}
                 </li>
                 <li className='flex items-center gap-2 text-sm text-white/70'>
-                  <Phone className='h-4 w-4 shrink-0 text-[#f0d9a8]' />
+                  <Phone className='h-4 w-4 shrink-0 text-[#d4d4d8]' />
                   {site.phone}
                 </li>
                 <li className='flex items-center gap-2 text-sm text-white/70'>
-                  <Mail className='h-4 w-4 shrink-0 text-[#f0d9a8]' />
+                  <Mail className='h-4 w-4 shrink-0 text-[#d4d4d8]' />
                   {site.email}
                 </li>
               </ul>
@@ -179,7 +179,7 @@ export default function Footer() {
         <div className='border-t border-white/10'>
           <div className='flex flex-col items-center justify-between gap-4  px-3 py-8 md:flex-row '>
             <Image
-              src='/logo.png'
+              src={site.logoWhite}
               alt={`${site.name} logo`}
               width={56}
               height={32}

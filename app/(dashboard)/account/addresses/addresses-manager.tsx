@@ -127,11 +127,11 @@ function AddressForm({
   }
 
   return (
-    <Card className='mb-6 overflow-hidden rounded-3xl border-gold/30 bg-white shadow-soft'>
+    <Card className='mb-6 overflow-hidden rounded-3xl border-gold/30 bg-white '>
       <CardContent className='p-5 sm:p-6'>
         <div className='mb-5 flex items-center justify-between gap-3'>
           <div className='flex items-center gap-2'>
-            <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-gold text-white shadow-soft'>
+            <span className='flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-gold text-white '>
               <MapPin className='h-5 w-5' />
             </span>
             <h3 className='text-lg font-bold tracking-tight'>
@@ -447,8 +447,8 @@ export default function AddressesManager({
   return (
     <div>
       {addresses.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center shadow-soft'>
-          <span className='flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-gold text-white shadow-lift'>
+        <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center '>
+          <span className='flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-gold text-white '>
             <MapPin className='h-8 w-8' />
           </span>
           <h3 className='mt-5 text-xl font-bold tracking-tight'>
@@ -488,7 +488,7 @@ export default function AddressesManager({
             {addresses.map((address) => (
               <Card
                 key={address._id}
-                className={`overflow-hidden rounded-3xl bg-white shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift ${
+                className={`overflow-hidden rounded-3xl bg-white  transition-all hover:-translate-y-0.5  ${
                   address.isDefault
                     ? 'border-gold/60 ring-1 ring-gold/30'
                     : 'border-border/60'

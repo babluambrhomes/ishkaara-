@@ -15,6 +15,7 @@ import {
   productCategories,
   products,
   reviewTemplates,
+  seedBanners,
   users,
   type SeedCategory,
 } from './seed-data'
@@ -43,6 +44,7 @@ async function main() {
   const { default: Coupon } = await import('../models/coupon.model')
   const { default: Review } = await import('../models/review.model')
   const { default: User } = await import('../models/user.model')
+  const { default: HomeBanner } = await import('../models/home-banner.model')
 
   await connectToDatabase()
   console.log('Connected to MongoDB')
@@ -54,8 +56,11 @@ async function main() {
     BlogPost.deleteMany({}),
     Category.deleteMany({}),
     Coupon.deleteMany({}),
+    HomeBanner.deleteMany({}),
   ])
-  console.log('Cleared reviews, products, blog posts, categories and coupons')
+  console.log(
+    'Cleared reviews, products, blog posts, categories, coupons and home banners'
+  )
 
   const createCategories = async (items: SeedCategory[]) => {
     const map = new Map<string, string>()
@@ -81,11 +86,6 @@ async function main() {
 
   // Tags consumed by the storefront home page filters. Spread them across the
   // catalogue so every home section has products to show.
-  const banners = [
-    '/images/banner1.jpg',
-    '/images/banner2.jpg',
-    '/images/banner3.jpg',
-  ]
   const homeTagsForIndex = (index: number): string[] => {
     const tags: string[] = []
     if (index % 3 === 0) tags.push('todays-deal')
@@ -101,24 +101,43 @@ async function main() {
       slug: toSlug(product.name),
       category: productCategoryIds.get(product.categoryName),
       categoryName: product.categoryName,
-      siteBanner: index < 6 ? banners[index % banners.length] : '',
       brand: product.brand,
       description: product.description,
       tags: Array.from(new Set([...product.tags, ...homeTagsForIndex(index)])),
       numSales: product.numSales,
       status: 'public',
-      variants: [
-        {
-          price: product.price,
-          listPrice: product.listPrice,
-          images: product.images,
-          size: product.sizes,
-          countInStock: product.countInStock,
-        },
-      ],
+      variants: product.variants,
     }))
   )
   console.log(`Created ${createdProducts.length} products`)
+
+  // Map product name -> id/slug so home banners can link to a real product.
+  const productRefs = new Map(
+    createdProducts.map((product) => [
+      product.name,
+      { _id: product._id.toString(), slug: product.slug },
+    ])
+  )
+
+  const createdBanners = await HomeBanner.create(
+    seedBanners.map((banner) => {
+      const ref = productRefs.get(banner.productName)
+      if (!ref) {
+        throw new Error(
+          `Home banner references unknown product "${banner.productName}"`
+        )
+      }
+      return {
+        productId: ref._id,
+        productSlug: ref.slug,
+        bannerUrl: banner.bannerUrl,
+        bannerType: banner.bannerType,
+        status: 'ACTIVE',
+        expireAt: null,
+      }
+    })
+  )
+  console.log(`Created ${createdBanners.length} home banners`)
 
   // Seed a deterministic sample of reviews per product and roll the ratings up
   // onto the product document, mirroring updateProductReview.

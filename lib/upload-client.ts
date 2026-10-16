@@ -1,4 +1,4 @@
-export type UploadEntity = 'user' | 'product' | 'category' | 'blog'
+export type UploadEntity = 'user' | 'product' | 'category' | 'blog' | 'banner'
 
 /**
  * Sends a single image to the upload API and resolves the stored storage key.

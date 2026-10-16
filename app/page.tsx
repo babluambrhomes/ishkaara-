@@ -1,48 +1,36 @@
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import BrowsingHistory from '@/components/shared/browsing-history'
 import Footer from '@/components/shared/footer'
 import Header from '@/components/shared/header'
 import { HomeCard } from '@/components/shared/home/home-card'
 import { HomeCarousel } from '@/components/shared/home/home-carousel'
+import { CategoryStrip } from '@/components/shared/home/category-strip'
+
 import ProductSlider from '@/components/shared/product/product-slider'
 import { Card, CardContent } from '@/components/ui/card'
 
-import {
-  getProductsForCard,
-  getProductsByTag,
-  getProductsForHero,
-  getAllCategories,
-} from '@/lib/actions/product.actions'
+import { getHomePageData } from '@/lib/actions/product.actions'
 import { toSlug } from '@/lib/utils'
+import RandomBannerGrid from '@/components/shared/home/randomBannerGrid'
+import RelatedToViewed from '@/components/shared/related-to-viewed'
 
 export default async function HomePage() {
-  const heroProducts = await getProductsForHero({ limit: 6 })
-  const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
-  const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
+  const {
+    heroBanners,
+    commonBanners,
+    todaysDeals,
+    bestSellingProducts,
+    categories,
+    newArrivals,
+    featureds,
+    bestSellers,
+  } = await getHomePageData()
 
-  const categories = (await getAllCategories()).slice(0, 4)
-  const newArrivals = await getProductsForCard({
-    tag: 'new-arrival',
-  })
-  const featureds = await getProductsForCard({
-    tag: 'featured',
-  })
-  const bestSellers = await getProductsForCard({
-    tag: 'best-seller',
-  })
+  const cardCategories = categories.map((category) => ({
+    name: category.name,
+    image: category.imageUrl || `/images/${toSlug(category.name)}.jpg`,
+    href: `/search?category=${encodeURIComponent(category.name)}`,
+  }))
   const cards = [
-    {
-      title: 'Categories to explore',
-      link: {
-        text: 'See More',
-        href: '/search',
-      },
-      items: categories.map((category) => ({
-        name: category.name,
-        image:
-          category.imageUrl || `/images/${toSlug(category.name)}.jpg`,
-        href: `/search?category=${encodeURIComponent(category.name)}`,
-      })),
-    },
     {
       title: 'Explore New Arrivals',
       items: newArrivals,
@@ -73,14 +61,17 @@ export default async function HomePage() {
     <>
      <Header />
     <div className='flex-1 flex flex-col gap-6 p-3 '>
-      <HomeCarousel products={heroProducts} />
+      <HomeCarousel banners={heroBanners} />
+      <CategoryStrip categories={cardCategories} />
+      <RandomBannerGrid banners={commonBanners.slice(2, 5)} />
       <HomeCard cards={cards} />
-      <Card className='w-full overflow-hidden rounded-2xl shadow-soft'>
+      <Card className='w-full overflow-hidden rounded-2xl '>
         <CardContent className='p-4 items-center gap-3'>
           <ProductSlider title="Today's Deals" products={todaysDeals} />
         </CardContent>
       </Card>
-      <Card className='w-full overflow-hidden rounded-2xl shadow-soft'>
+      <RandomBannerGrid banners={commonBanners.slice(1, 3)} />
+      <Card className='w-full overflow-hidden rounded-2xl '>
         <CardContent className='p-4 items-center gap-3'>
           <ProductSlider
             title='Best Selling Products'
@@ -89,7 +80,14 @@ export default async function HomePage() {
           />
         </CardContent>
       </Card>
-      <BrowsingHistoryList />
+      
+    <RelatedToViewed />
+
+     <RandomBannerGrid banners={commonBanners.slice(4)} />
+
+
+       <BrowsingHistory />
+
     </div>
     <Footer />
     </>

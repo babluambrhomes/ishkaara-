@@ -90,7 +90,7 @@ export function ImageUpload({
           )}
         >
           {uploading ? (
-            <span className='h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent' />
+            <span className='h-5 w-5 animate-spin rounded-circle border-2 border-current border-t-transparent' />
           ) : (
             <Upload className='h-5 w-5' />
           )}
@@ -172,7 +172,7 @@ export function MultiImageUpload({
           <button
             type='button'
             onClick={() => onChange(value.filter((k) => k !== key))}
-            className='absolute -right-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] text-white group-hover:flex'
+            className='absolute -right-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-circle bg-destructive text-[10px] text-white group-hover:flex'
             aria-label='Remove image'
           >
             ×
@@ -192,7 +192,7 @@ export function MultiImageUpload({
           aria-label='Add image'
         >
           {uploading ? (
-            <span className='h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent' />
+            <span className='h-5 w-5 animate-spin rounded-circle border-2 border-current border-t-transparent' />
           ) : (
             <Plus className='h-5 w-5' />
           )}

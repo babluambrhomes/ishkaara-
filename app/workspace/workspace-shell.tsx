@@ -17,6 +17,7 @@ import {
   Mail,
   HelpCircle,
   Ticket,
+  Images,
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
@@ -34,6 +35,7 @@ const links = [
   { title: 'Overview', href: '/workspace/overview', icon: LayoutDashboard },
   { title: 'Products', href: '/workspace/products', icon: Tags },
   { title: 'Categories', href: '/workspace/categories', icon: FolderTree },
+  { title: 'Home Banners', href: '/workspace/home-banners', icon: Images },
   { title: 'Blog', href: '/workspace/blog/posts', icon: FileText },
   { title: 'Orders', href: '/workspace/orders', icon: Package },
   { title: 'Users', href: '/workspace/users', icon: Users },

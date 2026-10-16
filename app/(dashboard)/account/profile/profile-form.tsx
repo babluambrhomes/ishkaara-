@@ -104,7 +104,7 @@ function AddPhoneFlow() {
   }
 
   return (
-    <div className='rounded-2xl border border-gold/30 bg-gradient-to-br from-[#fff5dd] via-background to-[#ffe9bd] p-4 sm:p-5'>
+    <div className='rounded-2xl border border-gold/30 bg-gradient-to-br from-[#f4f4f5] via-background to-[#e4e4e7] p-4 sm:p-5'>
       <div className='flex items-center gap-2'>
         <Smartphone className='h-4 w-4 text-gold' />
         <p className='text-sm font-bold text-foreground'>
@@ -220,7 +220,7 @@ export default function ProfileForm({
         </div>
       )}
 
-      <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+      <Card className='rounded-3xl border-border/60 bg-white '>
         <CardHeader>
           <CardTitle className='text-lg tracking-tight'>Edit Profile</CardTitle>
           <CardDescription>Update your personal information</CardDescription>
@@ -276,11 +276,11 @@ export default function ProfileForm({
         </CardContent>
       </Card>
 
-      <Card className='rounded-3xl border-border/60 bg-white shadow-soft'>
+      <Card className='rounded-3xl border-border/60 bg-white '>
         <CardContent className='space-y-5 p-6'>
           <div className='flex flex-wrap items-center justify-between gap-3'>
             <div className='flex items-center gap-3'>
-              <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary'>
+              <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-primary/5 text-primary'>
                 <Mail className='h-4 w-4' />
               </span>
               <div>
@@ -316,7 +316,7 @@ export default function ProfileForm({
 
           {needsEmailLink && (
             <form action={initiateGoogleAttach}>
-              <div className='rounded-2xl border border-gold/30 bg-gradient-to-br from-[#fff5dd] via-background to-[#ffe9bd] p-4 sm:p-5'>
+              <div className='rounded-2xl border border-gold/30 bg-gradient-to-br from-[#f4f4f5] via-background to-[#e4e4e7] p-4 sm:p-5'>
                 <p className='text-sm font-bold text-foreground'>
                   Verify email with Google
                 </p>
@@ -335,7 +335,7 @@ export default function ProfileForm({
 
           <div className='flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-5'>
             <div className='flex items-center gap-3'>
-              <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/5 text-primary'>
+              <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-primary/5 text-primary'>
                 <Smartphone className='h-4 w-4' />
               </span>
               <div>

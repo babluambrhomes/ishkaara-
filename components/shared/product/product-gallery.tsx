@@ -20,7 +20,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
             aria-label={`View product image ${index + 1}`}
             className={`relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-white transition-all sm:h-[72px] sm:w-[72px] ${
               selectedImage === index
-                ? 'ring-2 ring-gold ring-offset-2 ring-offset-background shadow-soft'
+                ? 'ring-2 ring-gold ring-offset-2 ring-offset-background '
                 : 'ring-1 ring-border hover:ring-primary/40'
             }`}
           >
@@ -35,7 +35,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
         ))}
       </div>
 
-      <div className='relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-white via-background to-primary/[0.04] p-6 shadow-inner-soft'>
+      <div className='relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-white via-background to-primary/[0.04] p-6 '>
         <Zoom>
           <div className='relative h-[380px] sm:h-[480px]'>
             <Image

@@ -72,7 +72,7 @@ function TableOfContents({
   return (
     <nav
       aria-label='Table of contents'
-      className={cn('rounded-2xl border border-border/60 bg-background p-4 shadow-soft', className)}
+      className={cn('rounded-2xl border border-border/60 bg-background p-4 ', className)}
     >
       <div className='mb-3 flex items-center gap-2 border-b border-border/50 pb-3'>
         <ListOrdered className='h-4 w-4 text-gold' />

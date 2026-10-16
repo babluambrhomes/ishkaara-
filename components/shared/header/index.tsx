@@ -11,8 +11,8 @@ export default async function Header() {
   const categories = await getAllCategories()
   const { site } = await getSetting()
   return (
-    <header className='sticky top-0 z-50 bg-primary text-white shadow-md'>
-      <div className='bg-gradient-to-b from-[#930202] to-[#560101] border-b border-white/10'>
+    <header className='sticky top-0 z-50 bg-white text-foreground shadow-md'>
+      <div className='bg-white border-b border-border'>
         <div className='px-2 py-2'>
           <div className='flex items-center justify-between gap-3'>
             {/* Left: mobile categories trigger + logo + desktop menus */}
@@ -25,7 +25,7 @@ export default async function Header() {
                 className='flex items-center font-extrabold text-2xl m-1 display-inline-block'
               >
                 <Image
-                  src={site.logo}
+                  src={site.logoGreen}
                   className='w-full h-auto max-w-[120px] '
                   width={66}
                   height={30}
@@ -38,7 +38,7 @@ export default async function Header() {
                   <Link
                     href={menu.href}
                     key={menu.href}
-                    className='px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/75 transition-colors hover:text-white'
+                    className='px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground/70 transition-colors hover:text-primary'
                   >
                     {menu.name}
                   </Link>

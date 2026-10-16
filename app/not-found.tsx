@@ -22,7 +22,7 @@ export default function NotFound() {
         <Button
           asChild
           size='lg'
-          className='rounded-full bg-gradient-to-r from-primary to-[#560101] shadow-lift hover:shadow-soft'
+          className='rounded-full bg-gradient-to-r from-primary to-[#243526]  '
         >
           <Link href='/'>Back to home</Link>
         </Button>

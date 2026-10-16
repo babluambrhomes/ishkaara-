@@ -66,7 +66,7 @@ export default function NewsletterForm() {
           type='email'
           placeholder='Enter your email'
           aria-label='Email address'
-          className='h-11 flex-1 rounded-full border-white/20 bg-white/95 text-black shadow-soft placeholder:text-black/40 focus-visible:ring-gold/60'
+          className='h-11 flex-1 rounded-full border-white/20 bg-white/95 text-black  placeholder:text-black/40 focus-visible:ring-gold/60'
           {...register('email')}
         />
         <Button

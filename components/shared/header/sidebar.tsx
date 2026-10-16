@@ -25,14 +25,14 @@ export default async function Sidebar({
 
   return (
     <Drawer direction='left'>
-      <DrawerTrigger className='my-2 flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition-all duration-200 hover:brightness-110 active:scale-95'>
+      <DrawerTrigger className='my-2 flex items-center gap-1.5 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground  transition-all duration-200 hover:bg-muted active:scale-95'>
         <MenuIcon className='h-5 w-5' />
         All
       </DrawerTrigger>
       <DrawerContent className='w-[350px] mt-0 top-0 rounded-none'>
         <div className='flex flex-col h-full'>
           {/* User Sign In Section */}
-          <div className='bg-gradient-to-b rounded-none from-[#930202] to-[#560101] text-white flex items-center justify-between  '>
+          <div className='bg-gradient-to-b rounded-none from-[#344c35] to-[#243526] text-white flex items-center justify-between  '>
             <DrawerHeader>
               <DrawerTitle className='flex items-center'>
                 <UserCircle className='h-6 w-6 mr-2' />

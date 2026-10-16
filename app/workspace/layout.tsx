@@ -18,7 +18,7 @@ export default async function WorkspaceLayout({
 
   const { site } = await getSetting()
   return (
-    <WorkspaceShell siteLogo={site.logo} menu={<Menu forAdmin />}>
+    <WorkspaceShell siteLogo={site.logoWhite} menu={<Menu forAdmin />}>
       {children}
     </WorkspaceShell>
   )

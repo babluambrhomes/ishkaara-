@@ -11,6 +11,7 @@ import { z } from 'zod'
 import { auth } from '@/auth'
 import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
+import { getActiveHeroBanners, getActiveCommonBanners } from './home-banner.actions'
 import {
   toPublicProduct,
   toPublicProducts as toPublicProductsList,
@@ -219,17 +220,63 @@ export async function getProductsByTag({
   return toPublicProductsList(products)
 }
 
-// GET PRODUCTS FOR HOME HERO (only products with a site banner)
-export async function getProductsForHero({ limit = 6 }: { limit?: number } = {}) {
+// AGGREGATED HOME PAGE DATA (single entry point for the home page)
+export async function getHomePageData() {
   await connectToDatabase()
-  const products = await Product.find({
-    status: 'public',
-    siteBanner: { $nin: ['', null] },
-  })
-    .sort({ createdAt: 'desc' })
+  const [
+    heroBanners,
+    commonBanners,
+    todaysDeals,
+    bestSellingProducts,
+    categories,
+    newArrivals,
+    featureds,
+    bestSellers,
+  ] = await Promise.all([
+    getActiveHeroBanners({ limit: 6 }),
+    getActiveCommonBanners(),
+    getProductsByTag({ tag: 'todays-deal' }),
+    getProductsByTag({ tag: 'best-seller' }),
+    getAllCategories(),
+    getProductsForCard({ tag: 'new-arrival' }),
+    getProductsForCard({ tag: 'featured' }),
+    getProductsForCard({ tag: 'best-seller' }),
+  ])
+
+  return {
+    heroBanners,
+    commonBanners,
+    todaysDeals,
+    bestSellingProducts,
+    categories,
+    newArrivals,
+    featureds,
+    bestSellers,
+  }
+}
+
+// SEARCH PRODUCT OPTIONS FOR PICKERS (id + name + slug)
+export async function searchProductOptions({
+  query,
+  limit = 10,
+}: {
+  query: string
+  limit?: number
+}) {
+  await assertStaff()
+  await connectToDatabase()
+  const filter = query
+    ? { name: { $regex: query, $options: 'i' }, status: { $ne: 'delete' } }
+    : { status: { $ne: 'delete' } }
+  const products = await Product.find(filter, { name: 1, slug: 1 })
+    .sort({ name: 1 })
     .limit(limit)
     .lean()
-  return toPublicProductsList(products)
+  return products.map((product) => ({
+    _id: product._id.toString(),
+    name: product.name,
+    slug: product.slug,
+  }))
 }
 
 // GET ONE PRODUCT BY SLUG (flattened to the requested/primary variant)

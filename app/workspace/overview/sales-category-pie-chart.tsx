@@ -29,7 +29,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const item = payload[0]
     return (
-      <div className='rounded-xl border border-border/60 bg-card px-3 py-2 shadow-lift'>
+      <div className='rounded-xl border border-border/60 bg-card px-3 py-2 '>
         <p className='text-xs font-medium text-muted-foreground'>
           {item.payload?._id ?? item.name}
         </p>
@@ -100,7 +100,7 @@ export default function SalesCategoryPieChart({ data }: { data: any[] }) {
           return (
             <li key={entry._id} className='flex items-center gap-3'>
               <span
-                className='h-3 w-3 shrink-0 rounded-full'
+                className='h-3 w-3 shrink-0 rounded-circle'
                 style={{ background: COLORS[index % COLORS.length] }}
               />
               <span className='min-w-0 flex-1 truncate text-sm font-medium'>

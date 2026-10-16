@@ -19,13 +19,13 @@ export default function ErrorPage({
 
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-background via-destructive/[0.04] to-gold/[0.08] px-4 py-12'>
-      <div className='pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-destructive/10 blur-3xl' />
+      <div className='pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-circle bg-destructive/10 blur-3xl' />
 
-      <div className='relative w-full max-w-lg overflow-hidden rounded-3xl border border-border/60 bg-white shadow-lift'>
+      <div className='relative w-full max-w-lg overflow-hidden rounded-3xl border border-border/60 bg-white '>
         <div className='h-2 bg-gradient-to-r from-destructive via-[#b91c1c] to-gold' />
 
         <div className='flex flex-col items-center px-6 py-10 text-center sm:px-10'>
-          <span className='flex h-20 w-20 items-center justify-center rounded-full bg-red-50 text-destructive ring-8 ring-red-50/60'>
+          <span className='flex h-20 w-20 items-center justify-center rounded-circle bg-red-50 text-destructive ring-8 ring-red-50/60'>
             <AlertTriangle className='h-11 w-11' />
           </span>
 

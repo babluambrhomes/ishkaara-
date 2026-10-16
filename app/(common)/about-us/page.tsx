@@ -45,7 +45,7 @@ export default async function AboutUsPage() {
 
   return (
     <div className='w-full  py-8 px-3'>
-      <div className='relative h-56 overflow-hidden rounded-2xl shadow-soft md:h-72'>
+      <div className='relative h-56 overflow-hidden rounded-2xl  md:h-72'>
         <Image
           src='/images/banner2.jpg'
           alt='About us'
@@ -57,7 +57,7 @@ export default async function AboutUsPage() {
         <div className='absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-transparent' />
         <div className='absolute inset-0 flex items-center px-8 md:px-12'>
           <div className='max-w-2xl'>
-            <p className='text-xs font-semibold uppercase tracking-[0.28em] text-[#f0d9a8]'>
+            <p className='text-xs font-semibold uppercase tracking-[0.28em] text-[#d4d4d8]'>
               Our story
             </p>
             <h1 className='mt-2 text-3xl font-bold tracking-tight text-white md:text-5xl'>
@@ -69,7 +69,7 @@ export default async function AboutUsPage() {
       </div>
 
       <div className='mt-12 grid grid-cols-1 items-center gap-10 lg:grid-cols-2'>
-        <div className='relative overflow-hidden rounded-2xl shadow-soft'>
+        <div className='relative overflow-hidden rounded-2xl '>
           <Image
             src='/images/wrist-watches.jpg'
             alt='Lemon Fashion collection'
@@ -104,9 +104,9 @@ export default async function AboutUsPage() {
         {values.map(({ Icon, title, text }) => (
           <div
             key={title}
-            className='rounded-2xl border border-border/60 bg-card p-6 shadow-soft'
+            className='rounded-2xl border border-border/60 bg-card p-6 '
           >
-            <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+            <div className='mb-4 flex h-12 w-12 items-center justify-center rounded-circle bg-primary/10'>
               <Icon className='h-6 w-6 text-primary' />
             </div>
             <h3 className='text-lg font-bold tracking-tight'>{title}</h3>
@@ -115,11 +115,11 @@ export default async function AboutUsPage() {
         ))}
       </div>
 
-      <div className='mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#930202] to-[#560101] p-8 shadow-soft md:p-10'>
+      <div className='mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#344c35] to-[#243526] p-8  md:p-10'>
         <div className='grid grid-cols-2 gap-8 text-center lg:grid-cols-4'>
           {stats.map((stat) => (
             <div key={stat.label}>
-              <p className='text-3xl font-bold tracking-tight text-[#f0d9a8] md:text-4xl'>
+              <p className='text-3xl font-bold tracking-tight text-[#d4d4d8] md:text-4xl'>
                 {stat.value}
               </p>
               <p className='mt-1 text-sm font-medium text-white/80 uppercase tracking-wider'>
@@ -130,7 +130,7 @@ export default async function AboutUsPage() {
         </div>
       </div>
 
-      <div className='mt-12 flex flex-col items-center gap-6 rounded-2xl border border-border/60 bg-card p-8 text-center shadow-soft md:flex-row md:justify-between md:text-left'>
+      <div className='mt-12 flex flex-col items-center gap-6 rounded-2xl border border-border/60 bg-card p-8 text-center  md:flex-row md:justify-between md:text-left'>
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
             Ready to find something you&apos;ll love?

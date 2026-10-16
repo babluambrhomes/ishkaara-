@@ -14,7 +14,7 @@ const Menu = ({ forAdmin = false }: { forAdmin?: boolean }) => {
         <Link
           href='/account'
           aria-label='Account'
-          className='self-center rounded-full p-2 transition-colors hover:bg-white/10 md:hidden'
+          className='self-center rounded-full p-2 transition-colors hover:bg-muted md:hidden'
         >
           <User className='h-7 w-7' />
         </Link>

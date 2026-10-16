@@ -49,7 +49,6 @@ export const ProductInputSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   slug: z.string().min(3, 'Slug must be at least 3 characters'),
   category: MongoId,
-  siteBanner: z.string().default(''),
   brand: z.string().min(1, 'Brand is required'),
   description: z.string().min(1, 'Description is required'),
   status: ContentStatusSchema.default('draft'),
@@ -350,6 +349,25 @@ export const CategoryUpdateSchema = CategoryInputSchema.extend({
   _id: z.string(),
 })
 
+// HOME BANNER
+export const HomeBannerInputSchema = z.object({
+  productId: MongoId,
+  productSlug: z.string().min(1, 'Product slug is required'),
+  bannerUrl: z.string().default(''),
+  bannerType: z.enum(['Hero', 'Common']).default('Common'),
+  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
+  expireAt: z
+    .preprocess(
+      (v) => (v === '' || v === undefined ? null : v),
+      z.union([z.coerce.date(), z.null()])
+    )
+    .default(null),
+})
+
+export const HomeBannerUpdateSchema = HomeBannerInputSchema.extend({
+  _id: z.string(),
+})
+
 
 // WEBPAGE
 export const WebPageInputSchema = z.object({
@@ -402,13 +420,15 @@ export const SettingInputSchema = z.object({
   }),
   site: z.object({
     name: z.string().min(1, 'Name is required'),
-    logo: z.string().min(1, 'logo is required'),
+    logoWhite: z.string().min(1, 'White logo is required'),
+    logoGreen: z.string().min(1, 'Green logo is required'),
     slogan: z.string().min(1, 'Slogan is required'),
     description: z.string().min(1, 'Description is required'),
     keywords: z.string().min(1, 'Keywords is required'),
     url: z.string().min(1, 'Url is required'),
     email: z.string().min(1, 'Email is required'),
     phone: z.string().min(1, 'Phone is required'),
+    whatsapp: z.string().optional(),
     author: z.string().min(1, 'Author is required'),
     copyright: z.string().min(1, 'Copyright is required'),
     address: z.string().min(1, 'Address is required'),

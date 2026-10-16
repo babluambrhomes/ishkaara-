@@ -90,7 +90,7 @@ const StepBadge = ({
   active?: boolean
 }) => (
   <span
-    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-circle text-sm font-bold transition-colors ${
       done
         ? 'bg-primary text-white'
         : active
@@ -125,7 +125,7 @@ const StepHeading = ({
 )
 
 const SectionCard = ({ children }: { children: React.ReactNode }) => (
-  <section className='rounded-2xl border border-border/70 bg-card p-5 shadow-sm md:p-6'>
+  <section className='rounded-2xl border border-border/70 bg-card p-5  md:p-6'>
     {children}
   </section>
 )
@@ -554,7 +554,7 @@ const CheckoutForm = ({
       }`}
     >
       <span
-        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-circle ${
           selected
             ? 'bg-primary/10 text-primary'
             : 'bg-muted text-muted-foreground'
@@ -571,7 +571,7 @@ const CheckoutForm = ({
         </span>
       </span>
       <span
-        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-circle border-2 ${
           selected ? 'border-primary bg-primary text-white' : 'border-border'
         }`}
       >
@@ -611,7 +611,7 @@ const CheckoutForm = ({
           </Badge>
         )}
         <span
-          className={`ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+          className={`ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-circle border-2 ${
             selected ? 'border-primary bg-primary text-white' : 'border-border'
           }`}
         >
@@ -633,7 +633,7 @@ const CheckoutForm = ({
 
   const OrderSummary = () => {
     return (
-    <div className='rounded-2xl border border-border/70 bg-card shadow-sm'>
+    <div className='rounded-2xl border border-border/70 bg-card '>
       <CardContent className='p-5'>
         <div className='mb-4 flex items-center justify-between'>
           <p className='text-base font-bold'>Order Summary</p>
@@ -651,7 +651,7 @@ const CheckoutForm = ({
             Your order qualifies for FREE Shipping
           </div>
         ) : (
-          <div className='mt-3 rounded-xl border border-border/60 bg-white p-3 shadow-sm'>
+          <div className='mt-3 rounded-xl border border-border/60 bg-white p-3 '>
             <p className='text-xs text-muted-foreground'>
               Add{' '}
               <span className='font-semibold text-gold'>
@@ -670,11 +670,11 @@ const CheckoutForm = ({
         )}
 
         {items.length > 0 && (
-          <div className='mt-3 space-y-3 rounded-xl border border-border/60 bg-white p-3 shadow-sm'>
+          <div className='mt-3 space-y-3 rounded-xl border border-border/60 bg-white p-3 '>
             {appliedCoupon ? (
               <div className='flex items-center justify-between gap-3'>
                 <div className='flex items-center gap-2'>
-                  <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500/15'>
+                  <span className='flex h-7 w-7 shrink-0 items-center justify-center rounded-circle bg-emerald-500/15'>
                     <Check className='h-3.5 w-3.5 text-emerald-600' />
                   </span>
                   <div>
@@ -689,7 +689,7 @@ const CheckoutForm = ({
                 <button
                   type='button'
                   onClick={removeAppliedCoupon}
-                  className='flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive'
+                  className='flex h-7 w-7 shrink-0 items-center justify-center rounded-circle text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive'
                   title='Remove coupon'
                 >
                   <X className='h-4 w-4' />
@@ -893,8 +893,8 @@ const CheckoutForm = ({
         })}
       </ol>
 
-      <div className='mb-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-gold/10 to-transparent p-4 shadow-sm'>
-        <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-gold text-white shadow-md'>
+      <div className='mb-6 flex items-center gap-4 overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 via-gold/10 to-transparent p-4 '>
+        <span className='flex h-11 w-11 shrink-0 items-center justify-center rounded-circle bg-gradient-to-br from-primary to-gold text-white '>
           <Truck className='h-5 w-5' />
         </span>
         <div>
@@ -925,7 +925,7 @@ const CheckoutForm = ({
               <div className='mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4'>
                 <div className='flex items-start justify-between gap-4'>
                   <div className='flex gap-3'>
-                    <span className='mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                    <span className='mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-primary/10 text-primary'>
                       <MapPin className='h-4 w-4' />
                     </span>
                     <div className='text-sm'>
@@ -1076,7 +1076,7 @@ const CheckoutForm = ({
                                 onClick={() =>
                                   updateItem(item, Math.max(1, item.quantity - 1))
                                 }
-                                className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+                                className='flex h-9 w-9 items-center justify-center rounded-circle text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
                               >
                                 <Minus className='h-4 w-4' />
                               </button>
@@ -1093,7 +1093,7 @@ const CheckoutForm = ({
                                     Math.min(item.countInStock, item.quantity + 1)
                                   )
                                 }
-                                className='flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
+                                className='flex h-9 w-9 items-center justify-center rounded-circle text-muted-foreground transition-colors hover:text-primary disabled:opacity-40'
                               >
                                 <Plus className='h-4 w-4' />
                               </button>

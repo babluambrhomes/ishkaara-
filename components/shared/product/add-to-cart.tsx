@@ -154,7 +154,7 @@ export default function AddToCart({
           size='sm'
           variant='outline'
           onClick={buyNow}
-          className='flex-1 gap-1.5 rounded-full border-gold/60 text-primary hover:bg-gold hover:text-[#3d1a00]'
+          className='flex-1 gap-1.5 rounded-full border-gold/60 text-primary hover:bg-gold hover:text-[#0f0d0d]'
         >
           Buy Now
         </Button>
@@ -181,7 +181,7 @@ export default function AddToCart({
             aria-label='Decrease quantity'
             disabled={quantity <= 1}
             onClick={decreaseQuantity}
-            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
+            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-circle border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
           >
             <Minus className='h-4 w-4' />
           </button>
@@ -193,7 +193,7 @@ export default function AddToCart({
             aria-label='Increase quantity'
             disabled={quantity >= item.countInStock}
             onClick={increaseQuantity}
-            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
+            className='flex h-11 w-11 shrink-0 items-center justify-center rounded-circle border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary disabled:opacity-40'
           >
             <Plus className='h-4 w-4' />
           </button>
@@ -211,7 +211,7 @@ export default function AddToCart({
           type='button'
           onClick={buyNow}
           disabled={item.countInStock <= 0}
-          className='h-11 w-full gap-2 rounded-full bg-gradient-to-r from-gold to-[#d4af37] font-bold text-[#3d1a00] shadow-soft transition-all hover:from-[#d4af37] hover:to-gold hover:shadow-lg'
+          className='h-11 w-full gap-2 rounded-full bg-gradient-to-r from-gold to-[#344c35] font-bold text-[#0f0d0d]  transition-all hover:from-[#344c35] hover:to-gold '
         >
           <ShoppingBag className='h-4 w-4' />
           Buy Now

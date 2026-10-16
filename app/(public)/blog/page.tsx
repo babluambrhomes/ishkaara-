@@ -60,7 +60,7 @@ export default async function BlogPage(props: {
                 variant={category === 'all' ? 'default' : 'outline'}
                 className={cn(
                   'cursor-pointer select-none rounded-full px-4 py-1 text-sm',
-                  category === 'all' && 'shadow-soft'
+                  category === 'all' && ''
                 )}
               >
                 All
@@ -72,7 +72,7 @@ export default async function BlogPage(props: {
                   variant={category === cat ? 'default' : 'outline'}
                   className={cn(
                     'cursor-pointer select-none rounded-full px-4 py-1 text-sm',
-                    category === cat && 'shadow-soft'
+                    category === cat && ''
                   )}
                 >
                   {cat}
@@ -108,7 +108,7 @@ export default async function BlogPage(props: {
               {posts.map((post) => (
                 <Card
                   key={post._id}
-                  className='group overflow-hidden rounded-2xl border-border/60 shadow-soft transition-all duration-300 hover:shadow-lift'
+                  className='group overflow-hidden rounded-2xl border-border/60  transition-all duration-300 '
                 >
                   <Link href={`/blog/${post.slug}`} className='block'>
                     <div className='relative aspect-[16/10] overflow-hidden'>

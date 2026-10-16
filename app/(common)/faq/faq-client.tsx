@@ -49,7 +49,7 @@ export default function FaqClient({ initialFaqs }: { initialFaqs: IFaq[] }) {
                 setOpenIndex(null)
               }}
               placeholder='Search a question... e.g. shipping, return, payment'
-              className='h-13 rounded-full border-border/70 pl-12 py-3.5 text-base shadow-soft focus-visible:ring-gold/60'
+              className='h-13 rounded-full border-border/70 pl-12 py-3.5 text-base  focus-visible:ring-gold/60'
             />
           </div>
         </div>
@@ -82,8 +82,8 @@ export default function FaqClient({ initialFaqs }: { initialFaqs: IFaq[] }) {
                   key={faq._id ? String(faq._id) : faq.question}
                   className={`overflow-hidden rounded-2xl border bg-background transition-all duration-300 ${
                     isOpen
-                      ? 'border-primary/40 shadow-lift'
-                      : 'border-border/60 shadow-soft hover:shadow-lift'
+                      ? 'border-primary/40 '
+                      : 'border-border/60  '
                   }`}
                 >
                   <button
@@ -130,7 +130,7 @@ export default function FaqClient({ initialFaqs }: { initialFaqs: IFaq[] }) {
 
       {/* Bottom CTA */}
       <div className='px-4 pb-12 md:px-8 lg:px-12'>
-        <div className='mx-auto max-w-3xl overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary to-[#560101] text-white shadow-lift'>
+        <div className='mx-auto max-w-3xl overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary to-[#243526] text-white '>
           <div className='flex flex-col items-center gap-4 px-6 py-10 text-center md:px-10'>
             <Mail className='h-8 w-8 text-gold' />
             <h2 className='text-2xl font-bold tracking-tight'>
@@ -140,7 +140,7 @@ export default function FaqClient({ initialFaqs }: { initialFaqs: IFaq[] }) {
               Our support team is here to help. Reach out to us and we&apos;ll
               get back to you as soon as possible.
             </p>
-            <Button asChild size='lg' className='rounded-full bg-white text-primary hover:bg-gold hover:text-[#3d1a00]'>
+            <Button asChild size='lg' className='rounded-full bg-white text-primary hover:bg-gold hover:text-[#0f0d0d]'>
               <Link href='/contact-us'>Contact Us</Link>
             </Button>
           </div>

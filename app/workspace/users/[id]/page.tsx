@@ -34,7 +34,7 @@ function DetailRow({
 }) {
   return (
     <div className='flex items-start gap-3'>
-      <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+      <span className='mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-circle bg-primary/10 text-primary'>
         <Icon className='h-4 w-4' />
       </span>
       <div className='min-w-0'>
@@ -78,7 +78,7 @@ export default async function UserEditPage(props: {
 
       <div className='my-8 grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start'>
         {/* Profile details card */}
-        <aside className='rounded-2xl border border-border/60 bg-card p-6 shadow-soft'>
+        <aside className='rounded-2xl border border-border/60 bg-card p-6 '>
           <div className='flex flex-col items-center text-center'>
             <UserAvatar src={user.profile} name={user.name} size={88} />
             <h2 className='mt-4 text-xl font-bold tracking-tight'>
@@ -126,7 +126,7 @@ export default async function UserEditPage(props: {
         </aside>
 
         {/* Edit form */}
-        <div className='rounded-2xl border border-border/60 bg-card p-6 shadow-soft'>
+        <div className='rounded-2xl border border-border/60 bg-card p-6 '>
           <h2 className='mb-6 text-lg font-bold tracking-tight'>Edit User</h2>
           <UserEditForm user={user} canChangeRole={canChangeRole} />
         </div>

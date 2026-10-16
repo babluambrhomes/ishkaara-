@@ -15,7 +15,6 @@ export interface IProductVariant {
 export interface IProduct extends Omit<Document, '_id'>, IProductInput {
   _id: string
   categoryName: string
-  siteBanner: string
   variants: IProductVariant[]
   createdAt: Date
   updatedAt: Date
@@ -77,10 +76,6 @@ const productSchema = new Schema<IProduct>(
       required: true,
       trim: true,
       index: true,
-    },
-    siteBanner: {
-      type: String,
-      default: '',
     },
     brand: {
       type: String,

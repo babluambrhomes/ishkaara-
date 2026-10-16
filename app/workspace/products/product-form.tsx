@@ -50,7 +50,6 @@ const productDefaultValues: IProductInput = {
   name: '',
   slug: '',
   category: '',
-  siteBanner: '',
   brand: '',
   description: '',
   status: 'draft',
@@ -303,7 +302,6 @@ const ProductForm = ({
       }
     }
   }
-  const siteBanner = form.watch('siteBanner')
 
   return (
     <>
@@ -571,33 +569,6 @@ const ProductForm = ({
                 </FormItem>
               )}
             />
-          </div>
-
-          <div className='flex gap-5'>
-            <div className='w-full max-w-[200px]'>
-              <FormField
-                control={form.control}
-                name='siteBanner'
-                render={() => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Site Banner (Home Hero)</FormLabel>
-                    <Card>
-                      <CardContent className='mt-2 min-h-24'>
-                        <FormControl>
-                          <ImageUpload
-                            entity='product'
-                            value={siteBanner}
-                            onChange={(key) => form.setValue('siteBanner', key)}
-                            label='Upload banner'
-                          />
-                        </FormControl>
-                      </CardContent>
-                    </Card>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
           </div>
 
           <div>

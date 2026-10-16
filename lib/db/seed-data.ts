@@ -11,28 +11,81 @@ export interface SeedCategory {
 
 export const productCategories: SeedCategory[] = [
   {
-    name: 'Jeans',
+    name: 'Footwear',
     type: 'product',
-    description: 'Denim jeans for every fit and finish.',
-    imageUrl: '/images/jeans.jpg',
+    description:
+      'Sneakers, formal shoes and everyday footwear for men and women.',
+    imageUrl: '/images/category_footwear.avif',
   },
   {
-    name: 'Shoes',
+    name: 'Jewellery',
     type: 'product',
-    description: 'Sneakers, running shoes and everyday footwear.',
-    imageUrl: '/images/shoes.jpg',
+    description:
+      'Earrings, necklaces, rings and bracelets finished with everyday sparkle.',
+    imageUrl: '/images/category_jewellery.avif',
   },
   {
-    name: 'T-Shirts',
+    name: 'Kids',
     type: 'product',
-    description: 'Everyday tees and polos in breathable cotton.',
-    imageUrl: '/images/t-shirts.jpg',
+    description:
+      'Comfort-first clothing and essentials for boys and girls.',
+    imageUrl: '/images/category_kids.avif',
   },
   {
-    name: 'Wrist Watches',
+    name: 'Shirts',
     type: 'product',
-    description: 'Analog, chronograph and smart watches.',
-    imageUrl: '/images/wrist-watches.jpg',
+    description:
+      'Casual and formal shirts cut for a sharp, modern fit.',
+    imageUrl: '/images/category_shirt.avif',
+  },
+  {
+    name: 'Watches',
+    type: 'product',
+    description:
+      'Analog, chronograph and everyday watches for every wrist.',
+    imageUrl: '/images/category_watchs.avif',
+  },
+  {
+    name: 'Western Wear',
+    type: 'product',
+    description:
+      'Dresses, tops and coordinated sets for a contemporary wardrobe.',
+    imageUrl: '/images/category_westanwear.avif',
+  },
+  {
+    name: 'Men',
+    type: 'product',
+    description:
+      'Everyday essentials and occasion wear curated for men.',
+    imageUrl: '/images/Men_web_c38beabd67.avif',
+  },
+  {
+    name: 'Women',
+    type: 'product',
+    description:
+      'The latest in womenswear, from ethnic classics to modern edits.',
+    imageUrl: '/images/womenswear_main_banners_web_d97f63106e.avif',
+  },
+  {
+    name: 'Handbags',
+    type: 'product',
+    description:
+      'Totes, slings and structured bags that finish every look.',
+    imageUrl: '/images/handbags_main_banners_web_7ab8613644.avif',
+  },
+  {
+    name: 'Beauty',
+    type: 'product',
+    description:
+      'Skin, face and self-care picks for a daily glow.',
+    imageUrl: '/images/Beauty_web_7965c69bea.avif',
+  },
+  {
+    name: 'Fragrance',
+    type: 'product',
+    description:
+      'Eau de parfum and body mists for day and evening.',
+    imageUrl: '/images/Fragrance_web_a305b28e31.avif',
   },
 ]
 
@@ -41,380 +94,465 @@ export const blogCategories: SeedCategory[] = [
     name: 'Style',
     type: 'blog',
     description: 'Outfit ideas and styling inspiration.',
-    imageUrl: '/images/banner1.jpg',
+    imageUrl: '/images/womenswear_main_banners_web_d97f63106e.avif',
   },
   {
     name: 'Fashion Tips',
     type: 'blog',
     description: 'Practical wardrobe and care advice.',
-    imageUrl: '/images/banner2.jpg',
+    imageUrl: '/images/menswear_main_banners_web_71e06f6f3f.avif',
   },
   {
     name: 'Guides',
     type: 'blog',
     description: 'Buying guides and size charts.',
-    imageUrl: '/images/banner3.jpg',
+    imageUrl: '/images/Luxe_Fest_Main_Banner_Web_0065511ae5.avif',
   },
 ]
+
+export interface SeedVariant {
+  price: number
+  listPrice: number
+  images: string[]
+  size?: string[]
+  countInStock: number
+}
 
 export interface SeedProduct {
   name: string
   brand: string
   description: string
   categoryName: string
-  images: string[]
-  price: number
-  listPrice: number
-  countInStock: number
-  sizes?: string[]
+  variants: SeedVariant[]
   tags: string[]
   numSales: number
 }
 
-const imgs = (code: string, count = 2): string[] =>
-  Array.from({ length: count }, (_, i) => `/images/${code}-${i + 1}.jpg`)
-
-const waistSizes = ['28', '30', '32', '34', '36']
+const apparelSizes = ['S', 'M', 'L', 'XL', 'XXL']
 const shoeSizes = ['6', '7', '8', '9', '10', '11']
-const teeSizes = ['S', 'M', 'L', 'XL', 'XXL']
 
 export const products: SeedProduct[] = [
-  // Jeans
+  // ------------------------------------------------------------------ Women
   {
-    name: "Levi's 511 Slim Fit Jeans",
-    brand: "Levi's",
+    name: "Libas Women's Straight Kurta Set",
+    brand: 'Libas',
     description:
-      'Slim through the seat and thigh with a modern tapered leg. Crafted from comfort-stretch denim that moves with you.',
-    categoryName: 'Jeans',
-    images: imgs('p11'),
-    price: 3499,
-    listPrice: 4999,
-    countInStock: 25,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'slim-fit', "levi's"],
-    numSales: 42,
+      "<p>The Libas Straight Kurta Set brings together a soft, breathable fabric and a fuss-free silhouette that works from work to weekends. The three-piece set pairs a straight-cut kurta with matching bottoms and a coordinated dupatta.</p><p>Finished with a mandarin neckline and three-quarter sleeves, it is tailored to flatter without feeling restrictive. The breathable weave keeps you comfortable through long days.</p><ul><li>Three-piece set: kurta, bottoms and dupatta</li><li>Straight fit with mandarin neck and 3/4 sleeves</li><li>Soft, breathable cotton-blend fabric</li><li>Available in four colourways</li><li>Machine washable</li></ul>",
+    categoryName: 'Western Wear',
+    variants: [
+      {
+        price: 1899,
+        listPrice: 2799,
+        images: ['/images/A26LIB56076INK_PINK.avif'],
+        size: apparelSizes,
+        countInStock: 24,
+      },
+      {
+        price: 1899,
+        listPrice: 2799,
+        images: ['/images/A26LIB56098ARD_MUSTARD.avif'],
+        size: apparelSizes,
+        countInStock: 18,
+      },
+      {
+        price: 1999,
+        listPrice: 2899,
+        images: ['/images/A26LIB56100NGE_ORANGE.avif'],
+        size: apparelSizes,
+        countInStock: 15,
+      },
+      {
+        price: 1899,
+        listPrice: 2799,
+        images: ['/images/A26LIB56107LUE_BLUE.avif'],
+        size: apparelSizes,
+        countInStock: 21,
+      },
+    ],
+    tags: ['kurtas', 'ethnic', 'women', 'libas', 'sets', 'cotton'],
+    numSales: 68,
   },
   {
-    name: 'Wrangler Texas Stretch Jeans',
-    brand: 'Wrangler',
+    name: "Libas Women's Daily Wear Kurta",
+    brand: 'Libas',
     description:
-      'A regular fit icon with a touch of stretch for all-day comfort and a classic five-pocket styling.',
-    categoryName: 'Jeans',
-    images: imgs('p12', 4),
-    price: 2899,
-    listPrice: 3999,
-    countInStock: 18,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'regular-fit', 'wrangler'],
-    numSales: 31,
+      "<p>A wardrobe staple from Libas, this everyday kurta is cut in a relaxed straight fit for all-day ease. The subtle print adds just the right amount of interest to a simple silhouette.</p><p>Pair it with leggings or the matching bottom for a complete look that is ready in minutes.</p><ul><li>Relaxed straight-fit kurta</li><li>Soft printed fabric with a breathable feel</li><li>Side slits for easy movement</li><li>Everyday value pricing</li></ul>",
+    categoryName: 'Women',
+    variants: [
+      {
+        price: 1099,
+        listPrice: 1699,
+        images: ['/images/S26LI99871AR_MUSTARD.avif'],
+        size: apparelSizes,
+        countInStock: 32,
+      },
+    ],
+    tags: ['kurtas', 'ethnic', 'women', 'libas', 'daily-wear'],
+    numSales: 51,
   },
   {
-    name: 'Lee Extreme Motion Jeans',
-    brand: 'Lee',
+    name: "Juniper Women's Printed Top",
+    brand: 'Juniper',
     description:
-      'Built with Extreme Motion technology for unstoppable movement, featuring a slim-straight silhouette.',
-    categoryName: 'Jeans',
-    images: imgs('p13'),
-    price: 3199,
-    listPrice: 4599,
-    countInStock: 22,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'stretch', 'lee'],
-    numSales: 27,
+      "<p>A breezy printed top from Juniper that layers effortlessly over denim or tailored trousers. The lightweight fabric and easy fit make it a go-to for warm days.</p><p>Finished with a comfortable round neck and short sleeves, it is an easy way to add colour to your rotation.</p><ul><li>Relaxed fit with round neck</li><li>Lightweight printed fabric</li><li>Short sleeves</li><li>Two colourways available</li></ul>",
+    categoryName: 'Western Wear',
+    variants: [
+      {
+        price: 899,
+        listPrice: 1399,
+        images: ['/images/A26JU14035IG_INDIGO.avif'],
+        size: apparelSizes,
+        countInStock: 28,
+      },
+      {
+        price: 999,
+        listPrice: 1499,
+        images: ['/images/A26JU1919IN_PINK.avif'],
+        size: apparelSizes,
+        countInStock: 20,
+      },
+    ],
+    tags: ['tops', 'women', 'juniper', 'western', 'casual'],
+    numSales: 37,
   },
   {
-    name: 'Pepe Jeans Kingston Slim',
-    brand: 'Pepe Jeans',
+    name: "Biba Women's Printed Kurta",
+    brand: 'Biba',
     description:
-      'Slim-fit denim with a clean dark indigo wash and durable construction for everyday wear.',
-    categoryName: 'Jeans',
-    images: imgs('p14'),
-    price: 2599,
-    listPrice: 3699,
-    countInStock: 30,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'slim-fit', 'pepe'],
-    numSales: 19,
-  },
-  {
-    name: 'Spykar Skinny Fit Jeans',
-    brand: 'Spykar',
-    description:
-      'A sharp skinny fit with high-recovery stretch, designed for a modern street-ready look.',
-    categoryName: 'Jeans',
-    images: imgs('p15'),
-    price: 2199,
-    listPrice: 3299,
-    countInStock: 16,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'skinny', 'spykar'],
-    numSales: 15,
-  },
-  {
-    name: "Levi's 501 Original Fit Jeans",
-    brand: "Levi's",
-    description:
-      'The original button-fly jean since 1873. Straight leg, regular fit and legendary durability.',
-    categoryName: 'Jeans',
-    images: imgs('p16'),
-    price: 3999,
-    listPrice: 5499,
-    countInStock: 12,
-    sizes: waistSizes,
-    tags: ['jeans', 'denim', 'original', "levi's"],
-    numSales: 55,
-  },
-
-  // Shoes
-  {
-    name: 'Nike Air Zoom Pegasus 40',
-    brand: 'Nike',
-    description:
-      'Responsive Air Zoom cushioning and a breathable mesh upper for your daily run.',
-    categoryName: 'Shoes',
-    images: imgs('p21'),
-    price: 6999,
-    listPrice: 8999,
-    countInStock: 15,
-    sizes: shoeSizes,
-    tags: ['shoes', 'running', 'sneakers', 'nike'],
-    numSales: 38,
-  },
-  {
-    name: 'Adidas Ultraboost 22',
-    brand: 'Adidas',
-    description:
-      'Incredible energy return from BOOST midsole with a Primeknit upper that adapts to your stride.',
-    categoryName: 'Shoes',
-    images: imgs('p22'),
-    price: 7999,
-    listPrice: 10999,
-    countInStock: 10,
-    sizes: shoeSizes,
-    tags: ['shoes', 'running', 'sneakers', 'adidas'],
-    numSales: 24,
-  },
-  {
-    name: 'Puma Smash v2 Sneakers',
-    brand: 'Puma',
-    description:
-      'A timeless court-inspired sneaker with a soft leather upper for everyday comfort.',
-    categoryName: 'Shoes',
-    images: imgs('p23'),
-    price: 2999,
-    listPrice: 4499,
-    countInStock: 28,
-    sizes: shoeSizes,
-    tags: ['shoes', 'sneakers', 'casual', 'puma'],
-    numSales: 46,
-  },
-  {
-    name: 'Reebok Classic Leather',
-    brand: 'Reebok',
-    description:
-      'The 1983 legend returns in soft garment leather with a die-cut EVA midsole.',
-    categoryName: 'Shoes',
-    images: imgs('p24'),
-    price: 4499,
-    listPrice: 5999,
-    countInStock: 20,
-    sizes: shoeSizes,
-    tags: ['shoes', 'sneakers', 'classic', 'reebok'],
-    numSales: 29,
-  },
-  {
-    name: 'New Balance 574',
-    brand: 'New Balance',
-    description:
-      'An everyday icon blending suede and mesh with ENCAP cushioning for all-day support.',
-    categoryName: 'Shoes',
-    images: imgs('p25'),
-    price: 5999,
-    listPrice: 7499,
-    countInStock: 14,
-    sizes: shoeSizes,
-    tags: ['shoes', 'sneakers', 'newbalance'],
-    numSales: 21,
-  },
-  {
-    name: 'Vans Old Skool',
-    brand: 'Vans',
-    description:
-      'The classic side-stripe skate shoe with a durable suede and canvas upper.',
-    categoryName: 'Shoes',
-    images: imgs('p26'),
-    price: 3499,
-    listPrice: 4999,
-    countInStock: 24,
-    sizes: shoeSizes,
-    tags: ['shoes', 'sneakers', 'skate', 'vans'],
-    numSales: 34,
-  },
-
-  // T-Shirts
-  {
-    name: "Levi's Housemark Graphic Tee",
-    brand: "Levi's",
-    description:
-      'A soft cotton crew-neck tee finished with the iconic Housemark logo.',
-    categoryName: 'T-Shirts',
-    images: imgs('p31'),
-    price: 899,
-    listPrice: 1299,
-    countInStock: 50,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'cotton', 'crew-neck', "levi's"],
-    numSales: 88,
-  },
-  {
-    name: 'U.S. Polo Assn. Crew Neck Tee',
-    brand: 'U.S. Polo Assn.',
-    description:
-      'Pure cotton crew-neck tee with a comfortable regular fit and subtle branding.',
-    categoryName: 'T-Shirts',
-    images: imgs('p32'),
-    price: 799,
-    listPrice: 1199,
-    countInStock: 45,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'cotton', 'casual', 'uspa'],
-    numSales: 73,
-  },
-  {
-    name: 'Allen Solly Solid Polo',
-    brand: 'Allen Solly',
-    description:
-      'A smart-casual pique polo with a ribbed collar and three-button placket.',
-    categoryName: 'T-Shirts',
-    images: imgs('p33'),
-    price: 1299,
-    listPrice: 1799,
-    countInStock: 35,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'polo', 'smart-casual', 'allen-solly'],
-    numSales: 40,
-  },
-  {
-    name: 'Van Heusen Cotton T-Shirt',
-    brand: 'Van Heusen',
-    description:
-      'Breathable combed cotton in a tailored fit that works from desk to dinner.',
-    categoryName: 'T-Shirts',
-    images: imgs('p34'),
-    price: 999,
-    listPrice: 1499,
-    countInStock: 40,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'cotton', 'formal', 'van-heusen'],
-    numSales: 36,
-  },
-  {
-    name: 'H&M Regular Fit Tee',
-    brand: 'H&M',
-    description:
-      'A wardrobe staple in soft jersey with a relaxed regular fit.',
-    categoryName: 'T-Shirts',
-    images: imgs('p35'),
-    price: 599,
-    listPrice: 899,
-    countInStock: 60,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'jersey', 'basics', 'hm'],
-    numSales: 95,
-  },
-  {
-    name: 'Zara Basic Crew Tee',
-    brand: 'Zara',
-    description:
-      'Minimal crew-neck tee with a refined neckline and premium cotton feel.',
-    categoryName: 'T-Shirts',
-    images: imgs('p36'),
-    price: 1199,
-    listPrice: 1599,
-    countInStock: 33,
-    sizes: teeSizes,
-    tags: ['t-shirts', 'cotton', 'minimal', 'zara'],
+      "<p>The Biba printed kurta blends festive-ready detailing with everyday comfort. A flattering straight silhouette and a rich all-over print make it a standout pick for gatherings and celebrations.</p><p>Style it with churidar or palazzos and a pair of juttis to complete the look.</p><ul><li>Straight-fit printed kurta</li><li>Vibrant all-over ethnic print</li><li>Three-quarter sleeves</li><li>Two festive colourways</li></ul>",
+    categoryName: 'Western Wear',
+    variants: [
+      {
+        price: 1499,
+        listPrice: 2299,
+        images: ['/images/A25BIJAMA30042L_BLUE.avif'],
+        size: apparelSizes,
+        countInStock: 19,
+      },
+      {
+        price: 1499,
+        listPrice: 2299,
+        images: ['/images/A25BIASSO31415R_RED.avif'],
+        size: apparelSizes,
+        countInStock: 16,
+      },
+    ],
+    tags: ['kurtas', 'ethnic', 'women', 'biba', 'festive'],
     numSales: 44,
   },
-
-  // Wrist Watches
   {
-    name: 'Titan Neo Analog Watch',
-    brand: 'Titan',
+    name: "Global Desi Women's Flared Top",
+    brand: 'Global Desi',
     description:
-      'A slim analog watch with a stainless-steel case and a clean white dial.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p41'),
-    price: 2499,
-    listPrice: 3499,
-    countInStock: 20,
-    tags: ['watches', 'analog', 'titan'],
+      "<p>A free-spirited flared top from Global Desi, designed for movement and finished with a bohemian print. The soft drape and flattering cut make it an instant favourite.</p><p>Team it with wide-leg trousers or denim for an effortless everyday look.</p><ul><li>Flared silhouette with a relaxed drape</li><li>Boho-inspired print</li><li>Soft, flowy fabric</li><li>Two colourways available</li></ul>",
+    categoryName: 'Women',
+    variants: [
+      {
+        price: 1299,
+        listPrice: 1899,
+        images: ['/images/S26BITED32402RE_RED.avif'],
+        size: apparelSizes,
+        countInStock: 22,
+      },
+      {
+        price: 1299,
+        listPrice: 1899,
+        images: ['/images/S26BITED32484LU_BLUE.avif'],
+        size: apparelSizes,
+        countInStock: 25,
+      },
+    ],
+    tags: ['tops', 'women', 'global-desi', 'boho', 'western'],
+    numSales: 33,
+  },
+  {
+    name: "W Women's Designer Kurta",
+    brand: 'W',
+    description:
+      "<p>A statement kurta from the house of W, crafted in a deep bottle-green hue with refined detailing. The structured cut and premium finish make it a versatile festive essential.</p><p>Pair it with contrasting bottoms for a polished evening look.</p><ul><li>Designer straight-fit kurta</li><li>Rich, deep-tone fabric</li><li>Refined neckline detailing</li><li>Festive-ready finish</li></ul>",
+    categoryName: 'Western Wear',
+    variants: [
+      {
+        price: 1699,
+        listPrice: 2499,
+        images: ['/images/S25JUP1352DARK_BOTTLE_GREEN.avif'],
+        size: apparelSizes,
+        countInStock: 14,
+      },
+    ],
+    tags: ['kurtas', 'ethnic', 'women', 'w-brand', 'designer'],
+    numSales: 26,
+  },
+
+  // -------------------------------------------------------------------- Men
+  {
+    name: "Allen Solly Men's Knit Sweater",
+    brand: 'Allen Solly',
+    description:
+      "<p>A smart layering piece from Allen Solly, this knit sweater pairs a clean crew neckline with a soft, warm handle. The deep dark-blue tone works with everything from denim to tailored trousers.</p><p>Wear it solo or over a shirt for an easy weekend-to-work transition.</p><ul><li>Crew-neck knit sweater</li><li>Soft, warm blend fabric</li><li>Regular fit with ribbed trims</li><li>Deep dark-blue colourway</li></ul>",
+    categoryName: 'Men',
+    variants: [
+      {
+        price: 1499,
+        listPrice: 2299,
+        images: ['/images/allen_S26ASWRGBB01134_DARK_BLUE.avif'],
+        size: apparelSizes,
+        countInStock: 23,
+      },
+    ],
+    tags: ['sweaters', 'men', 'allen-solly', 'winter', 'knitwear'],
+    numSales: 41,
+  },
+  {
+    name: "Allen Solly Men's Formal Trousers",
+    brand: 'Allen Solly',
+    description:
+      "<p>Tailored for the work week, these Allen Solly trousers offer a sharp line and a comfortable stretch finish. The rich chocolate shade takes them easily from desk to dinner.</p><p>A wrinkle-resistant weave keeps you looking crisp through the day.</p><ul><li>Slim-fit formal trousers</li><li>Comfort-stretch wrinkle-resistant fabric</li><li>Four-pocket styling</li><li>Rich chocolate colourway</li></ul>",
+    categoryName: 'Men',
+    variants: [
+      {
+        price: 1799,
+        listPrice: 2699,
+        images: ['/images/allen_S26VHUWLPT22089_CHOCOLATE.avif'],
+        size: ['30', '32', '34', '36', '38'],
+        countInStock: 20,
+      },
+    ],
+    tags: ['trousers', 'men', 'allen-solly', 'formal', 'office'],
+    numSales: 34,
+  },
+  {
+    name: "Latin Quarters Men's Linen Shirt",
+    brand: 'Latin Quarters',
+    description:
+      "<p>A relaxed linen-blend shirt from Latin Quarters, cut in a soft beige that suits the season. The breathable weave and clean lines make it a natural pick for warm afternoons.</p><p>Leave it loose over chinos for a laid-back, well-dressed look.</p><ul><li>Linen-blend casual shirt</li><li>Regular fit with a soft collar</li><li>Breathable woven fabric</li><li>Neutral beige colourway</li></ul>",
+    categoryName: 'Shirts',
+    variants: [
+      {
+        price: 1399,
+        listPrice: 1999,
+        images: ['/images/latien_S26LQT11696_BEIGE.avif'],
+        size: apparelSizes,
+        countInStock: 27,
+      },
+    ],
+    tags: ['shirts', 'men', 'latin-quarters', 'linen', 'casual'],
+    numSales: 30,
+  },
+  {
+    name: "Roadster Men's Casual Shirt",
+    brand: 'Roadster',
+    description:
+      "<p>An easy everyday shirt from Roadster, finished in a versatile black that pairs with almost anything. The soft cotton weave and regular fit keep it comfortable from morning to night.</p><p>Roll the sleeves and team it with jeans for a laid-back weekend look.</p><ul><li>Regular-fit casual shirt</li><li>Soft breathable cotton</li><li>Classic button-down front</li><li>Versatile solid black</li></ul>",
+    categoryName: 'Shirts',
+    variants: [
+      {
+        price: 999,
+        listPrice: 1599,
+        images: ['/images/A25346BT01_BLACK.avif'],
+        size: apparelSizes,
+        countInStock: 35,
+      },
+    ],
+    tags: ['shirts', 'men', 'roadster', 'casual', 'cotton'],
+    numSales: 47,
+  },
+  {
+    name: "HIGHLANDER Men's Slim Fit Shirt",
+    brand: 'HIGHLANDER',
+    description:
+      "<p>Cut close to the body with a modern slim line, this HIGHLANDER shirt is made for a sharp, put-together look. The deep black shade works equally well for the office or an evening out.</p><p>A durable cotton blend holds its shape and colour wash after wash.</p><ul><li>Slim-fit silhouette</li><li>Durable cotton-blend fabric</li><li>Structured collar and cuffs</li><li>Solid deep black</li></ul>",
+    categoryName: 'Shirts',
+    variants: [
+      {
+        price: 1099,
+        listPrice: 1699,
+        images: ['/images/A25346DR101_BLACK.avif'],
+        size: apparelSizes,
+        countInStock: 31,
+      },
+    ],
+    tags: ['shirts', 'men', 'highlander', 'slim-fit'],
+    numSales: 29,
+  },
+
+  // --------------------------------------------------------------- Footwear
+  {
+    name: "Viro Men's Formal Lace-Up Shoes",
+    brand: 'Viro',
+    description:
+      "<p>Polished and dependable, these Viro formal shoes bring a crisp finish to tailoring and smart-casual looks alike. The cushioned insole keeps long days comfortable, while the durable outsole grips the ground.</p><p>A timeless black lace-up that belongs in every wardrobe.</p><ul><li>Classic formal lace-up design</li><li>Cushioned footbed for all-day comfort</li><li>Durable, slip-resistant outsole</li><li>Two versatile styles available</li></ul>",
+    categoryName: 'Footwear',
+    variants: [
+      {
+        price: 1999,
+        listPrice: 2999,
+        images: ['/images/viro_A25VM10313570B_BLACK.avif'],
+        size: shoeSizes,
+        countInStock: 26,
+      },
+      {
+        price: 2199,
+        listPrice: 3299,
+        images: ['/images/viro_A25VM901422902_BLACK.avif'],
+        size: shoeSizes,
+        countInStock: 18,
+      },
+    ],
+    tags: ['footwear', 'men', 'viro', 'formal', 'shoes'],
+    numSales: 39,
+  },
+
+  // ---------------------------------------------------------------- Watches
+  {
+    name: 'Casio Analog Dress Watch',
+    brand: 'Casio',
+    description:
+      "<p>A clean, minimal analog watch from Casio with a refined dial and a comfortable strap. Reliable quartz movement and a legible face make it an everyday classic.</p><p>Dressy enough for work and easy enough for the weekend.</p><ul><li>Analog quartz movement</li><li>Minimal, easy-to-read dial</li><li>Comfortable, durable strap</li><li>Water-resistant build</li></ul>",
+    categoryName: 'Watches',
+    variants: [
+      {
+        price: 2499,
+        listPrice: 3499,
+        images: ['/images/casio_WTITWEL17202_NoColour.avif'],
+        countInStock: 17,
+      },
+    ],
+    tags: ['watches', 'analog', 'casio', 'men', 'everyday'],
     numSales: 52,
   },
   {
-    name: 'Fossil Gen 5 Smartwatch',
+    name: 'Fossil Chronograph Watch',
     brand: 'Fossil',
     description:
-      'A Wear OS smartwatch with heart-rate tracking, GPS and always-on display.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p42'),
-    price: 19999,
-    listPrice: 24999,
-    countInStock: 8,
-    tags: ['watches', 'smartwatch', 'fossil'],
-    numSales: 17,
-  },
-  {
-    name: 'Casio Edifice Chronograph',
-    brand: 'Casio',
-    description:
-      'A motorsport-inspired chronograph with a tachymeter bezel and stopwatch.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p43'),
-    price: 8999,
-    listPrice: 11999,
-    countInStock: 12,
-    tags: ['watches', 'chronograph', 'casio'],
+      "<p>Make a statement with this Fossil chronograph, pairing a bold dial and sub-dials with a robust case. Built for those who like their accessories with a little more presence.</p><p>An ideal pick for both business and casual settings.</p><ul><li>Chronograph with sub-dial detailing</li><li>Bold, well-proportioned case</li><li>Reliable quartz movement</li><li>Premium finish and strap</li></ul>",
+    categoryName: 'Watches',
+    variants: [
+      {
+        price: 8999,
+        listPrice: 11999,
+        images: ['/images/fossil_WFIFES5417I_NoColour.avif'],
+        countInStock: 9,
+      },
+    ],
+    tags: ['watches', 'chronograph', 'fossil', 'men', 'premium'],
     numSales: 23,
   },
   {
-    name: 'Fastrack Reflex V2',
-    brand: 'Fastrack',
+    name: 'Timex Classic Watch',
+    brand: 'Timex',
     description:
-      'A lightweight fitness band with activity, sleep and heart-rate tracking.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p44'),
-    price: 1799,
-    listPrice: 2499,
-    countInStock: 26,
-    tags: ['watches', 'smartwatch', 'fitness', 'fastrack'],
-    numSales: 61,
+      "<p>Two timeless Timex designs in one listing, each built on the brand's reputation for rugged reliability and everyday value. A comfortable fit and a clear, unfussy dial make these easy picks for daily wear.</p><p>Choose your preferred style and colourway.</p><ul><li>Two classic designs to choose from</li><li>Dependable quartz movement</li><li>Comfortable everyday strap</li><li>Great value for money</li></ul>",
+    categoryName: 'Watches',
+    variants: [
+      {
+        price: 2999,
+        listPrice: 4199,
+        images: ['/images/timex_NoColour.avif'],
+        countInStock: 20,
+      },
+      {
+        price: 3499,
+        listPrice: 4699,
+        images: ['/images/timex_WTT95416KM02K_NoColour.avif'],
+        countInStock: 14,
+      },
+    ],
+    tags: ['watches', 'timex', 'men', 'classic', 'everyday'],
+    numSales: 48,
+  },
+]
+
+// Home page banners. Each banner links to a product by name, so the seed
+// resolves the Product's _id and slug when inserting.
+export interface SeedBanner {
+  productName: string
+  bannerUrl: string
+  bannerType: 'Hero' | 'Common'
+}
+
+export const seedBanners: SeedBanner[] = [
+  // Hero banners (top home carousel)
+  {
+    productName: "Viro Men's Formal Lace-Up Shoes",
+    bannerUrl: '/images/footwear_main_banners_web_da722e42d4.avif',
+    bannerType: 'Hero',
   },
   {
-    name: 'Daniel Wellington Classic',
-    brand: 'Daniel Wellington',
-    description:
-      'A minimalist Swedish design with an ultra-thin case and interchangeable straps.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p45'),
-    price: 12999,
-    listPrice: 15999,
-    countInStock: 10,
-    tags: ['watches', 'minimal', 'dw'],
-    numSales: 14,
+    productName: "Allen Solly Men's Formal Trousers",
+    bannerUrl: '/images/menswear_main_banners_web_71e06f6f3f.avif',
+    bannerType: 'Hero',
   },
   {
-    name: 'Seiko 5 Sports Automatic',
-    brand: 'Seiko',
-    description:
-      'A self-winding automatic movement with day-date display and a durable bracelet.',
-    categoryName: 'Wrist Watches',
-    images: imgs('p46'),
-    price: 15999,
-    listPrice: 19999,
-    countInStock: 7,
-    tags: ['watches', 'automatic', 'seiko'],
-    numSales: 11,
+    productName: 'Casio Analog Dress Watch',
+    bannerUrl: '/images/watch_main_banners_web_156a722ff3.avif',
+    bannerType: 'Hero',
+  },
+  {
+    productName: "Libas Women's Straight Kurta Set",
+    bannerUrl: '/images/womenswear_main_banners_web_d97f63106e.avif',
+    bannerType: 'Hero',
+  },
+  {
+    productName: "Global Desi Women's Flared Top",
+    bannerUrl: '/images/Luxe_Fest_Main_Banner_Web_0065511ae5.avif',
+    bannerType: 'Hero',
+  },
+  {
+    productName: "Libas Women's Daily Wear Kurta",
+    bannerUrl: '/images/handbags_main_banners_web_7ab8613644.avif',
+    bannerType: 'Hero',
+  },
+  // Common banners (available for campaigns / later use)
+  {
+    productName: "Biba Women's Printed Kurta",
+    bannerUrl: '/images/Biba_web_eef619ca8d.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Juniper Women's Printed Top",
+    bannerUrl: '/images/Juniper_web_74cfa63296.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Libas Women's Straight Kurta Set",
+    bannerUrl: '/images/Libas_web_833d923b6e.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Viro Men's Formal Lace-Up Shoes",
+    bannerUrl: '/images/Footwear_web_c0d741627b.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: 'Timex Classic Watch',
+    bannerUrl: '/images/Watches_web_eac9322703.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Allen Solly Men's Knit Sweater",
+    bannerUrl: '/images/Men_web_c38beabd67.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Libas Women's Daily Wear Kurta",
+    bannerUrl: '/images/Beauty_web_7965c69bea.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "W Women's Designer Kurta",
+    bannerUrl: '/images/Fragrance_web_a305b28e31.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Global Desi Women's Flared Top",
+    bannerUrl: '/images/Handbags_web_7f4522f0ad.avif',
+    bannerType: 'Common',
+  },
+  {
+    productName: "Biba Women's Printed Kurta",
+    bannerUrl: '/images/Kashish_web_8846f46537.avif',
+    bannerType: 'Common',
   },
 ]
 
@@ -515,7 +653,7 @@ export const blogPosts: SeedBlogPost[] = [
   {
     title: '10 Timeless Denim Looks for Every Season',
     slug: 'timeless-denim-looks',
-    image: '/images/banner1.jpg',
+    image: '/images/womenswear_main_banners_web_d97f63106e.avif',
     categoryName: 'Style',
     tags: ['denim', 'style', 'outfits'],
     excerpt:
@@ -528,7 +666,7 @@ export const blogPosts: SeedBlogPost[] = [
   {
     title: 'How to Choose the Right Sneakers for Your Feet',
     slug: 'choose-right-sneakers',
-    image: '/images/banner2.jpg',
+    image: '/images/footwear_main_banners_web_da722e42d4.avif',
     categoryName: 'Guides',
     tags: ['shoes', 'sneakers', 'guide'],
     excerpt:
@@ -541,7 +679,7 @@ export const blogPosts: SeedBlogPost[] = [
   {
     title: 'Caring for Your Cotton T-Shirts So They Last Longer',
     slug: 'care-for-cotton-tshirts',
-    image: '/images/banner3.jpg',
+    image: '/images/menswear_main_banners_web_71e06f6f3f.avif',
     categoryName: 'Fashion Tips',
     tags: ['t-shirts', 'care', 'cotton'],
     excerpt:
@@ -554,7 +692,7 @@ export const blogPosts: SeedBlogPost[] = [
   {
     title: 'Analog vs Smartwatches: Which Should You Buy?',
     slug: 'analog-vs-smartwatches',
-    image: '/images/banner1.jpg',
+    image: '/images/watch_main_banners_web_156a722ff3.avif',
     categoryName: 'Guides',
     tags: ['watches', 'smartwatch', 'buying-guide'],
     excerpt:
@@ -567,7 +705,7 @@ export const blogPosts: SeedBlogPost[] = [
   {
     title: 'Building a Capsule Wardrobe on a Budget',
     slug: 'capsule-wardrobe-on-a-budget',
-    image: '/images/banner2.jpg',
+    image: '/images/Luxe_Fest_Main_Banner_Web_0065511ae5.avif',
     categoryName: 'Style',
     tags: ['style', 'capsule', 'budget'],
     excerpt:

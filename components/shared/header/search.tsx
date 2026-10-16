@@ -24,7 +24,7 @@ export default async function Search() {
       method='GET'
       className='flex items-stretch gap-1.5 h-10'
     >
-      <div className='flex items-center flex-1 overflow-hidden rounded-full bg-white shadow-inner-soft focus-within:ring-2 focus-within:ring-gold/70'>
+      <div className='flex items-center flex-1 overflow-hidden rounded-full border border-border bg-white  focus-within:ring-2 focus-within:ring-gold/70'>
         <Select name='category'>
           <SelectTrigger className='w-auto h-full border-0 bg-white text-black/70 rounded-none pl-4 pr-1 focus:ring-0'>
             <SelectValue placeholder='All' />
@@ -48,7 +48,7 @@ export default async function Search() {
       <button
         type='submit'
         aria-label='Search'
-        className='flex w-10 items-center justify-center rounded-full bg-gradient-to-b from-[#f6c344] to-[#d99a12] text-[#3d1a00] shadow-soft transition-all duration-200 hover:brightness-110 active:scale-95'
+        className='flex w-10 items-center justify-center rounded-full bg-gradient-to-b from-[#5c7d5d] to-[#344c35] text-[#0f0d0d]  transition-all duration-200 hover:brightness-110 active:scale-95'
       >
         <SearchIcon className='h-5 w-5' />
       </button>

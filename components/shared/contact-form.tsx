@@ -70,7 +70,7 @@ export default function ContactForm() {
   }
 
   return (
-    <Card className='rounded-2xl border-border/60 shadow-soft'>
+    <Card className='rounded-2xl border-border/60 '>
       <CardContent className='p-5 md:p-6'>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
           <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>

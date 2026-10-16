@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -103,7 +103,7 @@ function RowDeleteIcon() {
   return (
     <span className='relative inline-flex'>
       <Rows3 className='h-4 w-4' />
-      <X className='absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-background text-destructive' />
+      <X className='absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-circle bg-background text-destructive' />
     </span>
   )
 }
@@ -112,7 +112,7 @@ function ColumnDeleteIcon() {
   return (
     <span className='relative inline-flex'>
       <Columns3 className='h-4 w-4' />
-      <X className='absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-full bg-background text-destructive' />
+      <X className='absolute -bottom-1 -right-1 h-2.5 w-2.5 rounded-circle bg-background text-destructive' />
     </span>
   )
 }
@@ -158,7 +158,7 @@ const EMPTY_STATE: EditorStateSnapshot = {
   code: false,
   codeBlock: false,
   inTable: false,
-  color: '#000000',
+  color: '#0f0d0d',
   characters: 0,
   words: 0,
   canUndo: false,
@@ -305,7 +305,7 @@ export function TiptapEditor({
         code: editor.isActive('code'),
         codeBlock: editor.isActive('codeBlock'),
         inTable: editor.isActive('table'),
-        color: (editor.getAttributes('textStyle').color as string) || '#000000',
+        color: (editor.getAttributes('textStyle').color as string) || '#0f0d0d',
         characters: editor.storage.characterCount?.characters() ?? 0,
         words: editor.storage.characterCount?.words() ?? 0,
         canUndo: editor.can().undo(),
@@ -555,7 +555,7 @@ export function TiptapEditor({
           onClick={() => fileInputRef.current?.click()}
         >
           {uploading ? (
-            <span className='h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent' />
+            <span className='h-4 w-4 animate-spin rounded-circle border-2 border-current border-t-transparent' />
           ) : (
             <ImageIcon className='h-4 w-4' />
           )}
@@ -576,7 +576,7 @@ export function TiptapEditor({
           className={cn(
             TOOLBAR_BUTTON_CLASS,
             'cursor-pointer relative',
-            state.color !== '#000000' && 'text-foreground'
+            state.color !== '#0f0d0d' && 'text-foreground'
           )}
         >
           <Palette className='h-4 w-4' />

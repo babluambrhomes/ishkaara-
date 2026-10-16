@@ -99,7 +99,7 @@ export default async function BlogPostPage(props: {
           </p>
 
           {/* Mobile TOC */}
-          <details className='mt-6 rounded-2xl border border-border/60 bg-background shadow-soft lg:hidden'>
+          <details className='mt-6 rounded-2xl border border-border/60 bg-background  lg:hidden'>
             <summary className='cursor-pointer px-4 py-3 text-sm font-bold text-primary'>
               Table of Contents
             </summary>
@@ -146,7 +146,7 @@ export default async function BlogPostPage(props: {
             {relatedPosts.map((related) => (
               <Card
                 key={related._id}
-                className='group overflow-hidden rounded-2xl border-border/60 shadow-soft transition-all duration-300 hover:shadow-lift'
+                className='group overflow-hidden rounded-2xl border-border/60  transition-all duration-300 '
               >
                 <Link href={`/blog/${related.slug}`} className='block'>
                   <div className='relative aspect-[16/10] overflow-hidden'>

@@ -15,7 +15,7 @@ export default function WishlistButton() {
     <Link
       href='/wishlist'
       aria-label='Wishlist'
-      className='self-center rounded-full p-2 transition-colors hover:bg-white/10'
+      className='self-center rounded-full p-2 transition-colors hover:bg-muted'
     >
       <div className='relative flex items-center'>
         <Heart className='h-7 w-7' />
@@ -23,7 +23,7 @@ export default function WishlistButton() {
         {isMounted && count > 0 && (
           <span
             className={cn(
-              `bg-white px-1 rounded-full text-primary text-sm font-bold absolute left-[10px] top-[-4px] z-10`,
+              `bg-primary px-1 rounded-circle text-primary-foreground text-sm font-bold absolute left-[10px] top-[-4px] z-10`,
               count >= 10 && 'text-xs px-[2px]'
             )}
           >

@@ -61,7 +61,7 @@ export default async function ContactUsPage() {
 
   return (
     <div className='w-full  py-8 px-3'>
-      <div className='relative h-56 overflow-hidden rounded-2xl shadow-soft md:h-72'>
+      <div className='relative h-56 overflow-hidden rounded-2xl  md:h-72'>
         <Image
           src='/images/banner1.jpg'
           alt='Contact us'
@@ -73,7 +73,7 @@ export default async function ContactUsPage() {
         <div className='absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-transparent' />
         <div className='absolute inset-0 flex items-center px-8 md:px-12'>
           <div className='max-w-2xl'>
-            <p className='text-xs font-semibold uppercase tracking-[0.28em] text-[#f0d9a8]'>
+            <p className='text-xs font-semibold uppercase tracking-[0.28em] text-[#d4d4d8]'>
               Get in touch
             </p>
             <h1 className='mt-2 text-3xl font-bold tracking-tight text-white md:text-5xl'>
@@ -91,9 +91,9 @@ export default async function ContactUsPage() {
         {infoCards.map(({ Icon, title, value, sub }) => (
           <div
             key={title}
-            className='rounded-2xl border border-border/60 bg-card p-5 shadow-soft'
+            className='rounded-2xl border border-border/60 bg-card p-5 '
           >
-            <div className='mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10'>
+            <div className='mb-3 flex h-11 w-11 items-center justify-center rounded-circle bg-primary/10'>
               <Icon className='h-5 w-5 text-primary' />
             </div>
             <h2 className='text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground'>
@@ -109,7 +109,7 @@ export default async function ContactUsPage() {
         <ContactForm />
 
         <div className='space-y-6'>
-          <div className='overflow-hidden rounded-2xl border border-border/60 shadow-soft'>
+          <div className='overflow-hidden rounded-2xl border border-border/60 '>
             <iframe
               title={`${name} location map`}
               src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
@@ -119,7 +119,7 @@ export default async function ContactUsPage() {
             />
           </div>
 
-          <div className='rounded-2xl border border-border/60 bg-card p-5 shadow-soft'>
+          <div className='rounded-2xl border border-border/60 bg-card p-5 '>
             <h2 className='text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground'>
               Follow us
             </h2>
@@ -132,7 +132,7 @@ export default async function ContactUsPage() {
                   key={label}
                   href='#'
                   aria-label={label}
-                  className='flex h-10 w-10 items-center justify-center rounded-full border border-border/70 bg-white text-primary transition-all duration-200 hover:bg-primary hover:text-white hover:shadow-lift'
+                  className='flex h-10 w-10 items-center justify-center rounded-circle border border-border/70 bg-white text-primary transition-all duration-200 hover:bg-primary hover:text-white '
                 >
                   <Icon className='h-4 w-4' />
                 </a>

@@ -1,6 +1,6 @@
 'use client'
 import { ReactNode } from 'react'
-import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import BrowsingHistory from '@/components/shared/browsing-history'
 import { CartItemRow } from '@/components/shared/product/product-card'
 import ProductPrice from '@/components/shared/product/product-price'
 import { Button } from '@/components/ui/button'
@@ -67,8 +67,8 @@ export default function CartPage() {
       </div>
 
       {!isMounted ? null : items.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center shadow-inner-soft sm:py-20'>
-          <span className='flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-gold text-white shadow-lift'>
+        <div className='flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-white px-6 py-16 text-center  sm:py-20'>
+          <span className='flex h-20 w-20 items-center justify-center rounded-circle bg-gradient-to-br from-primary to-gold text-white '>
             <ShoppingBag className='h-9 w-9' />
           </span>
           <h2 className='mt-6 text-2xl font-bold tracking-tight sm:text-3xl'>
@@ -88,7 +88,7 @@ export default function CartPage() {
             <Button
               asChild
               variant='outline'
-              className='h-11 rounded-full border-gold/60 px-7 text-primary hover:bg-gold hover:text-[#3d1a00]'
+              className='h-11 rounded-full border-gold/60 px-7 text-primary hover:bg-gold hover:text-[#0f0d0d]'
             >
               <Link href='/'>Continue shopping</Link>
             </Button>
@@ -98,9 +98,9 @@ export default function CartPage() {
         <div className='grid grid-cols-1 gap-6 lg:grid-cols-3 lg:items-start'>
           <div className='space-y-4 lg:col-span-2'>
             {!hasFreeShipping && (
-              <div className='rounded-2xl border border-border/60 bg-white p-4 shadow-soft'>
+              <div className='rounded-2xl border border-border/60 bg-white p-4 '>
                 <div className='flex items-center gap-3'>
-                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold'>
+                  <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-gold/15 text-gold'>
                     <Truck className='h-5 w-5' />
                   </span>
                   <p className='text-sm leading-6'>
@@ -129,7 +129,7 @@ export default function CartPage() {
           </div>
 
           <div className='lg:sticky lg:top-24'>
-            <Card className='rounded-2xl border-border/60 shadow-soft'>
+            <Card className='rounded-2xl border-border/60 '>
               <CardHeader className='pb-3'>
                 <CardTitle className='text-lg'>Order Summary</CardTitle>
               </CardHeader>
@@ -188,7 +188,7 @@ export default function CartPage() {
       )}
 
       <div className='my-6' />
-      <BrowsingHistoryList className='mt-12' />
+      <BrowsingHistory className='mt-12' />
     </div>
   )
 }

@@ -32,6 +32,7 @@ export const STORAGE_FOLDERS = {
   product: 'lemon-fashion/product',
   category: 'lemon-fashion/category',
   blog: 'lemon-fashion/blog',
+  banner: 'lemon-fashion/banner',
 } as const
 
 let client: S3Client | null = null

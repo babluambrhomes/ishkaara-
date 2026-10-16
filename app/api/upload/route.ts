@@ -8,7 +8,7 @@ import { rateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 export const runtime = 'nodejs'
 
-const ENTITIES: StorageEntity[] = ['user', 'product', 'category', 'blog']
+const ENTITIES: StorageEntity[] = ['user', 'product', 'category', 'blog', 'banner']
 
 export async function POST(req: NextRequest) {
   try {

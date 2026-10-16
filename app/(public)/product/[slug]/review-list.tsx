@@ -304,7 +304,7 @@ export default function ReviewList({
               <CardHeader className='pb-3'>
                 <div className='flex flex-wrap items-center justify-between gap-3'>
                   <div className='flex items-center gap-3'>
-                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground'>
+                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-circle bg-muted text-sm font-semibold text-muted-foreground'>
                       {(review.user ? review.user.name : 'Anonymous')
                         .charAt(0)
                         .toUpperCase()}

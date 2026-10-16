@@ -39,10 +39,10 @@ export default async function OrderSuccessPage(props: {
 
   return (
     <div className='mx-auto max-w-2xl px-4 py-12 sm:px-6'>
-      <Card className='overflow-hidden rounded-3xl border-border/60 bg-white shadow-soft'>
-        <div className='h-2 bg-gradient-to-r from-primary via-[#a15111] to-gold' />
+      <Card className='overflow-hidden rounded-3xl border-border/60 bg-white '>
+        <div className='h-2 bg-gradient-to-r from-primary via-[#344c35] to-gold' />
         <CardContent className='flex flex-col items-center px-6 py-10 text-center'>
-          <span className='flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-8 ring-emerald-50/60'>
+          <span className='flex h-20 w-20 items-center justify-center rounded-circle bg-emerald-50 text-emerald-600 ring-8 ring-emerald-50/60'>
             <CheckCircle2 className='h-11 w-11' />
           </span>
           <h1 className='mt-6 text-2xl font-extrabold tracking-tight sm:text-3xl'>

@@ -45,7 +45,7 @@ export default function ProductBuyActions({
         </div>
       )}
 
-      <div className='rounded-3xl border border-gold/30 bg-gradient-to-br from-[#fff5dd] via-background to-[#ffe9bd] max-w-md p-4 sm:p-5'>
+      <div className='rounded-3xl border border-gold/30 bg-gradient-to-br from-[#f4f4f5] via-background to-[#e4e4e7] max-w-md p-4 sm:p-5'>
         <AddToCart item={{ ...item, size: selectedSize }} />
       </div>
     </div>

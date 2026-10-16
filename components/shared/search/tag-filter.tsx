@@ -21,7 +21,7 @@ const TagChip = ({
     className={cn(
       'rounded-full border px-3 py-1.5 text-xs font-medium transition-colors duration-200',
       active
-        ? 'border-primary bg-primary text-primary-foreground shadow-soft'
+        ? 'border-primary bg-primary text-primary-foreground '
         : 'border-border bg-white text-muted-foreground hover:border-primary/50 hover:text-foreground'
     )}
   >

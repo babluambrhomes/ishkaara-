@@ -25,7 +25,7 @@ export default function OrderItemImages({
       {shown.map((item, index) => (
         <div
           key={index}
-          className='relative h-12 w-12 overflow-hidden rounded-xl border-2 border-white bg-muted shadow-soft ring-1 ring-border/60'
+          className='relative h-12 w-12 overflow-hidden rounded-xl border-2 border-white bg-muted  ring-1 ring-border/60'
         >
           <Image
             src={getImageUrl(item.image)}
@@ -37,7 +37,7 @@ export default function OrderItemImages({
         </div>
       ))}
       {remaining > 0 && (
-        <div className='relative flex h-12 w-12 items-center justify-center rounded-xl border-2 border-white bg-muted text-xs font-bold text-muted-foreground shadow-soft ring-1 ring-border/60'>
+        <div className='relative flex h-12 w-12 items-center justify-center rounded-xl border-2 border-white bg-muted text-xs font-bold text-muted-foreground  ring-1 ring-border/60'>
           +{remaining}
         </div>
       )}

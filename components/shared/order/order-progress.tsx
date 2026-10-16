@@ -57,7 +57,7 @@ export default function OrderProgress({
       >
         <span
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-circle',
             isCancelled
               ? 'bg-red-100 text-red-600'
               : 'bg-amber-100 text-amber-600'
@@ -117,7 +117,7 @@ export default function OrderProgress({
                 )}
                 <span
                   className={cn(
-                    'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 bg-white transition-colors',
+                    'relative z-10 flex h-10 w-10 items-center justify-center rounded-circle border-2 bg-white transition-colors',
                     completed
                       ? 'border-emerald-500 bg-emerald-500 text-white'
                       : active
@@ -174,7 +174,7 @@ export default function OrderProgress({
               )}
               <span
                 className={cn(
-                  'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 bg-white transition-colors',
+                  'relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-circle border-2 bg-white transition-colors',
                   completed
                     ? 'border-emerald-500 bg-emerald-500 text-white'
                     : active

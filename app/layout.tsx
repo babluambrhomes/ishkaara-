@@ -1,18 +1,20 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Playfair_Display, Jost } from 'next/font/google'
 import './globals.css'
 import ClientProviders from '@/components/shared/client-providers'
 import { getSetting } from '@/lib/actions/setting.actions'
 
 
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const playfair = Playfair_Display({
+  variable: '--font-display',
   subsets: ['latin'],
+  display: 'swap',
 })
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jost = Jost({
+  variable: '--font-sans',
   subsets: ['latin'],
+  display: 'swap',
 })
 
 export async function generateMetadata() {
@@ -39,7 +41,7 @@ export default async function AppLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}
+        className={`min-h-screen ${jost.variable} ${playfair.variable} antialiased scroll-smooth`}
       >
         <ClientProviders setting={setting}>
           {children}

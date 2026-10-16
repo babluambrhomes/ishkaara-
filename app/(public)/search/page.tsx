@@ -200,7 +200,7 @@ export default async function SearchPage(props: {
         <div className='grid gap-6 lg:grid-cols-[260px_1fr]'>
           {/* Filters sidebar */}
           <CollapsibleOnMobile title='Filters'>
-            <Card className='rounded-2xl border-border/60 shadow-soft lg:sticky lg:top-6'>
+            <Card className='rounded-2xl border-border/60  lg:sticky lg:top-6'>
               <CardContent className='p-5'>
                 <div className='mb-4 flex items-center justify-between'>
                   <h2 className='text-sm font-bold uppercase tracking-[0.16em]'>
@@ -309,7 +309,7 @@ export default async function SearchPage(props: {
 
           {/* Results */}
           <div className='space-y-5'>
-            <div className='flex flex-col gap-3 rounded-2xl border border-border/60 bg-card px-5 py-4 shadow-soft sm:flex-row sm:items-center sm:justify-between'>
+            <div className='flex flex-col gap-3 rounded-2xl border border-border/60 bg-card px-5 py-4  sm:flex-row sm:items-center sm:justify-between'>
               <div className='flex items-center gap-2 text-sm text-muted-foreground'>
                 <Search className='h-4 w-4 text-primary' />
                 <span>
@@ -332,7 +332,7 @@ export default async function SearchPage(props: {
             </div>
 
             {totalProducts === 0 ? (
-              <Card className='rounded-2xl border-border/60 shadow-soft'>
+              <Card className='rounded-2xl border-border/60 '>
                 <CardContent className='flex flex-col items-center justify-center gap-3 px-6 py-16 text-center'>
                   <PackageSearch className='h-12 w-12 text-muted-foreground/50' />
                   <p className='text-lg font-semibold'>No products found</p>

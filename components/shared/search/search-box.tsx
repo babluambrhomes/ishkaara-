@@ -48,7 +48,7 @@ export default function SearchBox({
         <Input
           {...register('q')}
           placeholder={placeholder}
-          className='h-12 rounded-full border-border/70 bg-white pl-11 shadow-inner-soft'
+          className='h-12 rounded-full border-border/70 bg-white pl-11 '
         />
       </div>
       <Button type='submit' size='lg' className='h-12 rounded-full px-7'>
