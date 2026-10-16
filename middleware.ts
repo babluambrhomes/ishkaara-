@@ -23,7 +23,6 @@ const publicPages = [
   '/contact-us',
   '/faq',
   '/help',
-  '/testimonials',
   '/terms-and-conditions',
   '/privacy-policy',
   '/returns-policy',

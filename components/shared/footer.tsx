@@ -114,11 +114,6 @@ export default function Footer() {
                     Contact Us
                   </Link>
                 </li>
-                <li>
-                  <Link href='/testimonials' className={footerLinkClass}>
-                    Testimonials &amp; Reviews
-                  </Link>
-                </li>
               </ul>
             </div>
 

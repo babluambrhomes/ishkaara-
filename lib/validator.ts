@@ -111,14 +111,37 @@ export const CartItemSchema = OrderItemSchema.extend({
   clientId: z.string().min(1, 'clientId is required'),
 })
 
+const Text = (field: string, min: number, max: number) =>
+  z
+    .string()
+    .trim()
+    .min(min, `${field} must be at least ${min} characters`)
+    .max(max, `${field} must be at most ${max} characters`)
+
+const LetterText = (field: string, min: number, max: number) =>
+  Text(field, min, max).regex(
+    /^[\p{L}\p{N}\s.,'()&/-]+$/u,
+    `${field} contains invalid characters`
+  )
+
+const PhoneInput = z
+  .string()
+  .trim()
+  .min(7, 'Phone number is invalid')
+  .max(20, 'Phone number is invalid')
+  .regex(/^\+?[\d\s-]{7,20}$/, 'Phone number is invalid')
+
 export const ShippingAddressSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required'),
-  street: z.string().min(1, 'Address is required'),
-  city: z.string().min(1, 'City is required'),
-  postalCode: z.string().min(1, 'Postal code is required'),
-  province: z.string().min(1, 'Province is required'),
-  phone: z.string().min(1, 'Phone number is required'),
-  country: z.string().min(1, 'Country is required'),
+  fullName: LetterText('Full name', 2, 50),
+  street: Text('Address', 3, 200),
+  city: LetterText('City', 2, 60),
+  postalCode: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{4,10}$/, 'Postal code must be 4-10 digits'),
+  province: LetterText('Province', 2, 60),
+  phone: PhoneInput,
+  country: LetterText('Country', 2, 60),
 })
 
 export const AddressSchema = ShippingAddressSchema.extend({

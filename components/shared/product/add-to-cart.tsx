@@ -155,7 +155,7 @@ export default function AddToCart({
           size='sm'
           variant='outline'
           onClick={buyNow}
-          className='flex-1 gap-1.5 rounded-full border-gold/60 text-primary hover:bg-gold hover:text-[#0f0d0d]'
+          className='flex-1 gap-1.5 rounded-full border-gold/60 text-white hover:bg-gold '
         >
           Buy Now
         </Button>
@@ -212,7 +212,7 @@ export default function AddToCart({
           type='button'
           onClick={buyNow}
           disabled={item.countInStock <= 0}
-          className='h-11 w-full gap-2 rounded-full bg-gradient-to-r from-gold to-[#344c35] font-bold text-[#0f0d0d]  transition-all hover:from-[#344c35] hover:to-gold '
+          className='h-11 w-full gap-2 rounded-full bg-gradient-to-r from-gold to-[#344c35] font-bold text-white  transition-all  '
         >
           <ShoppingBag className='h-4 w-4' />
           Buy Now

@@ -181,7 +181,11 @@ function AddressForm({
                   <FormItem>
                     <FormLabel>Full name</FormLabel>
                     <FormControl>
-                      <Input placeholder='Recipient name' {...field} />
+                      <Input
+                        placeholder='Recipient name'
+                        maxLength={50}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -200,6 +204,7 @@ function AddressForm({
                       placeholder='House no, building, street, area'
                       className='resize-none'
                       rows={2}
+                      maxLength={200}
                       {...field}
                     />
                   </FormControl>
@@ -216,7 +221,7 @@ function AddressForm({
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input placeholder='City' {...field} />
+                      <Input placeholder='City' maxLength={60} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -229,7 +234,7 @@ function AddressForm({
                   <FormItem>
                     <FormLabel>State / Province</FormLabel>
                     <FormControl>
-                      <Input placeholder='State' {...field} />
+                      <Input placeholder='State' maxLength={60} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -245,7 +250,12 @@ function AddressForm({
                   <FormItem>
                     <FormLabel>Postal code</FormLabel>
                     <FormControl>
-                      <Input placeholder='PIN code' {...field} />
+                      <Input
+                        placeholder='PIN code'
+                        inputMode='numeric'
+                        maxLength={10}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,7 +268,11 @@ function AddressForm({
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input placeholder='Country' {...field} />
+                      <Input
+                        placeholder='Country'
+                        maxLength={60}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -275,6 +289,7 @@ function AddressForm({
                         type='tel'
                         inputMode='tel'
                         placeholder='Phone number'
+                        maxLength={20}
                         {...field}
                       />
                     </FormControl>

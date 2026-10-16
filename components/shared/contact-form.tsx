@@ -16,11 +16,34 @@ import { cn } from '@/lib/utils'
 const inputClass = 'bg-white focus-visible:ring-primary/30'
 
 const ContactFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().min(1, 'Email is required').email('Email is invalid'),
-  phone: z.string().min(1, 'Phone number is required'),
-  subject: z.string().min(1, 'Subject is required'),
-  message: z.string().min(1, 'Message is required'),
+  name: z
+    .string()
+    .trim()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be at most 50 characters')
+    .regex(/^[\p{L}\s.'-]+$/u, 'Name contains invalid characters'),
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .max(100, 'Email must be at most 100 characters')
+    .email('Email is invalid'),
+  phone: z
+    .string()
+    .trim()
+    .min(7, 'Phone number is invalid')
+    .max(20, 'Phone number is invalid')
+    .regex(/^\+?[\d\s-]{7,20}$/, 'Phone number is invalid'),
+  subject: z
+    .string()
+    .trim()
+    .min(3, 'Subject must be at least 3 characters')
+    .max(100, 'Subject must be at most 100 characters'),
+  message: z
+    .string()
+    .trim()
+    .min(10, 'Message must be at least 10 characters')
+    .max(1000, 'Message must be at most 1000 characters'),
 })
 
 type ContactFormValues = z.infer<typeof ContactFormSchema>
@@ -45,9 +68,14 @@ export default function ContactForm() {
   const {
     handleSubmit,
     register,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     reset,
   } = form
+
+  const fieldError = (name: keyof ContactFormValues) =>
+    errors[name] ? (
+      <p className='text-xs font-medium text-red-600'>{errors[name].message}</p>
+    ) : null
 
   const onSubmit = async (values: ContactFormValues) => {
     setStatus('loading')
@@ -79,9 +107,11 @@ export default function ContactForm() {
               <Input
                 id='name'
                 placeholder='Your full name'
+                maxLength={50}
                 className={inputClass}
                 {...register('name')}
               />
+              {fieldError('name')}
             </div>
             <div className='space-y-1.5'>
               <Label htmlFor='email'>Email</Label>
@@ -89,28 +119,35 @@ export default function ContactForm() {
                 id='email'
                 type='email'
                 placeholder='you@example.com'
+                maxLength={100}
                 className={inputClass}
                 {...register('email')}
               />
+              {fieldError('email')}
             </div>
             <div className='space-y-1.5'>
               <Label htmlFor='phone'>Phone Number</Label>
               <Input
                 id='phone'
                 type='tel'
+                inputMode='tel'
                 placeholder='Your phone number'
+                maxLength={20}
                 className={inputClass}
                 {...register('phone')}
               />
+              {fieldError('phone')}
             </div>
             <div className='space-y-1.5'>
               <Label htmlFor='subject'>Subject</Label>
               <Input
                 id='subject'
                 placeholder='What is this regarding?'
+                maxLength={100}
                 className={inputClass}
                 {...register('subject')}
               />
+              {fieldError('subject')}
             </div>
           </div>
 
@@ -120,9 +157,11 @@ export default function ContactForm() {
               id='message'
               placeholder='Write your message here...'
               rows={5}
+              maxLength={1000}
               className='bg-white'
               {...register('message')}
             />
+            {fieldError('message')}
           </div>
 
           {message && (

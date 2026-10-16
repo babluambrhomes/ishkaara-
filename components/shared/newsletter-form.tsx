@@ -11,7 +11,12 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 const NewsletterFormSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Email is invalid'),
+  email: z
+    .string()
+    .trim()
+    .min(1, 'Email is required')
+    .max(100, 'Email must be at most 100 characters')
+    .email('Please enter a valid email address'),
 })
 
 type NewsletterFormValues = z.infer<typeof NewsletterFormSchema>
@@ -32,7 +37,7 @@ export default function NewsletterForm() {
   const {
     handleSubmit,
     register,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
     reset,
   } = form
 
@@ -66,6 +71,7 @@ export default function NewsletterForm() {
           type='email'
           placeholder='Enter your email'
           aria-label='Email address'
+          maxLength={100}
           className='h-11 flex-1 rounded-full border-white/20 bg-white/95 text-black  placeholder:text-black/40 focus-visible:ring-gold/60'
           {...register('email')}
         />
@@ -80,6 +86,11 @@ export default function NewsletterForm() {
             : 'Subscribe'}
         </Button>
       </div>
+      {errors.email && (
+        <p className='text-sm font-medium text-rose-300'>
+          {errors.email.message}
+        </p>
+      )}
       {message && (
         <p
           className={cn(

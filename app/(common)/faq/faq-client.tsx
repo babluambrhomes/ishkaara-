@@ -140,7 +140,7 @@ export default function FaqClient({ initialFaqs }: { initialFaqs: IFaq[] }) {
               Our support team is here to help. Reach out to us and we&apos;ll
               get back to you as soon as possible.
             </p>
-            <Button asChild size='lg' className='rounded-full bg-white text-primary hover:bg-gold hover:text-[#0f0d0d]'>
+            <Button asChild size='lg' className='rounded-full text-white hover:bg-gold '>
               <Link href='/contact-us'>Contact Us</Link>
             </Button>
           </div>
