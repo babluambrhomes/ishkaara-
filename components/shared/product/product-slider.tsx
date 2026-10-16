@@ -25,7 +25,7 @@ export default function ProductSlider({
       <div className='relative'>
         <Swiper
           spaceBetween={16}
-          slidesPerView={1}
+          slidesPerView={2}
           breakpoints={{
             768: { slidesPerView: hideDetails ? 4 : 3 },
             1024: { slidesPerView: hideDetails ? 6 : 5 },

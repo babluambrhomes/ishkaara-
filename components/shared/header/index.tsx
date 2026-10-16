@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
 import Search from './search'
+import MobileSearch from './mobile-search'
 import data from '@/config/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
@@ -56,8 +57,10 @@ export default async function Header() {
           </div>
         </div>
         {/* Mobile search */}
-        <div className='md:hidden px-2 pb-2'>
-          <Search />
+        <div className='md:hidden px-2'>
+          <MobileSearch>
+            <Search />
+          </MobileSearch>
         </div>
       </div>
     </header>

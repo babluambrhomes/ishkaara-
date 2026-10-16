@@ -215,7 +215,7 @@ export default function ProductCard({
               size='icon'
               aria-label='Remove from wishlist'
               onClick={() => onRemove(product._id)}
-              className='shrink-0 rounded-full border border-border/60 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive'
+              className='shrink-0 rounded-full border border-border/60 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive max-sm:hidden'
             >
               <Trash2 className='h-4 w-4' />
             </Button>

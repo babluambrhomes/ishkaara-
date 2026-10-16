@@ -66,13 +66,13 @@ export default async function HomePage() {
       <RandomBannerGrid banners={commonBanners.slice(2, 5)} />
       <HomeCard cards={cards} />
       <Card className='w-full overflow-hidden rounded-2xl '>
-        <CardContent className='p-4 items-center gap-3'>
+        <CardContent className='p-0 sm:p-4 items-center gap-3'>
           <ProductSlider title="Today's Deals" products={todaysDeals} />
         </CardContent>
       </Card>
       <RandomBannerGrid banners={commonBanners.slice(1, 3)} />
       <Card className='w-full overflow-hidden rounded-2xl '>
-        <CardContent className='p-4 items-center gap-3'>
+        <CardContent className=' p-0 sm:p-4 items-center gap-3'>
           <ProductSlider
             title='Best Selling Products'
             products={bestSellingProducts}

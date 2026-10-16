@@ -157,7 +157,7 @@ export default async function AccountPage() {
         {accountLinks.map(({ href, icon: Icon, title, desc }) => (
           <Link key={title} href={href} className='group'>
             <Card className='h-full overflow-hidden rounded-3xl border-border/60 bg-white transition-all group-hover:-translate-y-1 group-hover:border-primary/30 '>
-              <CardContent className='flex h-full flex-col items-start gap-4 p-6'>
+              <CardContent className='flex h-full flex-col items-start gap-4 p-1 sm:p-6'>
                 <span className='flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-gold text-white '>
                   <Icon className='h-6 w-6' />
                 </span>

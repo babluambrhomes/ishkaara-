@@ -34,7 +34,7 @@ export default function WishlistPage() {
 
       <div className='px-4 py-8 md:px-8 lg:px-12'>
         {isMounted && items.length > 0 ? (
-          <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div className='grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             {items.map((item) => (
               <ProductCard
                 key={item._id}

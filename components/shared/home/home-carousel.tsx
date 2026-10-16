@@ -45,7 +45,7 @@ export function HomeCarousel({ banners }: { banners: HeroBannerItem[] }) {
           return (
             <SwiperSlide key={banner._id}>
               <Link href={`/product/${banner.productSlug}`}>
-                <div className='relative flex h-[70vh] w-full items-center justify-center bg-gradient-to-r from-primary/[0.07] via-background to-gold/10'>
+                <div className='relative flex h-[40vh] w-full items-center justify-center bg-gradient-to-r from-primary/[0.07] via-background to-gold/10 sm:h-[55vh] md:h-[70vh]'>
                   {image ? (
                     <Image
                       src={image}

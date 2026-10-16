@@ -39,7 +39,7 @@ const ProductPrice = ({
   return plain ? (
     formatCurrency(roundedPrice)
   ) : roundedList == 0 ? (
-    <div className={cn('text-3xl font-semibold tracking-tight', className)}>
+    <div className={cn('text-2xl sm:text-3xl font-semibold tracking-tight', className)}>
       <span className='text-xs align-super'>{CURRENCY_SYMBOL}</span>
       {intValue}
     </div>
@@ -48,7 +48,7 @@ const ProductPrice = ({
       <div
         className={`flex ${center ? 'justify-center' : ''} items-center gap-2`}
       >
-        <span className='rounded-full bg-gradient-to-r from-[#344c35] to-[#243526] px-3 py-1 text-white text-xs font-bold '>
+        <span className='rounded-full bg-gradient-to-r from-[#344c35] to-[#243526] px-1 sm:px-3 py-1 text-white text-[10px] sm:text-xs font-normal sm:font-bold '>
           {discountPercent}% Off
         </span>
         <span className='text-gold text-xs font-semibold tracking-tight'>
@@ -58,7 +58,7 @@ const ProductPrice = ({
       <div
         className={`flex ${center ? 'justify-center' : ''} items-center gap-2`}
       >
-        <div className={cn('text-3xl font-semibold tracking-tight', className)}>
+        <div className={cn('text-2xl sm:text-3xl font-semibold tracking-tight', className)}>
           <span className='text-xs align-super'>{CURRENCY_SYMBOL}</span>
           {intValue}
         </div>
@@ -74,9 +74,9 @@ const ProductPrice = ({
     <div className=''>
       <div className={`flex gap-3 ${center ? 'justify-center' : ''}`}>
         <div className='shrink-0 self-center whitespace-nowrap rounded-full bg-primary/10 px-2.5 py-1 text-sm font-bold leading-none text-primary'>
-          -{discountPercent}%
+          {discountPercent}%
         </div>
-        <div className={cn('text-3xl font-semibold tracking-tight', className)}>
+        <div className={cn('text-2xl sm:text-3xl font-semibold tracking-tight', className)}>
           <span className='text-xs align-super'>{CURRENCY_SYMBOL}</span>
           {intValue}
         </div>

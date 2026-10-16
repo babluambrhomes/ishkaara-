@@ -143,11 +143,12 @@ export default function AddToCart({
       <div className='flex w-full items-center gap-1.5'>
         <Button
           size='sm'
+          aria-label='Add to Cart'
           onClick={addToCart}
-          className='flex-1 gap-1.5 rounded-full'
+          className='flex-1 gap-1.5 rounded-full max-sm:flex-none'
         >
           <ShoppingCart className='h-4 w-4' />
-          Add to Cart
+          <span className='max-sm:hidden'>Add to Cart</span>
         </Button>
         <Button
           type='button'

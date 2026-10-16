@@ -51,7 +51,7 @@ export default function AddToWishlist({
         aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
         onClick={handleToggle}
         className={cn(
-          'flex h-9 w-9 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-all duration-200 hover:scale-110',
+          'flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200 hover:scale-110',
           className
         )}
       >

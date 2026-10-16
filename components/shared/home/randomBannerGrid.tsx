@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react'
 import CommonBanner from './common-banner'
+import useWindowSize from '@/hooks/use-window-size'
 
 import type { HeroBannerItem } from './home-carousel'
 
@@ -17,13 +18,11 @@ type BannerRow = {
   columns: number[]
 }
 
-const layoutPatterns: number[][] = [
+const desktopPatterns: number[][] = [
   [12],             // 100%
   [6, 6],           // 50% - 50%
   [4, 4, 4],        // 33% - 33% - 33%
-  [4, 8],           // 33% - 67%
-  [8, 4],           // 67% - 33%
-
+ 
   [3, 3, 6],        // 25% - 25% - 50%
   [6, 3, 3],        // 50% - 25% - 25%
   [3, 6, 3],        // 25% - 50% - 25%
@@ -51,14 +50,21 @@ const layoutPatterns: number[][] = [
   [4, 5, 3],        // 33% - 42% - 25%
 ]
 
-function generateLayout(banners: Banner[]): BannerRow[] {
+const mobilePatterns: number[][] = [
+  [12],             // 100%
+  [6, 6],           // 50% - 50%
+]
+
+function generateLayout(banners: Banner[], isMobile: boolean): BannerRow[] {
   const rows: BannerRow[] = []
   let index = 0
+
+  const patterns = isMobile ? mobilePatterns : desktopPatterns
 
   while (index < banners.length) {
     const remaining = banners.length - index
 
-    const availablePatterns = layoutPatterns.filter(
+    const availablePatterns = patterns.filter(
       (pattern) => pattern.length <= remaining
     )
 
@@ -82,10 +88,12 @@ export default function RandomBannerGrid({
   banners,
 }: RandomBannerGridProps) {
   const [rows, setRows] = useState<BannerRow[]>([])
+  const { width } = useWindowSize()
+  const isMobile = width <= 768
 
   useEffect(() => {
-    setRows(generateLayout(banners))
-  }, [banners])
+    setRows(generateLayout(banners, isMobile))
+  }, [banners, isMobile])
 
   if (!banners.length) return null
 
@@ -94,7 +102,7 @@ export default function RandomBannerGrid({
       {rows.map((row, rowIndex) => (
         <div
           key={`${rowIndex}-${row.banners.map((b) => b._id).join('-')}`}
-          className="grid grid-cols-1 gap-4 md:grid-cols-12"
+          className="grid grid-cols-12 gap-4"
         >
           {row.banners.map((banner, index) => (
             <div
