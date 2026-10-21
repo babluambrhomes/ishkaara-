@@ -391,6 +391,35 @@ export const HomeBannerUpdateSchema = HomeBannerInputSchema.extend({
   _id: z.string(),
 })
 
+// HOME FILTER
+const optionalText = (min: number, max: number, minMsg: string, maxMsg: string) =>
+  z.preprocess(
+    (v) => (v === '' || v === undefined ? undefined : v),
+    z.string().min(min, minMsg).max(max, maxMsg).optional()
+  )
+
+export const HomeFilterSectionSchema = z.object({
+  name: optionalText(2, 60, 'Name must be at least 2 characters', 'Name must be at most 60 characters'),
+  imgurl: z.array(z.string()).default([]),
+  redirect: z
+    .string()
+    .min(1, 'Redirect is required')
+    .trim(),
+  details: z.string().max(300, 'Too long').optional(),
+})
+
+export const HomeFilterInputSchema = z.object({
+  title: optionalText(2, 80, 'Title must be at least 2 characters', 'Title must be at most 80 characters'),
+  section: z.array(HomeFilterSectionSchema).default([]),
+  redirect: z.string().trim().optional(),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
+  details: z.string().max(300, 'Too long').optional(),
+})
+
+export const HomeFilterUpdateSchema = HomeFilterInputSchema.extend({
+  _id: z.string(),
+})
+
 
 // WEBPAGE
 export const WebPageInputSchema = z.object({

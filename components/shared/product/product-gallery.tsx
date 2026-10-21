@@ -10,8 +10,24 @@ export default function ProductGallery({ images }: { images: string[] }) {
   const [selectedImage, setSelectedImage] = useState(0)
 
   return (
-    <div className='grid grid-cols-[64px_minmax(0,1fr)] gap-3 sm:gap-4'>
-      <div className='flex flex-col gap-2 sm:gap-3'>
+    <div className=' flex flex-col gap-3 '>
+     
+
+      <div className='relative overflow-hidden rounded-3xl  p-6 '>
+        <Zoom>
+          <div className='relative h-[380px] sm:h-[480px]'>
+            <Image
+              src={getImageUrl(images[selectedImage])}
+              alt={'product image'}
+              fill
+              sizes='70vw'
+              className='object-contain drop-shadow-sm'
+              priority
+            />
+          </div>
+        </Zoom>
+      </div>
+       <div className='flex flex-col gap-2 sm:gap-3'>
         {images.map((image, index) => (
           <button
             key={index}
@@ -33,21 +49,6 @@ export default function ProductGallery({ images }: { images: string[] }) {
             />
           </button>
         ))}
-      </div>
-
-      <div className='relative overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-white via-background to-primary/[0.04] p-6 '>
-        <Zoom>
-          <div className='relative h-[380px] sm:h-[480px]'>
-            <Image
-              src={getImageUrl(images[selectedImage])}
-              alt={'product image'}
-              fill
-              sizes='70vw'
-              className='object-contain drop-shadow-sm'
-              priority
-            />
-          </div>
-        </Zoom>
       </div>
     </div>
   )

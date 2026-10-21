@@ -12,6 +12,7 @@ import { auth } from '@/auth'
 import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
 import { getActiveHeroBanners, getActiveCommonBanners } from './home-banner.actions'
+import { getHomeFilters } from './home-filter.actions'
 import {
   toPublicProduct,
   toPublicProducts as toPublicProductsList,
@@ -223,35 +224,19 @@ export async function getProductsByTag({
 // AGGREGATED HOME PAGE DATA (single entry point for the home page)
 export async function getHomePageData() {
   await connectToDatabase()
-  const [
-    heroBanners,
-    commonBanners,
-    todaysDeals,
-    bestSellingProducts,
-    categories,
-    newArrivals,
-    featureds,
-    bestSellers,
-  ] = await Promise.all([
-    getActiveHeroBanners({ limit: 6 }),
-    getActiveCommonBanners(),
-    getProductsByTag({ tag: 'todays-deal' }),
-    getProductsByTag({ tag: 'best-seller' }),
-    getAllCategories(),
-    getProductsForCard({ tag: 'new-arrival' }),
-    getProductsForCard({ tag: 'featured' }),
-    getProductsForCard({ tag: 'best-seller' }),
-  ])
+  const [heroBanners, commonBanners, categories, homeFilters] =
+    await Promise.all([
+      getActiveHeroBanners({ limit: 6 }),
+      getActiveCommonBanners(),
+      getAllCategories(),
+      getHomeFilters(),
+    ])
 
   return {
     heroBanners,
     commonBanners,
-    todaysDeals,
-    bestSellingProducts,
     categories,
-    newArrivals,
-    featureds,
-    bestSellers,
+    homeFilters,
   }
 }
 
