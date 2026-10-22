@@ -42,36 +42,43 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import { ImageUpload } from '@/components/shared/image-upload'
-import {
-  RedirectFilterBuilder,
-  parseSearchUrl,
-} from '@/components/shared/redirect-filter-builder'
+import { RedirectFilterBuilder } from '@/components/shared/redirect-filter-builder'
 import { useToast } from '@/hooks/use-toast'
 import {
-  createHomeFilter,
-  deleteHomeFilter,
-  getAllHomeFiltersForAdmin,
-  updateHomeFilter,
-} from '@/lib/actions/home-filter.actions'
-import { getAllCategories, getAllTags } from '@/lib/actions/product.actions'
+  createHomeLayout,
+  deleteHomeLayout,
+  getAllHomeLayoutsForAdmin,
+  updateHomeLayout,
+} from '@/lib/actions/home-layout.actions'
 import { getImageUrl } from '@/lib/image-url'
-import { HomeFilterInputSchema } from '@/lib/validator'
+import { HomeLayoutInputSchema } from '@/lib/validator'
+import {
+  HOME_LAYOUT_LABELS,
+  HOME_LAYOUT_TYPES,
+} from '@/lib/home-layout-types'
 
-const FormSchema = HomeFilterInputSchema.extend({})
+const FormSchema = HomeLayoutInputSchema.extend({})
 
 type FormValues = z.infer<typeof FormSchema>
 
-type FilterListData = {
-  filters: FormValues[]
+type LayoutListData = {
+  layouts: FormValues[]
   totalPages: number
-  totalFilters: number
+  totalLayouts: number
   from: number
   to: number
 }
 
-type FilterListItem = FormValues & { _id: string }
+type LayoutListItem = FormValues & { _id: string }
 
 const emptyValues: FormValues = {
   title: '',
@@ -79,6 +86,7 @@ const emptyValues: FormValues = {
   redirect: '',
   order: 0,
   details: '',
+  layout: 'grid',
 }
 
 const emptySection = {
@@ -88,32 +96,18 @@ const emptySection = {
   details: '',
 }
 
-export default function WorkspaceHomeFiltersPage() {
+export default function WorkspaceHomeLayoutsPage() {
   const { toast } = useToast()
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<FilterListData>()
+  const [data, setData] = useState<LayoutListData>()
   const [isPending, startTransition] = useTransition()
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<FilterListItem | null>(null)
-  const [categories, setCategories] = useState<string[]>([])
-  const [tags, setTags] = useState<string[]>([])
-
-  useEffect(() => {
-    let active = true
-    Promise.all([getAllCategories(), getAllTags()]).then(([cats, tagList]) => {
-      if (!active) return
-      setCategories(cats.map((c) => c.name))
-      setTags(tagList)
-    })
-    return () => {
-      active = false
-    }
-  }, [])
+  const [editing, setEditing] = useState<LayoutListItem | null>(null)
 
   const loadData = useCallback(
     (pageNumber: number) => {
       startTransition(async () => {
-        const result = await getAllHomeFiltersForAdmin({ page: pageNumber })
+        const result = await getAllHomeLayoutsForAdmin({ page: pageNumber })
         setData(result)
       })
     },
@@ -146,28 +140,29 @@ export default function WorkspaceHomeFiltersPage() {
     setDialogOpen(true)
   }
 
-  const openEdit = (filter: FilterListItem) => {
-    setEditing(filter)
-    const sections = (filter.section ?? []).map((s) => ({
+  const openEdit = (layout: LayoutListItem) => {
+    setEditing(layout)
+    const sections = (layout.section ?? []).map((s) => ({
       name: s.name ?? '',
       imgurl: s.imgurl ?? [],
       redirect: s.redirect ?? '',
       details: s.details ?? '',
     }))
     form.reset({
-      title: filter.title ?? '',
+      title: layout.title ?? '',
       section: sections,
-      redirect: filter.redirect ?? '',
-      order: filter.order ?? 0,
-      details: filter.details ?? '',
+      redirect: layout.redirect ?? '',
+      order: layout.order ?? 0,
+      details: layout.details ?? '',
+      layout: layout.layout ?? 'grid',
     })
     setDialogOpen(true)
   }
 
   const onSubmit = async (values: FormValues) => {
     const res = editing
-      ? await updateHomeFilter({ ...values, _id: editing._id })
-      : await createHomeFilter(values)
+      ? await updateHomeLayout({ ...values, _id: editing._id })
+      : await createHomeLayout(values)
     if (!res.success) {
       toast({ variant: 'destructive', description: res.message })
     } else {
@@ -181,14 +176,14 @@ export default function WorkspaceHomeFiltersPage() {
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
         <div className='flex flex-wrap items-center gap-2'>
-          <h1 className='font-bold text-lg'>Home Filters</h1>
+          <h1 className='font-bold text-lg'>Home Layouts</h1>
           {isPending ? (
             <p className='text-sm text-muted-foreground'>Loading...</p>
           ) : (
             <p className='text-sm text-muted-foreground'>
-              {data?.totalFilters === 0
+              {data?.totalLayouts === 0
                 ? 'No'
-                : `${data?.from}-${data?.to} of ${data?.totalFilters}`}
+                : `${data?.from}-${data?.to} of ${data?.totalLayouts}`}
               {' results'}
             </p>
           )}
@@ -196,8 +191,8 @@ export default function WorkspaceHomeFiltersPage() {
         <Button
           size='icon'
           onClick={openCreate}
-          aria-label='Create home filter'
-          data-tooltip='Create home filter'
+          aria-label='Create home layout'
+          data-tooltip='Create home layout'
         >
           <Plus className='h-4 w-4' />
         </Button>
@@ -206,44 +201,50 @@ export default function WorkspaceHomeFiltersPage() {
       <div>
         {!data ? (
           <p className='text-sm text-muted-foreground'>Loading...</p>
-        ) : data.filters.length === 0 ? (
+        ) : data.layouts.length === 0 ? (
           <p className='text-sm text-muted-foreground'>
-            No home filters found. Create one to get started.
+            No home layouts found. Create one to get started.
           </p>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
+                <TableHead>Layout</TableHead>
                 <TableHead>Sections</TableHead>
                 <TableHead>Order</TableHead>
                 <TableHead className='w-[120px]'>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.filters.map((filter) => (
-                <TableRow key={(filter as FilterListItem)._id}>
-                  <TableCell className='font-medium'>{filter.title || '—'}</TableCell>
+              {data.layouts.map((layout) => (
+                <TableRow key={(layout as LayoutListItem)._id}>
+                  <TableCell className='font-medium'>{layout.title || '—'}</TableCell>
                   <TableCell>
                     <Badge variant='outline'>
-                      {filter.section?.length ?? 0} items
+                      {HOME_LAYOUT_LABELS[layout.layout ?? 'grid']}
                     </Badge>
                   </TableCell>
-                  <TableCell>{filter.order}</TableCell>
+                  <TableCell>
+                    <Badge variant='outline'>
+                      {layout.section?.length ?? 0} items
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{layout.order}</TableCell>
                   <TableCell>
                     <div className='flex items-center gap-2'>
                       <Button
                         size='icon'
                         variant='outline'
-                        onClick={() => openEdit(filter as FilterListItem)}
-                        aria-label='Edit home filter'
+                        onClick={() => openEdit(layout as LayoutListItem)}
+                        aria-label='Edit home layout'
                         data-tooltip='Edit'
                       >
                         <Pencil className='h-4 w-4' />
                       </Button>
                       <DeleteDialog
-                        id={(filter as FilterListItem)._id}
-                        action={deleteHomeFilter}
+                        id={(layout as LayoutListItem)._id}
+                        action={deleteHomeLayout}
                         callbackAction={refresh}
                       />
                     </div>
@@ -280,7 +281,7 @@ export default function WorkspaceHomeFiltersPage() {
         <DialogContent className='max-h-[90vh] max-w-3xl overflow-y-auto'>
           <DialogHeader>
             <DialogTitle>
-              {editing ? 'Edit Home Filter' : 'Create Home Filter'}
+              {editing ? 'Edit Home Layout' : 'Create Home Layout'}
             </DialogTitle>
           </DialogHeader>
 
@@ -329,11 +330,9 @@ export default function WorkspaceHomeFiltersPage() {
                 render={({ field }) => (
                   <FormItem>
                     <RedirectFilterBuilder
-                      categories={categories}
-                      tags={tags}
                       value={field.value ?? ''}
                       onChange={field.onChange}
-                      label='Section Redirect (optional)'
+                      label='Layout Redirect (optional)'
                     />
                     <FormMessage />
                   </FormItem>
@@ -349,6 +348,34 @@ export default function WorkspaceHomeFiltersPage() {
                     <FormControl>
                       <Input placeholder='Short description' {...field} />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='layout'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Layout</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value ?? 'grid'}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select layout' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {HOME_LAYOUT_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {HOME_LAYOUT_LABELS[type]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -413,11 +440,9 @@ export default function WorkspaceHomeFiltersPage() {
                         render={({ field }) => (
                           <FormItem>
                             <RedirectFilterBuilder
-                              categories={categories}
-                              tags={tags}
                               value={field.value ?? ''}
                               onChange={field.onChange}
-                              label='Redirect URL'
+                              label='Card Redirect'
                             />
                             <FormMessage />
                           </FormItem>
@@ -480,7 +505,7 @@ export default function WorkspaceHomeFiltersPage() {
                               )}
                             </div>
                             <ImageUpload
-                              entity='home-filter'
+                              entity='home-layout'
                               value=''
                               onChange={(key) =>
                                 field.onChange([...(field.value ?? []), key])

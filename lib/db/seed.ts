@@ -16,6 +16,8 @@ import {
   products,
   reviewTemplates,
   seedBanners,
+  seedHomeLayouts,
+  seedVideos,
   users,
   type SeedCategory,
 } from './seed-data'
@@ -45,6 +47,8 @@ async function main() {
   const { default: Review } = await import('../models/review.model')
   const { default: User } = await import('../models/user.model')
   const { default: HomeBanner } = await import('../models/home-banner.model')
+  const { default: HomeLayout } = await import('../models/home-layout.model')
+  const { default: Video } = await import('../models/video.model')
 
   await connectToDatabase()
   console.log('Connected to MongoDB')
@@ -57,9 +61,11 @@ async function main() {
     Category.deleteMany({}),
     Coupon.deleteMany({}),
     HomeBanner.deleteMany({}),
+    HomeLayout.deleteMany({}),
+    Video.deleteMany({}),
   ])
   console.log(
-    'Cleared reviews, products, blog posts, categories, coupons and home banners'
+    'Cleared reviews, products, blog posts, categories, coupons, home banners, home layouts and videos'
   )
 
   const createCategories = async (items: SeedCategory[]) => {
@@ -84,7 +90,7 @@ async function main() {
     `Created ${productCategories.length} product and ${blogCategories.length} blog categories`
   )
 
-  // Tags consumed by the storefront home page filters. Spread them across the
+  // Tags consumed by the storefront home page layouts. Spread them across the
   // catalogue so every home section has products to show.
   const homeTagsForIndex = (index: number): string[] => {
     const tags: string[] = []
@@ -111,33 +117,42 @@ async function main() {
   )
   console.log(`Created ${createdProducts.length} products`)
 
-  // Map product name -> id/slug so home banners can link to a real product.
-  const productRefs = new Map(
-    createdProducts.map((product) => [
-      product.name,
-      { _id: product._id.toString(), slug: product.slug },
-    ])
-  )
-
+  // Home banners with random search-filter / product redirects.
   const createdBanners = await HomeBanner.create(
-    seedBanners.map((banner) => {
-      const ref = productRefs.get(banner.productName)
-      if (!ref) {
-        throw new Error(
-          `Home banner references unknown product "${banner.productName}"`
-        )
-      }
-      return {
-        productId: ref._id,
-        productSlug: ref.slug,
-        bannerUrl: banner.bannerUrl,
-        bannerType: banner.bannerType,
-        status: 'ACTIVE',
-        expireAt: null,
-      }
-    })
+    seedBanners.map((banner) => ({
+      redirect: banner.redirect,
+      bannerUrl: banner.bannerUrl,
+      bannerType: 'Hero',
+      status: 'ACTIVE',
+      expireAt: null,
+    }))
   )
   console.log(`Created ${createdBanners.length} home banners`)
+
+  // Home layout sections (one home-page row per document, 4 cards each).
+  await HomeLayout.create(
+    seedHomeLayouts.map((layout) => ({
+      title: layout.title,
+      details: layout.details,
+      redirect: layout.redirect,
+      order: layout.order,
+      layout: layout.layout,
+      section: layout.section,
+    }))
+  )
+  console.log(`Created ${seedHomeLayouts.length} home layouts`)
+
+  // Home videos (direct embed URLs).
+  await Video.create(
+    seedVideos.map((video) => ({
+      title: video.title,
+      videoUrl: video.videoUrl,
+      status: 'ACTIVE',
+      expireAt: null,
+      order: video.order,
+    }))
+  )
+  console.log(`Created ${seedVideos.length} videos`)
 
   // Seed a deterministic sample of reviews per product and roll the ratings up
   // onto the product document, mirroring updateProductReview.

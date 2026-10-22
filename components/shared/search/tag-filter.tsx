@@ -39,6 +39,7 @@ export default function TagFilter({
     q?: string
     category?: string
     tag?: string
+    brand?: string
     price?: string
     rating?: string
     sort?: string

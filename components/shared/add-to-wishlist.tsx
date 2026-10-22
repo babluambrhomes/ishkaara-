@@ -9,11 +9,9 @@ import { cn } from '@/lib/utils'
 
 export default function AddToWishlist({
   item,
-  variant = 'button',
   className,
 }: {
   item: WishlistItem
-  variant?: 'overlay' | 'button'
   className?: string
 }) {
   const isMounted = useIsMounted()
@@ -44,9 +42,10 @@ export default function AddToWishlist({
     })
   }
 
-  if (variant === 'overlay') {
-    return (
-      <button
+  
+
+  return (
+   <button
         type='button'
         aria-label={active ? 'Remove from wishlist' : 'Add to wishlist'}
         onClick={handleToggle}
@@ -57,23 +56,5 @@ export default function AddToWishlist({
       >
         <Heart className={cn('h-5 w-5', active && 'fill-current')} />
       </button>
-    )
-  }
-
-  return (
-    <button
-      type='button'
-      onClick={handleToggle}
-      className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200',
-        active
-          ? 'border-primary bg-primary text-white '
-          : 'border-border bg-background text-foreground hover:border-primary/50 hover:text-primary',
-        className
-      )}
-    >
-      <Heart className={cn('h-4 w-4', active && 'fill-current')} />
-      {active ? 'In Wishlist' : 'Add to Wishlist'}
-    </button>
   )
 }

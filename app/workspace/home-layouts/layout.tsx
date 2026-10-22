@@ -2,10 +2,10 @@ import type { ReactNode } from 'react'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Workspace Home Filters',
+  title: 'Workspace Home Layouts',
 }
 
-export default function WorkspaceHomeFiltersLayout({
+export default function WorkspaceHomeLayoutsLayout({
   children,
 }: {
   children: ReactNode

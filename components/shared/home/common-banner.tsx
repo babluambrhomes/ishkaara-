@@ -10,13 +10,13 @@ export default function CommonBanner({ banner }: { banner: HeroBannerItem }) {
 
   return (
     <Link
-      href={`/product/${banner.productSlug}`}
+      href={banner.redirect}
       className='block w-full overflow-hidden rounded-2xl bg-white'
     >
       <div className='relative h-[40vh] w-full'>
         <Image
           src={image}
-          alt={banner.productSlug}
+          alt='Home banner'
           fill
           sizes='100vw'
           className='object-cover'

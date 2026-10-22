@@ -11,8 +11,9 @@ import { z } from 'zod'
 import { auth } from '@/auth'
 import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
-import { getActiveHeroBanners, getActiveCommonBanners } from './home-banner.actions'
-import { getHomeFilters } from './home-filter.actions'
+import { getActiveHeroBanners } from './home-banner.actions'
+import { getActiveVideos } from './video.actions'
+import { getHomeLayouts } from './home-layout.actions'
 import {
   toPublicProduct,
   toPublicProducts as toPublicProductsList,
@@ -224,19 +225,18 @@ export async function getProductsByTag({
 // AGGREGATED HOME PAGE DATA (single entry point for the home page)
 export async function getHomePageData() {
   await connectToDatabase()
-  const [heroBanners, commonBanners, categories, homeFilters] =
-    await Promise.all([
-      getActiveHeroBanners({ limit: 6 }),
-      getActiveCommonBanners(),
-      getAllCategories(),
-      getHomeFilters(),
-    ])
+  const [heroBanners, categories, homeLayouts, videos] = await Promise.all([
+    getActiveHeroBanners({ limit: 6 }),
+    getAllCategories(),
+    getHomeLayouts(),
+    getActiveVideos(),
+  ])
 
   return {
     heroBanners,
-    commonBanners,
     categories,
-    homeFilters,
+    homeLayouts,
+    videos,
   }
 }
 
@@ -313,17 +313,21 @@ export async function getAllProducts({
   page,
   category,
   tag,
+  brand,
   price,
   rating,
+  size,
   sort,
 }: {
   query: string
   category: string
   tag: string
+  brand?: string
   limit?: number
   page: number
   price?: string
   rating?: string
+  size?: string
   sort?: string
 }) {
   const {
@@ -344,6 +348,8 @@ export async function getAllProducts({
   const categoryFilter =
     category && category !== 'all' ? { categoryName: category } : {}
   const tagFilter = tag && tag !== 'all' ? { tags: tag } : {}
+  const brandFilter =
+    brand && brand !== 'all' ? { brand } : {}
 
   const ratingFilter =
     rating && rating !== 'all'
@@ -353,6 +359,8 @@ export async function getAllProducts({
           },
         }
       : {}
+  const sizeFilter =
+    size && size !== 'all' ? { 'variants.size': size } : {}
   // 10-50
   const priceFilter =
     price && price !== 'all'
@@ -368,9 +376,11 @@ export async function getAllProducts({
     ...statusFilter,
     ...queryFilter,
     ...tagFilter,
+    ...brandFilter,
     ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
+    ...sizeFilter,
   })
     .sort(orderBy(sort))
     .skip(limit * (Number(page) - 1))
@@ -381,9 +391,11 @@ export async function getAllProducts({
     ...statusFilter,
     ...queryFilter,
     ...tagFilter,
+    ...brandFilter,
     ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
+    ...sizeFilter,
   })
   return {
     products: toPublicProductsList(products),
@@ -394,20 +406,92 @@ export async function getAllProducts({
   }
 }
 
-export async function getAllTags() {
-  const tags = await Product.aggregate([
-    { $unwind: '$tags' },
-    { $group: { _id: null, uniqueTags: { $addToSet: '$tags' } } },
-    { $project: { _id: 0, uniqueTags: 1 } },
+// PRICE BOUNDS FOR THE SEARCH FILTER SLIDER (display variant only)
+export async function getPriceBounds() {
+  await connectToDatabase()
+  const [result] = await Product.aggregate([
+    {
+      $match: {
+        status: 'public',
+        [`${PRICE_PATH}.$exists`]: true,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        min: { $min: `$${PRICE_PATH}` },
+        max: { $max: `$${PRICE_PATH}` },
+      },
+    },
   ])
-  return (
-    (tags[0]?.uniqueTags
-      .sort((a: string, b: string) => a.localeCompare(b))
-      .map((x: string) =>
-        x
-          .split('-')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ')
-      ) as string[]) || []
+  if (!result || result.min == null || result.max == null)
+    return { min: 0, max: 1000 }
+  return { min: Math.floor(result.min), max: Math.ceil(result.max) }
+}
+
+// ALL SIZES FOR THE SEARCH FILTER (from variants of public products)
+const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+
+const categoryMatch = (category?: string) =>
+  category && category !== 'all' ? { categoryName: category } : {}
+
+export async function getAllSizes({ category }: { category?: string } = {}) {
+  await connectToDatabase()
+  const sizes = await Product.distinct('variants.size', {
+    status: 'public',
+    ...categoryMatch(category),
+  })
+  return (sizes as string[])
+    .filter((size) => size && size.trim() !== '')
+    .sort((a, b) => {
+      const ai = SIZE_ORDER.indexOf(a.toUpperCase())
+      const bi = SIZE_ORDER.indexOf(b.toUpperCase())
+      if (ai !== -1 || bi !== -1)
+        return (ai === -1 ? SIZE_ORDER.length : ai) - (bi === -1 ? SIZE_ORDER.length : bi)
+      const an = Number(a)
+      const bn = Number(b)
+      if (!Number.isNaN(an) && !Number.isNaN(bn)) return an - bn
+      return a.localeCompare(b)
+    })
+}
+
+export async function getAllBrands({ category }: { category?: string } = {}) {
+  await connectToDatabase()
+  const brands = await Product.distinct('brand', {
+    status: 'public',
+    ...categoryMatch(category),
+  })
+  return (brands as string[])
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+}
+
+const isBrandTag = (tag: string, brandSlugs: Set<string>) => {
+  const slug = toSlug(tag)
+  if (brandSlugs.has(slug)) return true
+  for (const brandSlug of brandSlugs) {
+    if (brandSlug && slug.startsWith(`${brandSlug}-`)) return true
+  }
+  return false
+}
+
+export async function getAllTags({ category }: { category?: string } = {}) {
+  await connectToDatabase()
+  const match = { status: 'public' as const, ...categoryMatch(category) }
+  const [tagList, brands] = await Promise.all([
+    Product.distinct('tags', match),
+    Product.distinct('brand', match),
+  ])
+  const brandSlugs = new Set(
+    (brands as string[]).filter(Boolean).map((brand) => toSlug(brand))
   )
+  return (tagList as string[])
+    .filter((tag) => tag && !isBrandTag(tag, brandSlugs))
+    .sort((a: string, b: string) => a.localeCompare(b))
+    .map((x: string) =>
+      x
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    )
 }

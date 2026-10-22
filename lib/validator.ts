@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { formatNumberWithDecimal } from './utils'
 import { USER_ROLES } from './roles'
+import { HOME_LAYOUT_TYPES } from './home-layout-types'
 
 // Common
 const MongoId = z
@@ -374,10 +375,9 @@ export const CategoryUpdateSchema = CategoryInputSchema.extend({
 
 // HOME BANNER
 export const HomeBannerInputSchema = z.object({
-  productId: MongoId,
-  productSlug: z.string().min(1, 'Product slug is required'),
+  redirect: z.string().min(1, 'Redirect is required'),
   bannerUrl: z.string().default(''),
-  bannerType: z.enum(['Hero', 'Common']).default('Common'),
+  bannerType: z.enum(['Hero']).default('Hero'),
   status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
   expireAt: z
     .preprocess(
@@ -391,14 +391,14 @@ export const HomeBannerUpdateSchema = HomeBannerInputSchema.extend({
   _id: z.string(),
 })
 
-// HOME FILTER
+// HOME LAYOUT
 const optionalText = (min: number, max: number, minMsg: string, maxMsg: string) =>
   z.preprocess(
     (v) => (v === '' || v === undefined ? undefined : v),
     z.string().min(min, minMsg).max(max, maxMsg).optional()
   )
 
-export const HomeFilterSectionSchema = z.object({
+export const HomeLayoutSectionSchema = z.object({
   name: optionalText(2, 60, 'Name must be at least 2 characters', 'Name must be at most 60 characters'),
   imgurl: z.array(z.string()).default([]),
   redirect: z
@@ -408,15 +408,34 @@ export const HomeFilterSectionSchema = z.object({
   details: z.string().max(300, 'Too long').optional(),
 })
 
-export const HomeFilterInputSchema = z.object({
+export const HomeLayoutInputSchema = z.object({
   title: optionalText(2, 80, 'Title must be at least 2 characters', 'Title must be at most 80 characters'),
-  section: z.array(HomeFilterSectionSchema).default([]),
+  section: z.array(HomeLayoutSectionSchema).default([]),
   redirect: z.string().trim().optional(),
   order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
   details: z.string().max(300, 'Too long').optional(),
+  layout: z.enum([...HOME_LAYOUT_TYPES]).default('grid'),
 })
 
-export const HomeFilterUpdateSchema = HomeFilterInputSchema.extend({
+export const HomeLayoutUpdateSchema = HomeLayoutInputSchema.extend({
+  _id: z.string(),
+})
+
+// VIDEO
+export const VideoInputSchema = z.object({
+  title: optionalText(2, 80, 'Title must be at least 2 characters', 'Title must be at most 80 characters'),
+  videoUrl: z.string().min(1, 'Video ID or URL is required').trim(),
+  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
+  expireAt: z
+    .preprocess(
+      (v) => (v === '' || v === undefined ? null : v),
+      z.union([z.coerce.date(), z.null()])
+    )
+    .default(null),
+  order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
+})
+
+export const VideoUpdateSchema = VideoInputSchema.extend({
   _id: z.string(),
 })
 

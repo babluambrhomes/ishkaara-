@@ -1,12 +1,11 @@
 import { Document, Model, model, models, Schema } from 'mongoose'
 
-export type HomeBannerType = 'Hero' | 'Common'
+export type HomeBannerType = 'Hero'
 export type HomeBannerStatus = 'ACTIVE' | 'INACTIVE'
 
 export interface IHomeBanner extends Omit<Document, '_id'> {
   _id: string
-  productId: string
-  productSlug: string
+  redirect: string
   bannerUrl: string
   bannerType: HomeBannerType
   status: HomeBannerStatus
@@ -17,13 +16,7 @@ export interface IHomeBanner extends Omit<Document, '_id'> {
 
 const homeBannerSchema = new Schema<IHomeBanner>(
   {
-    productId: {
-      type: Schema.Types.ObjectId as unknown as typeof String,
-      ref: 'Product',
-      required: true,
-      index: true,
-    },
-    productSlug: {
+    redirect: {
       type: String,
       required: true,
       trim: true,
@@ -35,8 +28,8 @@ const homeBannerSchema = new Schema<IHomeBanner>(
     },
     bannerType: {
       type: String,
-      enum: ['Hero', 'Common'],
-      default: 'Common',
+      enum: ['Hero'],
+      default: 'Hero',
       required: true,
     },
     status: {

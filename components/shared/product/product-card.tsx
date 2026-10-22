@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Minus, Plus, Star, Trash2 } from 'lucide-react'
 
 import {
   Card,
@@ -29,6 +29,7 @@ function ProductCardImage({
   isDeal,
   discountPercent,
   wishlistItem,
+  avgRating,
 }: {
   name: string
   slug: string
@@ -37,6 +38,7 @@ function ProductCardImage({
   isDeal: boolean
   discountPercent: number
   wishlistItem: WishlistItem
+  avgRating?: number
 }) {
   return (
     <div className='relative'>
@@ -74,8 +76,18 @@ function ProductCardImage({
 
       {/* Wishlist */}
       <div className='absolute right-2 top-2 z-20'>
-        <AddToWishlist variant='overlay' item={wishlistItem} />
+        <AddToWishlist  item={wishlistItem} />
       </div>
+
+      {/* Rating badge on image (bottom-right) */}
+      {avgRating !== undefined && avgRating > 0 && (
+        <div className='absolute bottom-2 right-2 z-20 flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 shadow-sm backdrop-blur-sm'>
+          <Star className='h-3.5 w-3.5 fill-gold text-gold' />
+          <span className='text-xs font-bold text-foreground'>
+            {avgRating.toFixed(1)}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
@@ -187,6 +199,7 @@ export default function ProductCard({
           isDeal={isDeal}
           discountPercent={discountPercent}
           wishlistItem={wishlistItem}
+          avgRating={isProductData(product) ? product.avgRating : undefined}
         />
       </CardHeader>
       <CardContent className='flex-1 px-3 pb-2 pt-2'>
@@ -271,6 +284,7 @@ export function ProductCardSlider({
         isDeal={isDeal}
         discountPercent={discountPercent}
         wishlistItem={wishlistItem}
+        avgRating={product.avgRating}
       />
       {!hideDetails && (
         <div className='flex-1 p-3'>
@@ -367,6 +381,20 @@ export function CartItemRow({ item }: { item: CartItem }) {
             <Trash2 className='h-3.5 w-3.5' />
             Remove
           </button>
+
+          <div>
+            <AddToWishlist
+            item={{
+              _id: item.product,
+              name: item.name,
+              slug: item.slug,
+              price: round2(item.price),
+              image: item.image,
+              category: item.category,
+            }}
+          
+          />
+          </div>
         </div>
       </div>
 

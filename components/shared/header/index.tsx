@@ -4,6 +4,7 @@ import { getAllCategories } from '@/lib/actions/product.actions'
 import Menu from './menu'
 import Search from './search'
 import MobileSearch from './mobile-search'
+import HideOnSearch from './hide-on-search'
 import data from '@/config/data'
 import Sidebar from './sidebar'
 import { getSetting } from '@/lib/actions/setting.actions'
@@ -48,20 +49,24 @@ export default async function Header() {
             </div>
 
             {/* Center: search */}
-            <div className='hidden md:block flex-1 max-w-xl'>
-              <Search />
-            </div>
+            <HideOnSearch>
+              <div className='hidden md:block flex-1 max-w-xl'>
+                <Search />
+              </div>
+            </HideOnSearch>
 
             {/* Right: user / wishlist / cart icons */}
             <Menu />
           </div>
         </div>
         {/* Mobile search */}
-        <div className='md:hidden px-2'>
-          <MobileSearch>
-            <Search />
-          </MobileSearch>
-        </div>
+        <HideOnSearch>
+          <div className='md:hidden px-2'>
+            <MobileSearch>
+              <Search />
+            </MobileSearch>
+          </div>
+        </HideOnSearch>
       </div>
     </header>
   )

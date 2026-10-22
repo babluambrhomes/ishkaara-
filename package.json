@@ -6,6 +6,8 @@
     "email": "email dev",
     "seed": "npx tsx ./lib/db/seed.ts",
     "seed:categories": "npx tsx ./scripts/seed-categories.ts",
+    "seed:home-layouts": "npx tsx ./scripts/seed-home-layouts.ts",
+    "migrate:home-layout": "npx tsx ./scripts/migrate-home-layout.ts",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

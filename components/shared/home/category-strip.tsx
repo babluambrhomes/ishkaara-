@@ -44,7 +44,7 @@ export function CategoryStrip({ categories }: { categories: CategoryItem[] }) {
                 href={category.href}
                 className='group group/item flex flex-col items-center gap-3'
               >
-                <div className='relative aspect-square w-full overflow-hidden  border border-border/60 bg-muted'>
+                <div className='relative aspect-square w-full overflow-hidden   border border-border/60 bg-muted'>
                   <ImageHover
                     src={category.image}
                     hoverSrc={category.image}

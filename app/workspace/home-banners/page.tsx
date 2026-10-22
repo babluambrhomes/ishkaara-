@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { ChevronLeft, ChevronRight, ImageIcon, Pencil, Plus, PowerOff, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImageIcon, Pencil, Plus, PowerOff } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -50,26 +50,22 @@ import {
   deleteHomeBanner,
   getAllHomeBannersForAdmin,
   updateHomeBanner,
-  type HomeBannerWithProduct,
 } from '@/lib/actions/home-banner.actions'
-import { searchProductOptions } from '@/lib/actions/product.actions'
+import type { IHomeBanner } from '@/lib/models/home-banner.model'
 import { getImageUrl } from '@/lib/image-url'
 import { useDebouncedValue } from '@/hooks/use-debounce'
 
 const FormSchema = z.object({
-  productId: z.string().min(1, 'Select a product'),
-  productSlug: z.string().min(1, 'Select a product'),
+  redirect: z.string().min(1, 'Redirect is required'),
   bannerUrl: z.string(),
-  bannerType: z.enum(['Hero', 'Common']),
   status: z.enum(['ACTIVE', 'INACTIVE']),
   expireAt: z.string(),
 })
 
 type FormValues = z.infer<typeof FormSchema>
-type ProductOption = { _id: string; name: string; slug: string }
 
 type BannerListData = {
-  banners: HomeBannerWithProduct[]
+  banners: IHomeBanner[]
   totalPages: number
   totalBanners: number
   from: number
@@ -77,10 +73,8 @@ type BannerListData = {
 }
 
 const emptyValues: FormValues = {
-  productId: '',
-  productSlug: '',
+  redirect: '',
   bannerUrl: '',
-  bannerType: 'Hero',
   status: 'ACTIVE',
   expireAt: '',
 }
@@ -99,12 +93,7 @@ export default function WorkspaceHomeBannersPage() {
   const [isPending, startTransition] = useTransition()
   const debouncedQuery = useDebouncedValue(query, 500)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editing, setEditing] = useState<HomeBannerWithProduct | null>(null)
-  const [selectedProduct, setSelectedProduct] =
-    useState<ProductOption | null>(null)
-  const [productQuery, setProductQuery] = useState('')
-  const [productResults, setProductResults] = useState<ProductOption[]>([])
-  const [searching, setSearching] = useState(false)
+  const [editing, setEditing] = useState<IHomeBanner | null>(null)
 
   const loadData = useCallback(
     (searchQuery: string, pageNumber: number) => {
@@ -124,23 +113,6 @@ export default function WorkspaceHomeBannersPage() {
     loadData(debouncedQuery, 1)
   }, [debouncedQuery, loadData])
 
-  useEffect(() => {
-    const q = productQuery.trim()
-    if (!q) {
-      setProductResults([])
-      return
-    }
-    const timer = setTimeout(async () => {
-      setSearching(true)
-      try {
-        setProductResults(await searchProductOptions({ query: q }))
-      } finally {
-        setSearching(false)
-      }
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [productQuery])
-
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: emptyValues,
@@ -158,49 +130,26 @@ export default function WorkspaceHomeBannersPage() {
 
   const openCreate = () => {
     setEditing(null)
-    setSelectedProduct(null)
-    setProductQuery('')
-    setProductResults([])
     form.reset(emptyValues)
     setDialogOpen(true)
   }
 
-  const openEdit = (banner: HomeBannerWithProduct) => {
+  const openEdit = (banner: IHomeBanner) => {
     setEditing(banner)
-    setSelectedProduct(banner.productId ?? null)
-    setProductQuery('')
-    setProductResults([])
     form.reset({
-      productId: banner.productId?._id ?? '',
-      productSlug: banner.productSlug ?? '',
+      redirect: banner.redirect ?? '',
       bannerUrl: banner.bannerUrl ?? '',
-      bannerType: banner.bannerType,
       status: banner.status,
       expireAt: toDateInput(banner.expireAt),
     })
     setDialogOpen(true)
   }
 
-  const pickProduct = (product: ProductOption) => {
-    form.setValue('productId', product._id, { shouldValidate: true })
-    form.setValue('productSlug', product.slug, { shouldValidate: true })
-    setSelectedProduct(product)
-    setProductQuery('')
-    setProductResults([])
-  }
-
-  const clearProduct = () => {
-    form.setValue('productId', '')
-    form.setValue('productSlug', '')
-    setSelectedProduct(null)
-  }
-
   const onSubmit = async (values: FormValues) => {
     const payload = {
-      productId: values.productId,
-      productSlug: values.productSlug,
+      redirect: values.redirect,
       bannerUrl: values.bannerUrl,
-      bannerType: values.bannerType,
+      bannerType: 'Hero' as const,
       status: values.status,
       expireAt: values.expireAt ? new Date(values.expireAt) : null,
     }
@@ -235,7 +184,7 @@ export default function WorkspaceHomeBannersPage() {
             type='text'
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder='Filter product...'
+            placeholder='Filter by redirect...'
           />
           {isPending ? (
             <p className='text-sm text-muted-foreground'>Loading...</p>
@@ -270,8 +219,7 @@ export default function WorkspaceHomeBannersPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Banner</TableHead>
-                <TableHead>Product</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Redirect</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Expires</TableHead>
                 <TableHead className='w-[180px]'>Actions</TableHead>
@@ -284,7 +232,7 @@ export default function WorkspaceHomeBannersPage() {
                     {banner.bannerUrl ? (
                       <Image
                         src={getImageUrl(banner.bannerUrl)}
-                        alt={banner.productSlug}
+                        alt={banner.redirect}
                         width={80}
                         height={48}
                         className='h-12 w-20 rounded-md object-cover'
@@ -296,10 +244,7 @@ export default function WorkspaceHomeBannersPage() {
                     )}
                   </TableCell>
                   <TableCell className='font-medium'>
-                    {banner.productId?.name ?? banner.productSlug}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant='outline'>{banner.bannerType}</Badge>
+                    {banner.redirect}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -378,60 +323,22 @@ export default function WorkspaceHomeBannersPage() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-              <FormItem>
-                <FormLabel>Product</FormLabel>
-                {selectedProduct ? (
-                  <div className='flex items-center justify-between rounded-lg border border-border px-3 py-2'>
-                    <span className='text-sm font-medium'>
-                      {selectedProduct.name}
-                    </span>
-                    <button
-                      type='button'
-                      onClick={clearProduct}
-                      className='text-xs text-muted-foreground hover:text-destructive'
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : (
-                  <div className='space-y-2'>
-                    <div className='relative'>
-                      <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground' />
+              <FormField
+                control={form.control}
+                name='redirect'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Redirect URL</FormLabel>
+                    <FormControl>
                       <Input
-                        value={productQuery}
-                        onChange={(e) => setProductQuery(e.target.value)}
-                        placeholder='Search product by name...'
-                        className='pl-8'
+                        placeholder='/product/some-slug or /search?...'
+                        {...field}
                       />
-                    </div>
-                    {searching && (
-                      <p className='text-xs text-muted-foreground'>Searching...</p>
-                    )}
-                    {productResults.length > 0 && (
-                      <div className='max-h-48 overflow-y-auto rounded-lg border border-border'>
-                        {productResults.map((product) => (
-                          <button
-                            key={product._id}
-                            type='button'
-                            onClick={() => pickProduct(product)}
-                            className='flex w-full items-center justify-between px-3 py-2 text-left text-sm transition-colors hover:bg-muted'
-                          >
-                            <span className='truncate'>{product.name}</span>
-                            <span className='ml-2 shrink-0 text-xs text-muted-foreground'>
-                              {product.slug}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
-                {form.formState.errors.productId && (
-                  <p className='text-sm font-medium text-destructive'>
-                    {form.formState.errors.productId.message}
-                  </p>
-                )}
-              </FormItem>
+              />
 
               <FormField
                 control={form.control}
@@ -459,31 +366,6 @@ export default function WorkspaceHomeBannersPage() {
               <div className='grid grid-cols-2 gap-4'>
                 <FormField
                   control={form.control}
-                  name='bannerType'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select type' />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value='Hero'>Hero</SelectItem>
-                          <SelectItem value='Common'>Common</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name='status'
                   render={({ field }) => (
                     <FormItem>
@@ -506,21 +388,21 @@ export default function WorkspaceHomeBannersPage() {
                     </FormItem>
                   )}
                 />
-              </div>
 
-              <FormField
-                control={form.control}
-                name='expireAt'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Expires on (optional)</FormLabel>
-                    <FormControl>
-                      <Input type='date' {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name='expireAt'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expires on (optional)</FormLabel>
+                      <FormControl>
+                        <Input type='date' {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <DialogFooter>
                 <Button

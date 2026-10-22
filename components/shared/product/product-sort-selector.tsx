@@ -1,14 +1,6 @@
-'use client'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { getFilterUrl } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
-import React from 'react'
+import Link from 'next/link'
+
+import { cn, getFilterUrl } from '@/lib/utils'
 
 export default function ProductSortSelector({
   sortOrders,
@@ -20,33 +12,35 @@ export default function ProductSortSelector({
   params: {
     q?: string
     category?: string
+    tag?: string
     price?: string
     rating?: string
     sort?: string
     page?: string
   }
 }) {
-  const router = useRouter()
   return (
-    <Select
-      onValueChange={(v) => {
-        router.push(getFilterUrl({ params, sort: v }))
-      }}
-      value={sort}
-    >
-      <SelectTrigger>
-        <SelectValue>
-          Sort By: {sortOrders.find((s) => s.value === sort)!.name}
-        </SelectValue>
-      </SelectTrigger>
-
-      <SelectContent>
-        {sortOrders.map((s) => (
-          <SelectItem key={s.value} value={s.value}>
+    <div className='flex flex-wrap items-center gap-2'>
+      <span className='mr-1 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground'>
+        Sort by
+      </span>
+      {sortOrders.map((s) => {
+        const active = s.value === sort
+        return (
+          <Link
+            key={s.value}
+            href={getFilterUrl({ params, sort: s.value })}
+            className={cn(
+              'inline-flex items-center border px-3.5 py-1.5 text-xs font-semibold transition-colors duration-200',
+              active
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border/70 bg-white text-foreground/80 hover:border-primary/40 hover:text-primary'
+            )}
+          >
             {s.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+          </Link>
+        )
+      })}
+    </div>
   )
 }

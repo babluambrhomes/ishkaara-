@@ -191,32 +191,40 @@ export const getFilterUrl = ({
   params,
   category,
   tag,
+  brand,
   sort,
   price,
   rating,
+  size,
   page,
 }: {
   params: {
     q?: string
     category?: string
     tag?: string
+    brand?: string
     price?: string
     rating?: string
+    size?: string
     sort?: string
     page?: string
   }
   tag?: string
   category?: string
+  brand?: string
   sort?: string
   price?: string
   rating?: string
+  size?: string
   page?: string
 }) => {
   const newParams = { ...params }
   if (category) newParams.category = category
   if (tag) newParams.tag = toSlug(tag)
+  if (brand) newParams.brand = brand
   if (price) newParams.price = price
   if (rating) newParams.rating = rating
+  if (size) newParams.size = size
   if (page) newParams.page = page
   if (sort) newParams.sort = sort
   return `/search?${new URLSearchParams(newParams).toString()}`

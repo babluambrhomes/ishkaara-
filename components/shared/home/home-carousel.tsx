@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
 
 export type HeroBannerItem = {
   _id: string
-  productSlug: string
+  redirect: string
   bannerUrl: string
 }
 
@@ -44,12 +44,12 @@ export function HomeCarousel({ banners }: { banners: HeroBannerItem[] }) {
 
           return (
             <SwiperSlide key={banner._id}>
-              <Link href={`/product/${banner.productSlug}`}>
+              <Link href={banner.redirect}>
                 <div className='relative flex h-[40vh] w-full items-center justify-center bg-gradient-to-r from-primary/[0.07] via-background to-gold/10 sm:h-[30vh] md:h-[60vh]'>
                   {image ? (
                     <Image
                       src={image}
-                      alt={banner.productSlug}
+                      alt='Home banner'
                       fill
                       sizes='100vw'
                       className='object-cover '

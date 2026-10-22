@@ -2,6 +2,8 @@
 // Images point at the existing local assets in public/images so no S3/upload
 // step is required.
 
+import { type HomeLayoutType } from '../home-layout-types'
+
 export interface SeedCategory {
   name: string
   type: 'product' | 'blog'
@@ -463,96 +465,831 @@ export const products: SeedProduct[] = [
   },
 ]
 
-// Home page banners. Each banner links to a product by name, so the seed
-// resolves the Product's _id and slug when inserting.
+// Home page hero banners. Redirects are a mix of product search-filter URLs
+// and product detail URLs.
 export interface SeedBanner {
-  productName: string
+  redirect: string
   bannerUrl: string
-  bannerType: 'Hero' | 'Common'
 }
 
 export const seedBanners: SeedBanner[] = [
-  // Hero banners (top home carousel)
   {
-    productName: "Viro Men's Formal Lace-Up Shoes",
+    redirect: '/search?category=Footwear',
     bannerUrl: '/images/footwear_main_banners_web_da722e42d4.avif',
-    bannerType: 'Hero',
   },
   {
-    productName: "Allen Solly Men's Formal Trousers",
+    redirect: '/search?category=Watches&price=1000-10000',
     bannerUrl: '/images/menswear_main_banners_web_71e06f6f3f.avif',
-    bannerType: 'Hero',
   },
   {
-    productName: 'Casio Analog Dress Watch',
+    redirect: '/search?category=Women&tag=new-arrival',
     bannerUrl: '/images/watch_main_banners_web_156a722ff3.avif',
-    bannerType: 'Hero',
   },
   {
-    productName: "Libas Women's Straight Kurta Set",
+    redirect: '/search?category=Shirts&rating=4',
     bannerUrl: '/images/womenswear_main_banners_web_d97f63106e.avif',
-    bannerType: 'Hero',
   },
   {
-    productName: "Global Desi Women's Flared Top",
+    redirect: '/search?category=Handbags&sort=best-selling',
     bannerUrl: '/images/Luxe_Fest_Main_Banner_Web_0065511ae5.avif',
-    bannerType: 'Hero',
   },
   {
-    productName: "Libas Women's Daily Wear Kurta",
+    redirect: '/search?category=Kids&price=0-2000',
     bannerUrl: '/images/handbags_main_banners_web_7ab8613644.avif',
-    bannerType: 'Hero',
   },
-  // Common banners (available for campaigns / later use)
+]
+
+// Home videos. Each `videoUrl` is a direct embeddable URL rendered in an
+// iframe on the home page.
+export interface SeedVideo {
+  title?: string
+  videoUrl: string
+  order: number
+}
+
+export const seedVideos: SeedVideo[] = [
   {
-    productName: "Biba Women's Printed Kurta",
-    bannerUrl: '/images/Biba_web_eef619ca8d.avif',
-    bannerType: 'Common',
-  },
-  {
-    productName: "Juniper Women's Printed Top",
-    bannerUrl: '/images/Juniper_web_74cfa63296.avif',
-    bannerType: 'Common',
-  },
-  {
-    productName: "Libas Women's Straight Kurta Set",
-    bannerUrl: '/images/Libas_web_833d923b6e.avif',
-    bannerType: 'Common',
-  },
-  {
-    productName: "Viro Men's Formal Lace-Up Shoes",
-    bannerUrl: '/images/Footwear_web_c0d741627b.avif',
-    bannerType: 'Common',
+    title: 'Me at the zoo',
+    videoUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
+    order: 1,
   },
   {
-    productName: 'Timex Classic Watch',
-    bannerUrl: '/images/Watches_web_eac9322703.avif',
-    bannerType: 'Common',
+    title: 'Despacito',
+    videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk',
+    order: 2,
   },
   {
-    productName: "Allen Solly Men's Knit Sweater",
-    bannerUrl: '/images/Men_web_c38beabd67.avif',
-    bannerType: 'Common',
+    title: 'Gangnam Style',
+    videoUrl: 'https://www.youtube.com/embed/9bZkp7q19f0',
+    order: 3,
   },
   {
-    productName: "Libas Women's Daily Wear Kurta",
-    bannerUrl: '/images/Beauty_web_7965c69bea.avif',
-    bannerType: 'Common',
+    title: 'Bohemian Rhapsody',
+    videoUrl: 'https://www.youtube.com/embed/fJ9rUzIMcZQ',
+    order: 4,
   },
   {
-    productName: "W Women's Designer Kurta",
-    bannerUrl: '/images/Fragrance_web_a305b28e31.avif',
-    bannerType: 'Common',
+    title: 'Sample Video 1',
+    videoUrl: 'https://www.youtube.com/embed/3JZ_D3ELwOQ',
+    order: 5,
   },
   {
-    productName: "Global Desi Women's Flared Top",
-    bannerUrl: '/images/Handbags_web_7f4522f0ad.avif',
-    bannerType: 'Common',
+    title: 'Sample Video 2',
+    videoUrl: 'https://www.youtube.com/embed/LXb3EKWsInQ',
+    order: 6,
+  },
+]
+
+// Home layout sections. Each document is one home-page row with 4 cards.
+export interface SeedHomeLayoutSection {
+  name: string
+  imgurl: string[]
+  redirect: string
+  details?: string
+}
+
+export interface SeedHomeLayout {
+  title: string
+  details?: string
+  redirect: string
+  order: number
+  layout: HomeLayoutType
+  section: SeedHomeLayoutSection[]
+}
+
+export const seedHomeLayouts: SeedHomeLayout[] = [
+  {
+    title: 'Shop by Category',
+    details: 'Explore our top categories',
+    redirect: '/search',
+    order: 1,
+    layout: 'grid',
+    section: [
+      {
+        name: 'Shirts',
+        imgurl: ['/images/A25346BT01_BLACK.avif'],
+        redirect: '/search?category=Shirts',
+        details: 'Formal & casual shirts',
+      },
+      {
+        name: 'Watches',
+        imgurl: ['/images/casio_WTITWEL17202_NoColour.avif'],
+        redirect: '/search?category=Watches',
+        details: 'Analog & digital',
+      },
+      {
+        name: 'Footwear',
+        imgurl: ['/images/viro_A25VM10313570B_BLACK.avif'],
+        redirect: '/search?category=Footwear',
+        details: 'Shoes & sneakers',
+      },
+      {
+        name: 'Women',
+        imgurl: ['/images/latien_S26LQT11696_BEIGE.avif'],
+        redirect: '/search?category=Women',
+        details: 'Ethnic & western',
+      },
+      {
+        name: 'Men',
+        imgurl: ['/images/Men_web_c38beabd67.avif'],
+        redirect: '/search?category=Men',
+        details: 'Sharp casual & formal',
+      },
+      {
+        name: 'Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+        details: 'Everyday carry',
+      },
+    ],
   },
   {
-    productName: "Biba Women's Printed Kurta",
-    bannerUrl: '/images/Kashish_web_8846f46537.avif',
-    bannerType: 'Common',
+    title: "Men's Fashion",
+    details: 'Sharp looks for every occasion',
+    redirect: '/search?category=Men',
+    order: 2,
+    layout: 'featured',
+    section: [
+      {
+        name: 'Men',
+        imgurl: ['/images/allen_S26ASWRGBB01134_DARK_BLUE.avif'],
+        redirect: '/search?category=Men',
+        details: 'Curated menswear',
+      },
+      {
+        name: 'Men Shirts',
+        imgurl: ['/images/S26BITED32402RE_RED.avif'],
+        redirect: '/search?category=Shirts&tag=best-seller',
+        details: 'Best selling shirts',
+      },
+      {
+        name: 'Men Watches',
+        imgurl: ['/images/fossil_WFIFES5417I_NoColour.avif'],
+        redirect: '/search?category=Watches&brand=Fossil',
+        details: 'Premium timepieces',
+      },
+      {
+        name: 'Men Footwear',
+        imgurl: ['/images/viro_A25VM901422902_BLACK.avif'],
+        redirect: '/search?category=Footwear&sort=best-selling',
+        details: 'Top rated shoes',
+      },
+    ],
+  },
+  {
+    title: "Women's Fashion",
+    details: 'Trendsetting styles for her',
+    redirect: '/search?category=Women',
+    order: 3,
+    layout: 'horizontal',
+    section: [
+      {
+        name: 'Women Ethnic',
+        imgurl: ['/images/A26JU14035IG_INDIGO.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+        details: 'Fresh kurta sets',
+      },
+      {
+        name: 'Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+        details: 'Everyday carry',
+      },
+      {
+        name: 'Western Wear',
+        imgurl: ['/images/A26LIB56100NGE_ORANGE.avif'],
+        redirect: '/search?category=Western%20Wear',
+        details: 'Tops & dresses',
+      },
+      {
+        name: 'Women Watches',
+        imgurl: ['/images/timex_WTT95416KM02K_NoColour.avif'],
+        redirect: '/search?category=Watches&rating=4',
+        details: 'Highly rated',
+      },
+      {
+        name: 'Women Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+        details: 'Bags to match',
+      },
+      {
+        name: 'Western Wear',
+        imgurl: ['/images/category_westanwear.avif'],
+        redirect: '/search?category=Western%20Wear',
+        details: 'Denim & more',
+      },
+    ],
+  },
+  {
+    title: "Today's Deals",
+    details: 'Limited time offers',
+    redirect: '/search?tag=todays-deal',
+    order: 4,
+    layout: 'grid',
+    section: [
+      {
+        name: 'Deal Shirts',
+        imgurl: ['/images/S26BITED32484LU_BLUE.avif'],
+        redirect: '/search?category=Shirts&tag=todays-deal',
+        details: 'Save big today',
+      },
+      {
+        name: 'Deal Watches',
+        imgurl: ['/images/timex_NoColour.avif'],
+        redirect: '/search?category=Watches&tag=todays-deal',
+        details: 'Steal the deal',
+      },
+      {
+        name: 'Deal Footwear',
+        imgurl: ['/images/category_footwear.avif'],
+        redirect: '/search?category=Footwear&tag=todays-deal',
+        details: 'Under budget',
+      },
+      {
+        name: 'Deal Women',
+        imgurl: ['/images/A26LIB56076INK_PINK.avif'],
+        redirect: '/search?category=Women&tag=todays-deal',
+        details: 'Fresh discounts',
+      },
+      {
+        name: 'Deal Kids',
+        imgurl: ['/images/category_kids.avif'],
+        redirect: '/search?category=Kids&tag=todays-deal',
+        details: 'Little ones too',
+      },
+      {
+        name: 'Deal Jewellery',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Jewellery&tag=todays-deal',
+        details: 'Shine for less',
+      },
+    ],
+  },
+  {
+    title: 'New Arrivals',
+    details: 'Just landed this week',
+    redirect: '/search?tag=new-arrival',
+    order: 5,
+    layout: 'horizontal',
+    section: [
+      {
+        name: 'New Shirts',
+        imgurl: ['/images/S26LI99871AR_MUSTARD.avif'],
+        redirect: '/search?category=Shirts&tag=new-arrival',
+      },
+      {
+        name: 'New Women',
+        imgurl: ['/images/A26JU1919IN_PINK.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+      },
+      {
+        name: 'New Watches',
+        imgurl: ['/images/casio_WTITWEL17202_NoColour.avif'],
+        redirect: '/search?category=Watches&tag=new-arrival',
+      },
+      {
+        name: 'New Footwear',
+        imgurl: ['/images/category_footwear.avif'],
+        redirect: '/search?category=Footwear&tag=new-arrival',
+      },
+      {
+        name: 'New Jewellery',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Jewellery&tag=new-arrival',
+      },
+      {
+        name: 'New Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags&tag=new-arrival',
+      },
+    ],
+  },
+  {
+    title: 'Best Sellers',
+    details: 'Loved by thousands of customers',
+    redirect: '/search?sort=best-selling',
+    order: 6,
+    layout: 'featured',
+    section: [
+      {
+        name: 'Men Bestsellers',
+        imgurl: ['/images/allen_S26VHUWLPT22089_CHOCOLATE.avif'],
+        redirect: '/search?category=Men&sort=best-selling',
+      },
+      {
+        name: 'Women Bestsellers',
+        imgurl: ['/images/S25JUP1352DARK_BOTTLE_GREEN.avif'],
+        redirect: '/search?category=Women&sort=best-selling',
+      },
+      {
+        name: 'Watch Bestsellers',
+        imgurl: ['/images/fossil_WFIFES5417I_NoColour.avif'],
+        redirect: '/search?category=Watches&sort=best-selling',
+      },
+      {
+        name: 'Footwear Bestsellers',
+        imgurl: ['/images/viro_A25VM10313570B_BLACK.avif'],
+        redirect: '/search?category=Footwear&sort=best-selling',
+      },
+    ],
+  },
+  {
+    title: 'Footwear Edit',
+    details: 'Steps that make a statement',
+    redirect: '/search?category=Footwear',
+    order: 7,
+    layout: 'grid',
+    section: [
+      {
+        name: 'Under ₹999',
+        imgurl: ['/images/viro_A25VM901422902_BLACK.avif'],
+        redirect: '/search?category=Footwear&price=0-999',
+      },
+      {
+        name: '₹1000 - ₹3000',
+        imgurl: ['/images/Footwear_web_c0d741627b.avif'],
+        redirect: '/search?category=Footwear&price=1000-3000',
+      },
+      {
+        name: 'Premium',
+        imgurl: ['/images/category_footwear.avif'],
+        redirect: '/search?category=Footwear&price=3000-50000',
+      },
+      {
+        name: 'Top Rated',
+        imgurl: ['/images/footwear_main_banners_web_da722e42d4.avif'],
+        redirect: '/search?category=Footwear&rating=4',
+      },
+      {
+        name: 'Sports',
+        imgurl: ['/images/viro_A25VM10313570B_BLACK.avif'],
+        redirect: '/search?category=Footwear&sort=best-selling',
+      },
+      {
+        name: 'Formal Shoes',
+        imgurl: ['/images/A25346BT01_BLACK.avif'],
+        redirect: '/search?category=Footwear&price=3000-50000',
+      },
+    ],
+  },
+  {
+    title: 'Watch Collection',
+    details: 'Timeless pieces for every wrist',
+    redirect: '/search?category=Watches',
+    order: 8,
+    layout: 'horizontal',
+    section: [
+      {
+        name: 'Casio',
+        imgurl: ['/images/casio_WTITWEL17202_NoColour.avif'],
+        redirect: '/search?category=Watches&brand=Casio',
+      },
+      {
+        name: 'Fossil',
+        imgurl: ['/images/fossil_WFIFES5417I_NoColour.avif'],
+        redirect: '/search?category=Watches&brand=Fossil',
+      },
+      {
+        name: 'Timex',
+        imgurl: ['/images/timex_NoColour.avif'],
+        redirect: '/search?category=Watches&brand=Timex',
+      },
+      {
+        name: 'Under ₹5000',
+        imgurl: ['/images/timex_WTT95416KM02K_NoColour.avif'],
+        redirect: '/search?category=Watches&price=0-5000',
+      },
+      {
+        name: 'Premium',
+        imgurl: ['/images/Watches_web_eac9322703.avif'],
+        redirect: '/search?category=Watches&price=5000-50000',
+      },
+      {
+        name: 'Top Rated',
+        imgurl: ['/images/watch_main_banners_web_156a722ff3.avif'],
+        redirect: '/search?category=Watches&rating=4',
+      },
+    ],
+  },
+  {
+    title: 'Beauty & Fragrance',
+    details: 'Everyday indulgence',
+    redirect: '/search?category=Beauty',
+    order: 9,
+    layout: 'featured',
+    section: [
+      {
+        name: 'Beauty',
+        imgurl: ['/images/Beauty_web_7965c69bea.avif'],
+        redirect: '/search?category=Beauty',
+      },
+      {
+        name: 'Fragrance',
+        imgurl: ['/images/Fragrance_web_a305b28e31.avif'],
+        redirect: '/search?category=Fragrance',
+      },
+      {
+        name: 'Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags&price=1000-5000',
+      },
+      {
+        name: 'Jewellery',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Jewellery',
+      },
+    ],
+  },
+  {
+    title: 'Under ₹999',
+    details: 'Great style, small prices',
+    redirect: '/search?price=0-999',
+    order: 10,
+    layout: 'grid',
+    section: [
+      {
+        name: 'Shirts Under ₹999',
+        imgurl: ['/images/A25BIJAMA30042L_BLUE.avif'],
+        redirect: '/search?category=Shirts&price=0-999',
+      },
+      {
+        name: 'Women Under ₹999',
+        imgurl: ['/images/A26LIB56098ARD_MUSTARD.avif'],
+        redirect: '/search?category=Women&price=0-999',
+      },
+      {
+        name: 'Kids Under ₹999',
+        imgurl: ['/images/category_kids.avif'],
+        redirect: '/search?category=Kids&price=0-999',
+      },
+      {
+        name: 'Accessories',
+        imgurl: ['/images/A25BIASSO31415R_RED.avif'],
+        redirect: '/search?category=Jewellery&price=0-999',
+      },
+      {
+        name: 'Kids Footwear',
+        imgurl: ['/images/category_kids.avif'],
+        redirect: '/search?category=Kids&price=0-999',
+      },
+      {
+        name: 'Scarves & Caps',
+        imgurl: ['/images/A25346DR101_BLACK.avif'],
+        redirect: '/search?category=Western%20Wear&price=0-999',
+      },
+    ],
+  },
+  {
+    title: 'Trending Now',
+    details: 'What everyone is shopping for',
+    redirect: '/search',
+    order: 11,
+    layout: 'carousel',
+    section: [
+      {
+        name: 'Trending Shirts',
+        imgurl: ['/images/A25346BT01_BLACK.avif'],
+        redirect: '/search?category=Shirts',
+        details: 'Auto-playing spotlight',
+      },
+      {
+        name: 'Trending Footwear',
+        imgurl: ['/images/category_footwear.avif'],
+        redirect: '/search?category=Footwear',
+        details: 'Auto-playing spotlight',
+      },
+      {
+        name: 'Trending Watches',
+        imgurl: ['/images/casio_WTITWEL17202_NoColour.avif'],
+        redirect: '/search?category=Watches',
+        details: 'Auto-playing spotlight',
+      },
+      {
+        name: 'Trending Women',
+        imgurl: ['/images/latien_S26LQT11696_BEIGE.avif'],
+        redirect: '/search?category=Women',
+        details: 'Auto-playing spotlight',
+      },
+      {
+        name: 'Trending Ethnic',
+        imgurl: ['/images/A26JU14035IG_INDIGO.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+        details: 'Auto-playing spotlight',
+      },
+      {
+        name: 'Trending Handbags',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+        details: 'Auto-playing spotlight',
+      },
+    ],
+  },
+  {
+    title: 'Shop by Category Strip',
+    details: 'Swipe through our categories',
+    redirect: '/search',
+    order: 12,
+    layout: 'carousel-square',
+    section: [
+      {
+        name: 'Shirts',
+        imgurl: ['/images/A25346BT01_BLACK.avif'],
+        redirect: '/search?category=Shirts',
+      },
+      {
+        name: 'Watches',
+        imgurl: ['/images/fossil_WFIFES5417I_NoColour.avif'],
+        redirect: '/search?category=Watches',
+      },
+      {
+        name: 'Footwear',
+        imgurl: ['/images/viro_A25VM10313570B_BLACK.avif'],
+        redirect: '/search?category=Footwear',
+      },
+      {
+        name: 'Beauty',
+        imgurl: ['/images/Beauty_web_7965c69bea.avif'],
+        redirect: '/search?category=Beauty',
+      },
+      {
+        name: 'Jewellery',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Jewellery',
+      },
+      {
+        name: 'Fragrance',
+        imgurl: ['/images/Fragrance_web_a305b28e31.avif'],
+        redirect: '/search?category=Fragrance',
+      },
+    ],
+  },
+  {
+    title: 'Popular Picks',
+    details: 'Circular quick links',
+    redirect: '/search',
+    order: 13,
+    layout: 'carousel-circle',
+    section: [
+      {
+        name: 'Ethnic',
+        imgurl: ['/images/A26JU14035IG_INDIGO.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+      },
+      {
+        name: 'Casual',
+        imgurl: ['/images/S26BITED32402RE_RED.avif'],
+        redirect: '/search?category=Shirts',
+      },
+      {
+        name: 'Formal',
+        imgurl: ['/images/allen_S26ASWRGBB01134_DARK_BLUE.avif'],
+        redirect: '/search?category=Men',
+      },
+      {
+        name: 'Sports',
+        imgurl: ['/images/viro_A25VM901422902_BLACK.avif'],
+        redirect: '/search?category=Footwear',
+      },
+      {
+        name: 'Accessories',
+        imgurl: ['/images/A25BIASSO31415R_RED.avif'],
+        redirect: '/search?category=Jewellery',
+      },
+      {
+        name: 'Beauty',
+        imgurl: ['/images/Beauty_web_7965c69bea.avif'],
+        redirect: '/search?category=Beauty',
+      },
+      {
+        name: 'Kids',
+        imgurl: ['/images/category_kids.avif'],
+        redirect: '/search?category=Kids',
+      },
+    ],
+  },
+  {
+    title: 'The Lookbook',
+    details: 'Editorial portrait cards',
+    redirect: '/search',
+    order: 14,
+    layout: 'carousel-rectangle',
+    section: [
+      {
+        name: 'Men Editorial',
+        imgurl: ['/images/allen_S26VHUWLPT22089_CHOCOLATE.avif'],
+        redirect: '/search?category=Men',
+      },
+      {
+        name: 'Women Editorial',
+        imgurl: ['/images/S25JUP1352DARK_BOTTLE_GREEN.avif'],
+        redirect: '/search?category=Women',
+      },
+      {
+        name: 'Fragrance Edit',
+        imgurl: ['/images/Fragrance_web_a305b28e31.avif'],
+        redirect: '/search?category=Fragrance',
+      },
+      {
+        name: 'Handbag Edit',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+      },
+      {
+        name: 'Footwear Edit',
+        imgurl: ['/images/footwear_main_banners_web_da722e42d4.avif'],
+        redirect: '/search?category=Footwear',
+      },
+      {
+        name: 'Ethnic Edit',
+        imgurl: ['/images/A26LIB56100NGE_ORANGE.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+      },
+    ],
+  },
+  {
+    title: 'Moodboard',
+    details: 'A staggered wall of favourites',
+    redirect: '/search',
+    order: 15,
+    layout: 'masonry',
+    section: [
+      {
+        name: 'Mustard',
+        imgurl: ['/images/S26LI99871AR_MUSTARD.avif'],
+        redirect: '/search?category=Shirts&tag=new-arrival',
+      },
+      {
+        name: 'Pink',
+        imgurl: ['/images/A26JU1919IN_PINK.avif'],
+        redirect: '/search?category=Women',
+      },
+      {
+        name: 'Denim',
+        imgurl: ['/images/A26LIB56076INK_PINK.avif'],
+        redirect: '/search?category=Women&tag=todays-deal',
+      },
+      {
+        name: 'Navy',
+        imgurl: ['/images/S26BITED32484LU_BLUE.avif'],
+        redirect: '/search?category=Shirts&tag=todays-deal',
+      },
+      {
+        name: 'Orange',
+        imgurl: ['/images/A26LIB56100NGE_ORANGE.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+      },
+      {
+        name: 'Green',
+        imgurl: ['/images/timex_WTT95416KM02K_NoColour.avif'],
+        redirect: '/search?category=Watches',
+      },
+      {
+        name: 'Ivory',
+        imgurl: ['/images/A26LIB56098ARD_MUSTARD.avif'],
+        redirect: '/search?category=Shirts&price=0-999',
+      },
+      {
+        name: 'Blue',
+        imgurl: ['/images/A26LIB56107LUE_BLUE.avif'],
+        redirect: '/search?category=Western%20Wear',
+      },
+    ],
+  },
+  {
+    title: 'Handbag Edit',
+    details: 'Bags worth carrying',
+    redirect: '/search?category=Handbags',
+    order: 16,
+    layout: 'grid',
+    section: [
+      {
+        name: 'Everyday Tote',
+        imgurl: ['/images/Handbags_web_7f4522f0ad.avif'],
+        redirect: '/search?category=Handbags',
+        details: 'Room for everything',
+      },
+      {
+        name: 'Biba Collection',
+        imgurl: ['/images/Biba_web_eef619ca8d.avif'],
+        redirect: '/search?category=Handbags&price=1000-3000',
+        details: 'Bright everyday picks',
+      },
+      {
+        name: 'Kashish Clutches',
+        imgurl: ['/images/Kashish_web_8846f46537.avif'],
+        redirect: '/search?category=Handbags&price=0-1000',
+        details: 'Small but mighty',
+      },
+      {
+        name: 'Party Clutches',
+        imgurl: ['/images/handbags_main_banners_web_7ab8613644.avif'],
+        redirect: '/search?category=Handbags&price=3000-50000',
+        details: 'For the evening',
+      },
+      {
+        name: 'Juniper Bags',
+        imgurl: ['/images/Juniper_web_74cfa63296.avif'],
+        redirect: '/search?category=Handbags&sort=best-selling',
+        details: 'Customer favourites',
+      },
+      {
+        name: 'Bags Under ₹999',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Handbags&price=0-999',
+        details: 'Great prices',
+      },
+    ],
+  },
+  {
+    title: 'Ethnic Wear',
+    details: 'Festive favourites for her',
+    redirect: '/search?category=Women&tag=new-arrival',
+    order: 17,
+    layout: 'horizontal',
+    section: [
+      {
+        name: 'Kurtas',
+        imgurl: ['/images/A26JU14035IG_INDIGO.avif'],
+        redirect: '/search?category=Women&tag=new-arrival',
+        details: 'Indigo kurtas',
+      },
+      {
+        name: 'Palazzos',
+        imgurl: ['/images/A26JU1919IN_PINK.avif'],
+        redirect: '/search?category=Women&price=1000-3000',
+        details: 'Comfortable bottoms',
+      },
+      {
+        name: 'Kurti Sets',
+        imgurl: ['/images/S26LI99871AR_MUSTARD.avif'],
+        redirect: '/search?category=Shirts&tag=new-arrival',
+        details: 'Ready to wear',
+      },
+      {
+        name: 'Dresses',
+        imgurl: ['/images/A26LIB56100NGE_ORANGE.avif'],
+        redirect: '/search?category=Women&price=3000-50000',
+        details: 'Occasion wear',
+      },
+      {
+        name: 'Tops',
+        imgurl: ['/images/S25JUP1352DARK_BOTTLE_GREEN.avif'],
+        redirect: '/search?category=Women&price=0-999',
+        details: 'Everyday basics',
+      },
+      {
+        name: 'Sarees',
+        imgurl: ['/images/latien_S26LQT11696_BEIGE.avif'],
+        redirect: '/search?category=Women&sort=best-selling',
+        details: 'Timeless drapes',
+      },
+    ],
+  },
+  {
+    title: 'Festive Sale',
+    details: 'Limited time festive offers',
+    redirect: '/search?tag=todays-deal',
+    order: 18,
+    layout: 'carousel',
+    section: [
+      {
+        name: 'Festive Kurtas',
+        imgurl: ['/images/A26JU14035IG_INDIGO.avif'],
+        redirect: '/search?category=Women&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+      {
+        name: 'Festive Shirts',
+        imgurl: ['/images/S26BITED32402RE_RED.avif'],
+        redirect: '/search?category=Shirts&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+      {
+        name: 'Festive Footwear',
+        imgurl: ['/images/viro_A25VM901422902_BLACK.avif'],
+        redirect: '/search?category=Footwear&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+      {
+        name: 'Festive Watches',
+        imgurl: ['/images/timex_NoColour.avif'],
+        redirect: '/search?category=Watches&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+      {
+        name: 'Festive Jewellery',
+        imgurl: ['/images/category_jewellery.avif'],
+        redirect: '/search?category=Jewellery&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+      {
+        name: 'Festive Fragrance',
+        imgurl: ['/images/Fragrance_web_a305b28e31.avif'],
+        redirect: '/search?category=Fragrance&tag=todays-deal',
+        details: 'Flat discounts',
+      },
+    ],
   },
 ]
 

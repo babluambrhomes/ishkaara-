@@ -2,6 +2,10 @@ import Link from 'next/link'
 import React from 'react'
 
 import { cn, getFilterUrl } from '@/lib/utils'
+import {
+  SEARCH_RATING_OPTIONS,
+  SEARCH_SORT_ORDERS,
+} from '@/lib/search-filters'
 
 import Pagination from '@/components/shared/pagination'
 import ProductCard from '@/components/shared/product/product-card'
@@ -9,59 +13,33 @@ import ProductSortSelector from '@/components/shared/product/product-sort-select
 import Rating from '@/components/shared/product/rating'
 import CollapsibleOnMobile from '@/components/shared/collapsible-on-mobile'
 import SearchBox from '@/components/shared/search/search-box'
+import PriceRangeFilter from '@/components/shared/search/price-range-filter'
 import TagFilter from '@/components/shared/search/tag-filter'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
+  getAllBrands,
   getAllCategories,
   getAllProducts,
+  getAllSizes,
   getAllTags,
+  getPriceBounds,
 } from '@/lib/actions/product.actions'
 import { IProductDisplay } from '@/types'
 import {
-  Check,
   PackageSearch,
   RotateCcw,
-  Search,
 } from 'lucide-react'
-
-const sortOrders = [
-  { value: 'price-low-to-high', name: 'Price: Low to high' },
-  { value: 'price-high-to-low', name: 'Price: High to low' },
-  { value: 'newest-arrivals', name: 'Newest arrivals' },
-  { value: 'avg-customer-review', name: 'Avg. customer review' },
-  { value: 'best-selling', name: 'Best selling' },
-]
-
-const prices = [
-  {
-    name: '$1 to $20',
-    value: '1-20',
-  },
-  {
-    name: '$21 to $50',
-    value: '21-50',
-  },
-  {
-    name: '$51 to $1000',
-    value: '51-1000',
-  },
-]
-
-const ratingOptions = [
-  { value: '4', label: '4 & Up' },
-  { value: '3', label: '3 & Up' },
-  { value: '2', label: '2 & Up' },
-  { value: '1', label: '1 & Up' },
-]
 
 type SearchParamsShape = {
   q: string
   category: string
   tag: string
+  brand: string
   price: string
   rating: string
+  size: string
   sort: string
   page: string
 }
@@ -70,13 +48,20 @@ export async function generateMetadata(props: {
   searchParams: Promise<SearchParamsShape>
 }) {
   const searchParams = await props.searchParams
-  const { q = 'all', category = 'all', tag = 'all', price = 'all', rating = 'all' } =
-    searchParams
+  const {
+    q = 'all',
+    category = 'all',
+    tag = 'all',
+    brand = 'all',
+    price = 'all',
+    rating = 'all',
+  } = searchParams
 
   if (
     (q !== 'all' && q !== '') ||
     category !== 'all' ||
     tag !== 'all' ||
+    brand !== 'all' ||
     rating !== 'all' ||
     price !== 'all'
   ) {
@@ -84,6 +69,7 @@ export async function generateMetadata(props: {
       title: `Search ${q !== 'all' ? q : ''}
         ${category !== 'all' ? ` : Category ${category}` : ''}
         ${tag !== 'all' ? ` : Tag ${tag}` : ''}
+        ${brand !== 'all' ? ` : Brand ${brand}` : ''}
         ${price !== 'all' ? ` : Price ${price}` : ''}
         ${rating !== 'all' ? ` : Rating ${rating}` : ''}`,
     }
@@ -128,7 +114,7 @@ const FilterLink = ({
     )}
   >
     {children}
-    {active && <Check className='h-3.5 w-3.5 text-primary' />}
+    
   </Link>
 )
 
@@ -141,22 +127,29 @@ export default async function SearchPage(props: {
     q = 'all',
     category = 'all',
     tag = 'all',
+    brand = 'all',
     price = 'all',
     rating = 'all',
+    size = 'all',
     sort = 'best-selling',
     page = '1',
   } = searchParams
 
-  const params = { q, category, tag, price, rating, sort, page }
+  const params = { q, category, tag, brand, price, rating, size, sort, page }
 
   const categories = await getAllCategories()
-  const tags = await getAllTags()
+  const tags = await getAllTags({ category })
+  const brands = await getAllBrands({ category })
+  const sizes = await getAllSizes({ category })
+  const priceBounds = await getPriceBounds()
   const data = await getAllProducts({
     category,
     tag,
+    brand,
     query: q,
     price,
     rating,
+    size,
     page: Number(page),
     sort,
   })
@@ -166,10 +159,12 @@ export default async function SearchPage(props: {
     hasSearch ||
     (category !== 'all' && category !== '') ||
     (tag !== 'all' && tag !== '') ||
+    brand !== 'all' ||
     price !== 'all' ||
-    rating !== 'all'
+    rating !== 'all' ||
+    size !== 'all'
 
-  const { totalProducts, totalPages, from, to } = data
+  const { totalProducts, totalPages } = data
 
   return (
     <div>
@@ -192,6 +187,13 @@ export default async function SearchPage(props: {
             <div className='flex-1'>
               <SearchBox defaultValue={hasSearch ? q : ''} />
             </div>
+          </div>
+          <div className='mt-4'>
+            <ProductSortSelector
+              sortOrders={SEARCH_SORT_ORDERS}
+              sort={sort}
+              params={params}
+            />
           </div>
         </div>
       </div>
@@ -221,8 +223,8 @@ export default async function SearchPage(props: {
                 </div>
 
                 <div className='space-y-5'>
-                  <FilterSection title='Department'>
-                    <ul className='space-y-0.5'>
+                  <FilterSection title='Category'>
+                    <ul className='space-y-0.5 flex flex-wrap gap-2'>
                       <li>
                         <FilterLink
                           href={getFilterUrl({ category: 'all', params })}
@@ -246,27 +248,38 @@ export default async function SearchPage(props: {
 
                   <Separator />
 
-                  <FilterSection title='Price'>
-                    <ul className='space-y-0.5'>
+                  <FilterSection title='Brand'>
+                    <ul className='space-y-0.5 flex flex-wrap gap-2'>
                       <li>
                         <FilterLink
-                          href={getFilterUrl({ price: 'all', params })}
-                          active={price === 'all'}
+                          href={getFilterUrl({ brand: 'all', params })}
+                          active={brand === 'all' || brand === ''}
                         >
                           All
                         </FilterLink>
                       </li>
-                      {prices.map((p) => (
-                        <li key={p.value}>
+                      {brands.map((b) => (
+                        <li key={b}>
                           <FilterLink
-                            href={getFilterUrl({ price: p.value, params })}
-                            active={price === p.value}
+                            href={getFilterUrl({ brand: b, params })}
+                            active={b === brand}
                           >
-                            {p.name}
+                            {b}
                           </FilterLink>
                         </li>
                       ))}
                     </ul>
+                  </FilterSection>
+
+                  <Separator />
+
+                  <FilterSection title='Price'>
+                    <PriceRangeFilter
+                      min={priceBounds.min}
+                      max={priceBounds.max}
+                      value={price}
+                      params={params}
+                    />
                   </FilterSection>
 
                   <Separator />
@@ -281,7 +294,7 @@ export default async function SearchPage(props: {
                           All
                         </FilterLink>
                       </li>
-                      {ratingOptions.map((r) => (
+                      {SEARCH_RATING_OPTIONS.map((r) => (
                         <li key={r.value}>
                           <FilterLink
                             href={getFilterUrl({ rating: r.value, params })}
@@ -291,6 +304,31 @@ export default async function SearchPage(props: {
                               <Rating rating={Number(r.value)} size={4} />
                               {r.label}
                             </span>
+                          </FilterLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </FilterSection>
+
+                  <Separator />
+
+                  <FilterSection title='Size'>
+                    <ul className='space-y-0.5 flex flex-wrap gap-2'>
+                      <li>
+                        <FilterLink
+                          href={getFilterUrl({ size: 'all', params })}
+                          active={size === 'all' || size === ''}
+                        >
+                          All
+                        </FilterLink>
+                      </li>
+                      {sizes.map((s) => (
+                        <li key={s}>
+                          <FilterLink
+                            href={getFilterUrl({ size: s, params })}
+                            active={s === size}
+                          >
+                            {s}
                           </FilterLink>
                         </li>
                       ))}
@@ -309,27 +347,9 @@ export default async function SearchPage(props: {
 
           {/* Results */}
           <div className='space-y-5'>
-            <div className='flex flex-col gap-3 rounded-2xl border border-border/60 bg-card px-5 py-4  sm:flex-row sm:items-center sm:justify-between'>
-              <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                <Search className='h-4 w-4 text-primary' />
-                <span>
-                  Showing{' '}
-                  <span className='font-semibold text-foreground'>
-                    {totalProducts === 0 ? 0 : `${from}-${to}`}
-                  </span>{' '}
-                  of{' '}
-                  <span className='font-semibold text-foreground'>
-                    {totalProducts}
-                  </span>{' '}
-                  results
-                </span>
-              </div>
-              <ProductSortSelector
-                sortOrders={sortOrders}
-                sort={sort}
-                params={params}
-              />
-            </div>
+          
+
+           
 
             {totalProducts === 0 ? (
               <Card className='rounded-2xl border-border/60 '>

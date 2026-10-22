@@ -1,21 +1,26 @@
 import { Document, Model, model, models, Schema } from 'mongoose'
+import {
+  HOME_LAYOUT_TYPES,
+  type HomeLayoutType,
+} from '@/lib/home-layout-types'
 
-export interface IHomeFilterSection {
+export interface IHomeLayoutSection {
   name?: string
   imgurl: string[]
   redirect: string
   details?: string
 }
 
-export interface IHomeFilter extends Document {
+export interface IHomeLayout extends Document {
   title?: string
-  section: IHomeFilterSection[]
+  section: IHomeLayoutSection[]
   redirect?: string
   order: number
   details?: string
+  layout: HomeLayoutType
 }
 
-const homeFilterSectionSchema = new Schema<IHomeFilterSection>(
+const homeLayoutSectionSchema = new Schema<IHomeLayoutSection>(
   {
     name: {
       type: String,
@@ -38,14 +43,14 @@ const homeFilterSectionSchema = new Schema<IHomeFilterSection>(
   { _id: false }
 )
 
-const homeFilterSchema = new Schema<IHomeFilter>(
+const homeLayoutSchema = new Schema<IHomeLayout>(
   {
     title: {
       type: String,
       trim: true,
     },
     section: {
-      type: [homeFilterSectionSchema],
+      type: [homeLayoutSectionSchema],
       default: [],
     },
     redirect: {
@@ -61,14 +66,20 @@ const homeFilterSchema = new Schema<IHomeFilter>(
       type: String,
       trim: true,
     },
+    layout: {
+      type: String,
+      enum: [...HOME_LAYOUT_TYPES],
+      default: 'grid',
+      required: true,
+    },
   },
   { timestamps: true }
 )
 
-homeFilterSchema.index({ order: 1 })
+homeLayoutSchema.index({ order: 1 })
 
-const HomeFilter =
-  (models.HomeFilter as Model<IHomeFilter>) ||
-  model<IHomeFilter>('HomeFilter', homeFilterSchema)
+const HomeLayout =
+  (models.HomeLayout as Model<IHomeLayout>) ||
+  model<IHomeLayout>('HomeLayout', homeLayoutSchema)
 
-export default HomeFilter
+export default HomeLayout

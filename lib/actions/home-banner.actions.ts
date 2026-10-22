@@ -2,7 +2,6 @@
 
 import { connectToDatabase } from '@/config/db'
 import HomeBanner, { IHomeBanner } from '@/lib/models/home-banner.model'
-import Product from '@/lib/models/product.model'
 import { revalidatePath } from 'next/cache'
 import { formatError } from '../utils'
 import { HomeBannerInputSchema, HomeBannerUpdateSchema } from '../validator'
@@ -48,8 +47,7 @@ export async function updateHomeBanner(
     await connectToDatabase()
     const banner = await HomeBanner.findById(values._id)
     if (!banner) throw new Error('Home banner not found')
-    banner.productId = values.productId
-    banner.productSlug = values.productSlug
+    banner.redirect = values.redirect
     banner.bannerUrl = values.bannerUrl
     banner.bannerType = values.bannerType
     banner.status = values.status
@@ -90,11 +88,7 @@ export async function deactivateHomeBanner(id: string) {
   }
 }
 
-export type HomeBannerWithProduct = Omit<IHomeBanner, 'productId'> & {
-  productId: { _id: string; name: string; slug: string } | null
-}
-
-// GET ALL FOR ADMIN (paginated, product populated with name/slug)
+// GET ALL FOR ADMIN (paginated)
 export async function getAllHomeBannersForAdmin({
   query = '',
   page = 1,
@@ -113,16 +107,10 @@ export async function getAllHomeBannersForAdmin({
 
   const filters: Record<string, unknown> = {}
   if (query && query !== 'all') {
-    const regex = new RegExp(query, 'i')
-    const products = await Product.find({ name: regex }, { _id: 1 }).lean()
-    filters.$or = [
-      { productSlug: regex },
-      { productId: { $in: products.map((product) => product._id) } },
-    ]
+    filters.redirect = new RegExp(query, 'i')
   }
 
   const banners = await HomeBanner.find(filters)
-    .populate('productId', 'name slug')
     .sort({ createdAt: -1 })
     .skip(limit * (Number(page) - 1))
     .limit(limit)
@@ -130,7 +118,7 @@ export async function getAllHomeBannersForAdmin({
   const countBanners = await HomeBanner.countDocuments(filters)
 
   return {
-    banners: JSON.parse(JSON.stringify(banners)) as HomeBannerWithProduct[],
+    banners: JSON.parse(JSON.stringify(banners)) as IHomeBanner[],
     totalPages: Math.ceil(countBanners / limit),
     totalBanners: countBanners,
     from: limit * (Number(page) - 1) + 1,
@@ -151,20 +139,6 @@ export async function getActiveHeroBanners({
   })
     .sort({ createdAt: -1 })
     .limit(limit)
-    .lean()
-  return JSON.parse(JSON.stringify(banners)) as IHomeBanner[]
-}
-
-// GET ACTIVE COMMON BANNERS (shown randomly on the public home page)
-export async function getActiveCommonBanners(): Promise<IHomeBanner[]> {
-  await connectToDatabase()
-  const now = new Date()
-  const banners = await HomeBanner.find({
-    bannerType: 'Common',
-    status: 'ACTIVE',
-    $or: [{ expireAt: null }, { expireAt: { $gt: now } }],
-  })
-    .sort({ createdAt: -1 })
     .lean()
   return JSON.parse(JSON.stringify(banners)) as IHomeBanner[]
 }
