@@ -421,25 +421,6 @@ export const HomeLayoutUpdateSchema = HomeLayoutInputSchema.extend({
   _id: z.string(),
 })
 
-// VIDEO
-export const VideoInputSchema = z.object({
-  title: optionalText(2, 80, 'Title must be at least 2 characters', 'Title must be at most 80 characters'),
-  videoUrl: z.string().min(1, 'Video ID or URL is required').trim(),
-  status: z.enum(['ACTIVE', 'INACTIVE']).default('ACTIVE'),
-  expireAt: z
-    .preprocess(
-      (v) => (v === '' || v === undefined ? null : v),
-      z.union([z.coerce.date(), z.null()])
-    )
-    .default(null),
-  order: z.coerce.number().int().min(0, 'Order must be at least 0').default(0),
-})
-
-export const VideoUpdateSchema = VideoInputSchema.extend({
-  _id: z.string(),
-})
-
-
 // WEBPAGE
 export const WebPageInputSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),

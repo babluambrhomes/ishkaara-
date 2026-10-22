@@ -37,10 +37,12 @@ export function RedirectFilterBuilder({
   value,
   onChange,
   label = 'Redirect URL',
+  placeholder = 'e.g. /search?category=Shirts',
 }: {
   value: string
   onChange: (url: string) => void
   label?: string
+  placeholder?: string
 }) {
   const [builder, setBuilder] = useState<BuilderState>(() =>
     parseSearchUrl(value)
@@ -284,7 +286,7 @@ export function RedirectFilterBuilder({
       </div>
 
       <Input
-        placeholder='e.g. /search?category=Shirts'
+        placeholder={placeholder}
         value={value}
         onChange={(e) => onManualChange(e.target.value)}
       />

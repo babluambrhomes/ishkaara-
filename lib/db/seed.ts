@@ -17,7 +17,7 @@ import {
   reviewTemplates,
   seedBanners,
   seedHomeLayouts,
-  seedVideos,
+ 
   users,
   type SeedCategory,
 } from './seed-data'
@@ -48,7 +48,7 @@ async function main() {
   const { default: User } = await import('../models/user.model')
   const { default: HomeBanner } = await import('../models/home-banner.model')
   const { default: HomeLayout } = await import('../models/home-layout.model')
-  const { default: Video } = await import('../models/video.model')
+ 
 
   await connectToDatabase()
   console.log('Connected to MongoDB')
@@ -62,10 +62,10 @@ async function main() {
     Coupon.deleteMany({}),
     HomeBanner.deleteMany({}),
     HomeLayout.deleteMany({}),
-    Video.deleteMany({}),
+
   ])
   console.log(
-    'Cleared reviews, products, blog posts, categories, coupons, home banners, home layouts and videos'
+    'Cleared reviews, products, blog posts, categories, coupons, home banners, home layouts '
   )
 
   const createCategories = async (items: SeedCategory[]) => {
@@ -142,17 +142,7 @@ async function main() {
   )
   console.log(`Created ${seedHomeLayouts.length} home layouts`)
 
-  // Home videos (direct embed URLs).
-  await Video.create(
-    seedVideos.map((video) => ({
-      title: video.title,
-      videoUrl: video.videoUrl,
-      status: 'ACTIVE',
-      expireAt: null,
-      order: video.order,
-    }))
-  )
-  console.log(`Created ${seedVideos.length} videos`)
+ 
 
   // Seed a deterministic sample of reviews per product and roll the ratings up
   // onto the product document, mirroring updateProductReview.

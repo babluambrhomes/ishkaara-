@@ -12,7 +12,7 @@ import { auth } from '@/auth'
 import { isStaffRole } from '@/lib/roles'
 import { getSetting } from './setting.actions'
 import { getActiveHeroBanners } from './home-banner.actions'
-import { getActiveVideos } from './video.actions'
+
 import { getHomeLayouts } from './home-layout.actions'
 import {
   toPublicProduct,
@@ -225,18 +225,18 @@ export async function getProductsByTag({
 // AGGREGATED HOME PAGE DATA (single entry point for the home page)
 export async function getHomePageData() {
   await connectToDatabase()
-  const [heroBanners, categories, homeLayouts, videos] = await Promise.all([
-    getActiveHeroBanners({ limit: 6 }),
+  const [heroBanners, categories, homeLayouts] = await Promise.all([
+    getActiveHeroBanners({ limit: 10 }),
     getAllCategories(),
     getHomeLayouts(),
-    getActiveVideos(),
+   
   ])
 
   return {
     heroBanners,
     categories,
     homeLayouts,
-    videos,
+   
   }
 }
 

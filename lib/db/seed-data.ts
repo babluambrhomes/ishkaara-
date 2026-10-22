@@ -499,46 +499,7 @@ export const seedBanners: SeedBanner[] = [
   },
 ]
 
-// Home videos. Each `videoUrl` is a direct embeddable URL rendered in an
-// iframe on the home page.
-export interface SeedVideo {
-  title?: string
-  videoUrl: string
-  order: number
-}
 
-export const seedVideos: SeedVideo[] = [
-  {
-    title: 'Me at the zoo',
-    videoUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
-    order: 1,
-  },
-  {
-    title: 'Despacito',
-    videoUrl: 'https://www.youtube.com/embed/kJQP7kiw5Fk',
-    order: 2,
-  },
-  {
-    title: 'Gangnam Style',
-    videoUrl: 'https://www.youtube.com/embed/9bZkp7q19f0',
-    order: 3,
-  },
-  {
-    title: 'Bohemian Rhapsody',
-    videoUrl: 'https://www.youtube.com/embed/fJ9rUzIMcZQ',
-    order: 4,
-  },
-  {
-    title: 'Sample Video 1',
-    videoUrl: 'https://www.youtube.com/embed/3JZ_D3ELwOQ',
-    order: 5,
-  },
-  {
-    title: 'Sample Video 2',
-    videoUrl: 'https://www.youtube.com/embed/LXb3EKWsInQ',
-    order: 6,
-  },
-]
 
 // Home layout sections. Each document is one home-page row with 4 cards.
 export interface SeedHomeLayoutSection {

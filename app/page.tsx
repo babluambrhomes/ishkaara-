@@ -9,10 +9,11 @@ import { getHomePageData } from '@/lib/actions/product.actions'
 import { toSlug } from '@/lib/utils'
 import RelatedToViewed from '@/components/shared/related-to-viewed'
 import OurUsps from '@/components/shared/home/our-usps'
-import VideoSection from '@/components/shared/home/video-section'
+
+
 
 export default async function HomePage() {
-  const { heroBanners, categories, homeLayouts, videos } =
+  const { heroBanners, categories, homeLayouts } =
     await getHomePageData()
 
   const cardCategories = categories.map((category) => ({
@@ -27,11 +28,7 @@ export default async function HomePage() {
       <div className='flex-1 flex flex-col gap-6 p-3 '>
         <HomeCarousel banners={heroBanners} />
         <CategoryStrip categories={cardCategories} />
-        
         <HomeLayoutSection layouts={homeLayouts} />
-
-        <VideoSection videos={videos} />
-
         <RelatedToViewed />
         <BrowsingHistory />
         <OurUsps />

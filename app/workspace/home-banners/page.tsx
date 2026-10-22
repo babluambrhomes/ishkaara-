@@ -43,6 +43,7 @@ import {
 } from '@/components/ui/table'
 import DeleteDialog from '@/components/shared/delete-dialog'
 import { ImageUpload } from '@/components/shared/image-upload'
+import { RedirectFilterBuilder } from '@/components/shared/redirect-filter-builder'
 import { useToast } from '@/hooks/use-toast'
 import {
   createHomeBanner,
@@ -314,7 +315,7 @@ export default function WorkspaceHomeBannersPage() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className='max-w-lg'>
+        <DialogContent className='max-w-3xl'>
           <DialogHeader>
             <DialogTitle>
               {editing ? 'Edit Banner' : 'Create Banner'}
@@ -328,13 +329,12 @@ export default function WorkspaceHomeBannersPage() {
                 name='redirect'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Redirect URL</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='/product/some-slug or /search?...'
-                        {...field}
-                      />
-                    </FormControl>
+                    <RedirectFilterBuilder
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      label='Redirect URL'
+                      placeholder='/product/some-slug or /search?...'
+                    />
                     <FormMessage />
                   </FormItem>
                 )}
